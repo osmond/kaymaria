@@ -55,7 +55,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🎉 **Completion Feedback** – Subtle check animation and timestamp confirmation when tasks are marked done
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
-- ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care
+- 📜 **Global Timeline** – View all plant care events in a chronological feed
 - 🔁 **Timeline Task Actions** – Complete tasks directly from the timeline with undo support
 - 📸 **Photo Gallery** – View plant photos over time to track growth
 - 🌿 **Plant Detail Hero** – Large photo banner with species and acquisition date

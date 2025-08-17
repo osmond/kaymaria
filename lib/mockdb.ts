@@ -315,6 +315,14 @@ export function getRule(plantId: string, type: CareType): Rule | undefined {
   return p?.rules.find(r => r.type === type);
 }
 
+export function listEvents(days: number): (Event & { plantName: string })[] {
+  const cutoff = Date.now() - days * 864e5;
+  return EVENTS
+    .filter(e => new Date(e.at).getTime() >= cutoff)
+    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+    .map(e => ({ ...e, plantName: getPlant(e.plantId)?.name || "Unknown" }));
+}
+
 // ----- Notes helpers -----
 export function addNote(plantId: string, text: string): Note {
   const note: Note = {

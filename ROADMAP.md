@@ -109,7 +109,7 @@ All items are **unchecked** to indicate upcoming work.
 
 ## Phase 3 – Journaling & History
 
-- [ ] Timeline view of all plant care events
+- [x] Timeline view of all plant care events
 - [ ] Filter by event type (water, fertilize, etc.)
 - [ ] Add plant photo journal entries
 - [ ] Mood/notes tagging per entry

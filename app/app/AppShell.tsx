@@ -88,10 +88,11 @@ function CompleteFlash() {
 }
 
 type PlantListItem = { id: string; name: string; roomId?: string };
+type EventDTO = { id: string; plantId: string; plantName: string; type: "water" | "fertilize" | "repot"; at: string };
 
-export default function AppShell({ initialView }:{ initialView?: "today"|"plants"|"insights"|"settings" }) {
-  type View = "today" | "plants" | "insights" | "settings";
-  const [view, setView] = useState<View>("today");
+export default function AppShell({ initialView }:{ initialView?: "today"|"timeline"|"plants"|"insights"|"settings" }) {
+  type View = "today" | "timeline" | "plants" | "insights" | "settings";
+  const [view, setView] = useState<View>(initialView ?? "today");
   const [homeTab, setHomeTab] = useState<"today" | "upcoming">("today");
 
   // modals
@@ -113,6 +114,11 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
   const [tasks, setTasks] = useState<TaskDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  // events list for Timeline tab
+  const [events, setEvents] = useState<EventDTO[]>([]);
+  const [eventsErr, setEventsErr] = useState<string | null>(null);
+  const [eventsLoading, setEventsLoading] = useState(false);
 
   // plants list for Plants tab
   const [plants, setPlants] = useState<PlantListItem[]>([]);
@@ -169,6 +175,22 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
   }
   useEffect(() => {
     refresh();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setEventsLoading(true);
+        setEventsErr(null);
+        const r = await fetch(`/api/events?window=30d`, { cache: "no-store" });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        setEvents(await r.json());
+      } catch (e: any) {
+        setEventsErr(e?.message || "Failed to load");
+      } finally {
+        setEventsLoading(false);
+      }
+    })();
   }, []);
 
   // Load plants list once we first visit the Plants tab
@@ -590,6 +612,31 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
                 No upcoming tasks
               </div>
             )}
+          </section>
+        )}
+
+        {view === "timeline" && (
+          <section className="mt-4 rounded-xl border bg-white shadow-sm">
+            <div className="px-4 py-3 border-b">
+              <div className="text-base font-medium">Timeline</div>
+              <div className="text-xs text-neutral-500">Recent care events</div>
+            </div>
+            <ul className="text-sm px-4 py-2">
+              {eventsErr && <li className="py-3 text-red-600">{eventsErr}</li>}
+              {!eventsErr && eventsLoading && (
+                <li className="py-3 text-neutral-500">Loading…</li>
+              )}
+              {!eventsErr && !eventsLoading && events.length === 0 && (
+                <li className="py-3 text-neutral-500">No events</li>
+              )}
+              {!eventsErr &&
+                events.map((e) => (
+                  <li key={e.id} className="py-3 border-b last:border-b-0">
+                    <span className="font-medium">{e.plantName}</span> — {pastTenseLabel(e.type)}
+                    <span className="text-neutral-500"> {timeAgo(new Date(e.at))}</span>
+                  </li>
+                ))}
+            </ul>
           </section>
         )}
 

@@ -1,10 +1,10 @@
 "use client";
 import * as React from "react";
 
-import { Leaf, Sprout, BarChart3, Cog } from "lucide-react";
+import { Leaf, Sprout, BarChart3, Cog, History } from "lucide-react";
 
 
-export type Tab = "today" | "plants" | "insights" | "settings";
+export type Tab = "today" | "timeline" | "plants" | "insights" | "settings";
 
 export default function BottomNav({
   value,
@@ -43,9 +43,10 @@ export default function BottomNav({
       className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="max-w-screen-sm mx-auto grid grid-cols-4">
+      <div className="max-w-screen-sm mx-auto grid grid-cols-5">
 
         <Item tab="today" label="Today" icon={<Leaf />} />
+        <Item tab="timeline" label="Timeline" icon={<History />} />
         <Item tab="plants" label="Plants" icon={<Sprout />} />
         <Item tab="insights" label="Insights" icon={<BarChart3 />} />
         <Item tab="settings" label="Settings" icon={<Cog />} />
