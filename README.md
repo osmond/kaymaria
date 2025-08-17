@@ -162,5 +162,18 @@ curl -X POST http://localhost:3000/api/ai/care-recommend \\
 
 This returns JSON with recommended `water`, `fertilizer`, `light`, and `repot` fields.
 
-Include the optional `season` and `location` fields to tailor care advice to the time of year and environment. If omitted, the current season is used and location defaults to `unspecified`.
+Include optional fields:
+
+- `season` and `location` to tailor care advice to the time of year and environment. If omitted, the current season is used and location defaults to `unspecified`.
+- `feedback` to tweak future recommendations based on previous guidance (e.g. `"too much water"`).
+
+Example with feedback:
+
+```bash
+curl -X POST http://localhost:3000/api/ai/care-recommend \\
+  -H 'Content-Type: application/json' \\
+  -d '{"species":"Monstera deliciosa","feedback":"too much water"}'
+```
+
+The feedback is included in the AI prompt so new suggestions are adjusted accordingly.
 

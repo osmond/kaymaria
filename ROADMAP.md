@@ -92,7 +92,7 @@ All items are **unchecked** to indicate upcoming work.
   - [x] Fertilizer type and frequency
   - [x] Light level requirements
   - [x] Repotting schedule
-- [ ] Input factors for recommendations:
+- [x] Input factors for recommendations:
   - [x] Pot size
   - [x] Pot material
   - [x] Soil type
@@ -100,9 +100,9 @@ All items are **unchecked** to indicate upcoming work.
   - [x] Room humidity
   - [x] Seasonal changes
   - [x] Plant location (room/outdoor/etc.)
-- [ ] Learn from user input:
-  - [ ] Feedback (e.g. “too much water”)
-  - [ ] Adjust future care suggestions
+- [x] Learn from user input:
+  - [x] Feedback (e.g. “too much water”)
+  - [x] Adjust future care suggestions
 - [ ] Long-term idea: fine-tune a model using user care logs
 
 ---
