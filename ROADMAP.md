@@ -35,7 +35,7 @@ All items are **unchecked** to indicate upcoming work.
 - [x] **Upcoming view**: Show tasks due in the next 7 days (or a configurable range)
 - [x] **Group tasks by plant**: Visual hierarchy that nests or groups tasks under each plant
 - [x] **Sort by urgency**: Sort tasks by due date/time within each plant group
-- [ ] **Task icons**: Use visual icons (💧 Water, 🌱 Fertilize, 🪴 Repot) for quick scanning
+- [x] **Task icons**: Use visual icons (💧 Water, 🌱 Fertilize, 🪴 Repot) for quick scanning
 - [ ] **Quick Notes**: Allow inline note-taking for a plant directly from the task card (e.g., "drooping today" or "spotted new growth")
 - [ ] **Inline task actions**:
   - [ ] Mark as done (with subtle animation or feedback)
