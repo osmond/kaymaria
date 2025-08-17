@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
       name: body?.name || "New Plant",
       roomId: body?.room ?? body?.roomId,
       species: body?.species,
+      potSize: body?.potSize,
       rules: Array.isArray(body?.rules)
         ? body.rules.map((r: any) => ({
             type: r?.type,
