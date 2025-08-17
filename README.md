@@ -50,6 +50,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🔍 **Task Type Filters** – Filter tasks by action (water, fertilize, repot)
 - ⏰ **Overdue/Urgent Filters** – Show only overdue tasks or those due soon
 - 📝 **Quick Notes** – Jot down observations directly from any task card
+- 🤏 **Gesture Support** – Swipe tasks to complete or edit; long-press to add notes or photos
 - ✅ **Inline Task Actions** – Mark tasks done, defer them, or edit details without leaving the dashboard
 - 🎉 **Completion Feedback** – Subtle check animation and timestamp confirmation when tasks are marked done
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
