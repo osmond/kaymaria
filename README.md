@@ -112,3 +112,17 @@ curl -X POST http://localhost:3000/api/plants \\
   -d '{"name":"Palm","rules":[{"type":"water","intervalDays":5},{"type":"fertilize","intervalDays":30}]}'
 ```
 
+## ✅ Task API
+
+Tasks represent upcoming care actions for your plants. Completed tasks automatically log an event and schedule the next one based on your plant's care rules.
+
+- `GET /api/tasks` – list tasks due in the next 7 days (`?window=14d` for a different range)
+- `POST /api/tasks` – create a new task
+- `PATCH /api/tasks/:id` – mark a task complete and record the event
+
+Example:
+
+```bash
+curl -X PATCH http://localhost:3000/api/tasks/t_<uuid>
+```
+

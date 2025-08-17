@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { completeTask } from "@/lib/mockdb";
+import { completeTask, addEvent, CareType } from "@/lib/mockdb";
 import { touchWatered } from "@/lib/plantstore";
 
 // Accept both "t_<uuid>" and "plantId:type" (e.g. "p3:water")
@@ -11,20 +11,24 @@ export async function PATCH(
 
   const id = decodeURIComponent(params.id);
 
-  // If composite id "plantId:type", also update plant lastWaterAt
+  // Try to find and remove a matching task
+  const rec = completeTask(id);
+  if (rec) {
+    if (rec.type === "water") touchWatered(rec.plantId);
+    addEvent(rec.plantId, rec.type);
+    return NextResponse.json({ ok: true });
+  }
+
+  // If composite id "plantId:type", schedule next task even if no mock task existed
   if (id.includes(":")) {
     const [plantId, type] = id.split(":");
     if (!plantId || !type) {
       return NextResponse.json({ error: "bad id" }, { status: 400 });
     }
     if (type === "water") touchWatered(plantId);
-    // Also try to remove task if it matches any mock task id
-    completeTask(id);
+    addEvent(plantId, type as CareType);
     return NextResponse.json({ ok: true });
   }
 
-  // Normal task id
-  const ok = completeTask(id);
-  if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ error: "Not found" }, { status: 404 });
 }
