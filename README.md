@@ -51,6 +51,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - ⏰ **Overdue/Urgent Filters** – Show only overdue tasks or those due soon
 - 📝 **Quick Notes** – Jot down observations directly from any task card
 - ✅ **Inline Task Actions** – Mark tasks done, defer them, or edit details without leaving the dashboard
+- 🎉 **Completion Feedback** – Subtle check animation and timestamp confirmation when tasks are marked done
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care

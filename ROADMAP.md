@@ -66,9 +66,9 @@ All items are **unchecked** to indicate upcoming work.
   - [x] **Timeline**: List of all completed and upcoming care tasks
   - [x] **Notes**: Free-form journaling or text entries
   - [x] **Photos**: A visual gallery of growth over time
-- [ ] **Task completion feedback**:
-  - [ ] Add a subtle animation when a task is marked done. don't use emojis
-  - [ ] Temporary confirmation message (e.g., “Watered!” with timestamp)
+- [x] **Task completion feedback**:
+  - [x] Add a subtle animation when a task is marked done. don't use emojis
+  - [x] Temporary confirmation message (e.g., “Watered!” with timestamp)
 - [ ] **Inline “Mark as Done” on Timeline**:
   - [ ] Let users complete tasks directly from the timeline view
   - [ ] Support undo in case of accidental tap
