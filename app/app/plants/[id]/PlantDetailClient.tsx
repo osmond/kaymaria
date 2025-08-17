@@ -5,6 +5,7 @@ import type { Tab } from '@/components/BottomNav';
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, Droplet, FlaskConical, Sprout } from "lucide-react";
 import BottomNav from '@/components/BottomNav';
 
 type CareType = "water" | "fertilize" | "repot";
@@ -78,6 +79,18 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
     } catch { /* keep UX smooth in mock */ }
   };
 
+
+  const iconFor = (type: CareType) => {
+    const className = "inline h-4 w-4";
+    switch (type) {
+      case "water":
+        return <Droplet className={className} />;
+      case "fertilize":
+        return <FlaskConical className={className} />;
+      default:
+        return <Sprout className={className} />;
+    }
+
   const addNote = async () => {
     const text = noteText.trim();
     if (!text) return;
@@ -92,6 +105,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       setNotes((n) => [rec, ...n]);
       setNoteText("");
     } catch {}
+
   };
 
   return (
@@ -100,7 +114,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       <header className="px-4 pt-6 pb-2 sticky top-0 bg-white/90 backdrop-blur border-b">
         <div className="flex items-center gap-2">
           <Link href="/app" aria-label="Back" className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100">
-            <span className="text-lg leading-none">←</span>
+            <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-baseline justify-between w-full">
             <h1 className="text-xl font-semibold tracking-tight">{name}</h1>
@@ -196,8 +210,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
               {!err && plantTasks.length === 0 && <li className="py-3 text-neutral-500">No tasks yet</li>}
               {!err && plantTasks.map(t => (
                 <li key={t.id} className="py-3 border-b last:border-b-0">
-                  {t.type === "water" ? "💧" : t.type === "fertilize" ? "🧪" : "🪴"}{" "}
-                  {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} —{" "}
+                  {iconFor(t.type)} {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} —{" "}
                   {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
                   {(() => {
                     const d = new Date(t.dueAt); const today = new Date();
