@@ -81,7 +81,7 @@ All items are **unchecked** to indicate upcoming work.
 
 ### 🧠 Smart Features
 
-- [ ] Integrate local weather (based on plant location)
+- [x] Integrate local weather (based on plant location)
 - [ ] Adjust watering suggestions based on evapotranspiration (ET₀)
 - [ ] Notify users if conditions suggest watering/fertilizing soon
 

@@ -21,7 +21,7 @@ type TaskDTO = {
 
 type Note = { id: string; text: string; at: string };
 
-export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string; nextWater?: string; waterIntervalDays?: number; nextFertilize?: string; fertilizeIntervalDays?: number; light?: string; humidity?: string; potSize?: string; potMaterial?: string; soilType?: string } }) {
+export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string; nextWater?: string; waterIntervalDays?: number; nextFertilize?: string; fertilizeIntervalDays?: number; light?: string; humidity?: string; potSize?: string; potMaterial?: string; soilType?: string; latitude?: number; longitude?: number } }) {
   const id = plant.id;
   const router = useRouter();
   const [name] = useState(plant.name);
@@ -35,6 +35,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
   const [notes, setNotes] = useState<Note[]>([]);
   const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
+  const [weather, setWeather] = useState<{ temperature: number } | null>(null);
 
   const fmt = (d: Date) => new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(d);
 
@@ -63,6 +64,20 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
     })();
     return () => { alive = false; };
   }, [id]);
+
+  useEffect(() => {
+    let alive = true;
+    if (plant.latitude === undefined || plant.longitude === undefined) return;
+    (async () => {
+      try {
+        const r = await fetch(`/api/plants/${id}/weather`, { cache: "no-store" });
+        if (!r.ok) throw new Error();
+        const data: { temperature: number } = await r.json();
+        if (alive) setWeather(data);
+      } catch {}
+    })();
+    return () => { alive = false; };
+  }, [id, plant.latitude, plant.longitude]);
 
   const plantTasks = useMemo(() => (allTasks ?? []).filter(t => t.plantId === id), [allTasks, id]);
 
@@ -218,6 +233,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
             />
             <Stat label="Light" value={plant.light || "—"} />
             <Stat label="Humidity" value={plant.humidity || "—"} />
+            <Stat label="Weather" value={weather ? `${Math.round(weather.temperature)}°C` : "—"} />
             <Stat
               label="Pot"
               value={

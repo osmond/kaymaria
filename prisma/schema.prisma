@@ -17,6 +17,8 @@ model Plant {
   nextFertilize  DateTime?
   waterIntervalDays     Int?
   fertilizeIntervalDays Int?
+  latitude       Float?
+  longitude      Float?
   tasks          Task[]
 }
 
