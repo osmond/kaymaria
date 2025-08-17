@@ -151,6 +151,15 @@ export function completeTask(idOrComposite: string): TaskRec | null {
   return rec;
 }
 
+export function deferTask(id: string, days: number): TaskRec | null {
+  const rec = TASKS.find(t => t.id === id);
+  if (!rec) return null;
+  const d = new Date(rec.dueAt);
+  d.setDate(d.getDate() + days);
+  rec.dueAt = d.toISOString();
+  return rec;
+}
+
 export function createTask(partial: Partial<TaskRec>): TaskRec {
   const id = `t_${uuid()}`;
   const rec: TaskRec = {

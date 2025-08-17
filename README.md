@@ -47,6 +47,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - ⏱️ **Urgency Sorting** – Tasks within each plant group are ordered by due date
 - 💧 **Task Icons** – Visual cues for watering, fertilizing, and repotting tasks
 - 📝 **Quick Notes** – Jot down observations directly from any task card
+- ✅ **Inline Task Actions** – Mark tasks done or defer them without leaving the dashboard
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care

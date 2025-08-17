@@ -212,6 +212,23 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
     }
   };
 
+  const deferTask = async (t: TaskDTO) => {
+    try {
+      setTasks((prev) => prev.filter((x) => x.id !== t.id));
+      const r = await fetch(`/api/tasks/${encodeURIComponent(t.id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deferDays: 1 }),
+      });
+      if (!r.ok) throw new Error();
+      toast(`${labelForType(t.type)} • ${t.plantName} deferred`);
+      refresh();
+    } catch {
+      toast("Failed to defer");
+      refresh();
+    }
+  };
+
   const remove = (t: TaskDTO) => {
     setTasks((prev) => prev.filter((x) => x.id !== t.id));
     toast(`Dismissed • ${t.plantName}`, {
@@ -408,6 +425,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
                         onComplete={() => complete(t)}
                         onAddNote={(note) => addNote(t.plantId, note)}
                         onDelete={() => remove(t)}
+                        onDefer={() => deferTask(t)}
                         showPlant={false}
                       />
                     ))}
@@ -460,6 +478,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
                         onComplete={() => complete(t)}
                         onAddNote={(note) => addNote(t.plantId, note)}
                         onDelete={() => remove(t)}
+                        onDefer={() => deferTask(t)}
                       />
                     ))}
                   </div>
