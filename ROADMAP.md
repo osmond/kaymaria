@@ -42,8 +42,8 @@ All items are **unchecked** to indicate upcoming work.
   - [x] Defer (e.g., "Remind me tomorrow")
   - [x] Edit task details (date, type, etc.)
 - [ ] ** filters**: 
-  - [x] Filter by room/location
-  - [ ] Filter by task type
+- [x] Filter by room/location
+  - [x] Filter by task type
   - [ ] Filter by overdue/urgent
 - [ ] **Mobile-first layout**: Design for one-handed thumb reach (FAB in lower right, swipe actions on cards)
 
