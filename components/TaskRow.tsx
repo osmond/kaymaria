@@ -52,26 +52,35 @@ export default function TaskRow({
   return (
     <div className="relative">
       <div className="absolute inset-0 rounded-xl overflow-hidden">
-        <div className="absolute inset-y-0 left-0 w-1/2 grid place-items-center bg-emerald-100 text-emerald-700">
+        <div className="absolute inset-y-0 left-0 w-20 grid place-items-center bg-emerald-100 text-emerald-700">
           <div className="flex items-center gap-2 text-xs font-medium">
             <Check className="h-4 w-4" />
             Complete
           </div>
         </div>
-        <div className="absolute inset-y-0 right-0 w-1/2 grid place-items-center bg-red-100 text-red-600">
-          <div className="flex items-center gap-2 text-xs font-medium">
-            <Trash2 className="h-4 w-4" />
-            Delete
+        <div className="absolute inset-y-0 right-0 flex">
+          <div className="w-20 grid place-items-center bg-blue-100 text-blue-600">
+            <div className="flex items-center gap-2 text-xs font-medium">
+              <Edit2 className="h-4 w-4" />
+              Edit
+            </div>
+          </div>
+          <div className="w-20 grid place-items-center bg-red-100 text-red-600">
+            <div className="flex items-center gap-2 text-xs font-medium">
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </div>
           </div>
         </div>
       </div>
       <motion.div
         drag="x"
-        dragConstraints={{ left: -120, right: 120 }}
+        dragConstraints={{ left: -160, right: 80 }}
         dragElastic={0.2}
         onDragEnd={(_, i) => {
-          if (i.offset.x > 80) onComplete();
-          else if (i.offset.x < -80) onDelete();
+          if (i.offset.x > 60) onComplete();
+          else if (i.offset.x < -120) onDelete();
+          else if (i.offset.x < -60) onEdit();
         }}
         className="relative"
       >
