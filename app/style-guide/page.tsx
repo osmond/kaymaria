@@ -14,12 +14,13 @@ export default function StyleGuidePreviewPage() {
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("light")
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-display">Style Guide</h1>
-        <Button
-          variant="secondary"
-          onClick={() => setPreviewMode(previewMode === "light" ? "dark" : "light")}
+    <div data-theme={previewMode} className={previewMode === "dark" ? "dark" : ""}>
+      <div className="min-h-screen p-6 space-y-8 bg-neutral-50 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-50 transition-colors">
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl font-display">Style Guide</h1>
+          <Button
+            variant="secondary"
+            onClick={() => setPreviewMode(previewMode === "light" ? "dark" : "light")}
         >
           Preview: {previewMode === "light" ? "Light" : "Dark"}
         </Button>
@@ -54,6 +55,7 @@ export default function StyleGuidePreviewPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }
