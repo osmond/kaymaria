@@ -8,6 +8,7 @@
    - `NEXT_PUBLIC_BASE_URL` should point to the URL where the app runs.
    - `DATABASE_URL` is used by Prisma; the example file defaults to a local SQLite database.
    - `NEXT_PUBLIC_TASK_WINDOW_DAYS` controls how many days ahead the Upcoming view looks (default `7`)
+   - `OPENAI_API_KEY` enables AI-powered care recommendations
 2. Install dependencies, seed the database, and start the development server:
 
 ```bash
@@ -68,6 +69,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 📱 **Mobile-First Layout** – Bottom navigation, floating action button, and swipeable task cards optimized for one-handed use
 - 🌤️ **Weather Awareness** – Current local weather for each plant using Open‑Meteo
 - 🔔 **Condition Alerts** – Notifies you when weather suggests watering or fertilizing soon
+- 🤖 **AI Care Recommendations** – Generates plant-specific watering, fertilizer, light, and repotting guidance
 
 ---
 
@@ -147,4 +149,16 @@ Example:
 ```bash
 curl -X PATCH http://localhost:3000/api/tasks/t_<uuid>
 ```
+
+## 🤖 AI Recommendation API
+
+Request plant-specific care guidance powered by OpenAI:
+
+```bash
+curl -X POST http://localhost:3000/api/ai/care-recommend \\
+  -H 'Content-Type: application/json' \\
+  -d '{"species":"Monstera deliciosa","potSize":"8in","potMaterial":"terracotta","soilType":"well-draining","lightLevel":"bright indirect"}'
+```
+
+This returns JSON with recommended `water`, `fertilizer`, `light`, and `repot` fields.
 

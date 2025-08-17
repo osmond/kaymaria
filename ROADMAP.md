@@ -87,11 +87,11 @@ All items are **unchecked** to indicate upcoming work.
 
 ### 🌿 AI-Powered Care Recommendations (via OpenAI API)
 
-- [ ] Recommend plant-specific:
-  - [ ] Watering amount
-  - [ ] Fertilizer type and frequency
-  - [ ] Light level requirements
-  - [ ] Repotting schedule
+- [x] Recommend plant-specific:
+  - [x] Watering amount
+  - [x] Fertilizer type and frequency
+  - [x] Light level requirements
+  - [x] Repotting schedule
 - [ ] Input factors for recommendations:
   - [ ] Pot size
   - [ ] Pot material
