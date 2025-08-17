@@ -3,6 +3,14 @@ import OpenAI from "openai";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+function getSeason(date: Date = new Date()): string {
+  const month = date.getMonth() + 1;
+  if (month >= 3 && month <= 5) return "spring";
+  if (month >= 6 && month <= 8) return "summer";
+  if (month >= 9 && month <= 11) return "fall";
+  return "winter";
+}
+
 export async function POST(req: NextRequest) {
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json(
@@ -18,6 +26,7 @@ export async function POST(req: NextRequest) {
   const soilType = body.soilType ?? "well-draining";
   const lightLevel = body.lightLevel ?? "medium";
   const humidity = body.humidity ?? "medium";
+  const season = body.season ?? getSeason();
 
   try {
     const completion = await client.chat.completions.create({
@@ -30,7 +39,7 @@ export async function POST(req: NextRequest) {
         },
           {
             role: "user",
-            content: `Give care recommendations for a plant with the following details:\nSpecies: ${species}\nPot size: ${potSize}\nPot material: ${potMaterial}\nSoil type: ${soilType}\nLight level: ${lightLevel}\nHumidity: ${humidity}\nRespond with a JSON object containing water (amountMl, frequencyDays), fertilizer (type, frequencyDays), light (level), repot (schedule).`,
+            content: `Give care recommendations for a plant with the following details:\nSpecies: ${species}\nPot size: ${potSize}\nPot material: ${potMaterial}\nSoil type: ${soilType}\nLight level: ${lightLevel}\nHumidity: ${humidity}\nSeason: ${season}\nRespond with a JSON object containing water (amountMl, frequencyDays), fertilizer (type, frequencyDays), light (level), repot (schedule).`,
           },
       ],
       response_format: { type: "json_object" },

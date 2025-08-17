@@ -98,7 +98,7 @@ All items are **unchecked** to indicate upcoming work.
   - [x] Soil type
   - [x] Indoor light level
   - [x] Room humidity
-  - [ ] Seasonal changes
+  - [x] Seasonal changes
   - [ ] Plant location (room/outdoor/etc.)
 - [ ] Learn from user input:
   - [ ] Feedback (e.g. “too much water”)
