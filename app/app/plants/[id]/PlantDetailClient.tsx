@@ -27,9 +27,11 @@ function timeAgo(d: Date) {
   const mins = Math.floor(diff / 60000); return `${mins}m ago`;
 }
 
-export default function PlantDetailClient({ plant }: { plant: { id: string; name: string } }) {
+export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string } }) {
   const id = plant.id;
   const [name] = useState(plant.name);
+  const photo = plant.photos?.[0] || "https://placehold.co/600x400?text=Plant";
+  const acquired = plant.acquiredAt ? new Date(plant.acquiredAt) : null;
   const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -100,10 +102,13 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       <main className="flex-1 px-4 pb-28">
         {/* Hero */}
         <div className="rounded-2xl overflow-hidden border bg-white shadow-sm mt-4">
-          <div className="h-40 bg-neutral-200" />
+          <img src={photo} alt={name} className="h-40 w-full object-cover bg-neutral-200" />
           <div className="p-4">
             <h2 className="text-lg font-semibold">{name}</h2>
-            <div className="text-sm text-neutral-500">Room: — • Species: —</div>
+            <div className="text-sm text-neutral-500">
+              {plant.species || "—"}
+              {acquired && ` • Acquired ${new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(acquired)}`}
+            </div>
           </div>
         </div>
 

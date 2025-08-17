@@ -10,7 +10,8 @@ export const mockPlants = [
     lastFertilized: "2025-08-01",
     nextFertilize: "2025-09-01",
     fertilizeIntervalDays: 30,
-    photos: [],
+    acquiredAt: "2024-03-01",
+    photos: ["https://placehold.co/600x400?text=Fiddle"],
     notes: [],
   },
   {
@@ -24,7 +25,8 @@ export const mockPlants = [
     lastFertilized: "2025-07-20",
     nextFertilize: "2025-08-20",
     fertilizeIntervalDays: 60,
-    photos: [],
+    acquiredAt: "2023-11-12",
+    photos: ["https://placehold.co/600x400?text=Snake"],
     notes: [],
   }
 ];
