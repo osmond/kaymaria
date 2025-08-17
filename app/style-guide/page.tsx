@@ -19,6 +19,7 @@ export default function StyleGuidePreviewPage() {
         <h1 className="text-4xl font-display">Style Guide</h1>
         <Button
           variant="secondary"
+          aria-pressed={previewMode === "dark"}
           onClick={() => setPreviewMode(previewMode === "light" ? "dark" : "light")}
         >
           Preview: {previewMode === "light" ? "Light" : "Dark"}
@@ -61,7 +62,12 @@ export default function StyleGuidePreviewPage() {
 function ColorSwatch({ name, hex, text = "white" }: { name: string, hex: string, text?: string }) {
   return (
     <div className="flex flex-col items-start gap-1">
-      <div className="w-full h-16 rounded-lg" style={{ backgroundColor: hex }} />
+      <div
+        className="w-full h-16 rounded-lg"
+        style={{ backgroundColor: hex }}
+        role="img"
+        aria-label={`${name} color swatch ${hex}`}
+      />
       <span className="text-sm text-muted-foreground">{name}</span>
       <span className="text-xs" style={{ color: text }}>{hex}</span>
     </div>
@@ -72,15 +78,38 @@ function ThemeSwatch({ label, primary, secondary, background, foreground }: Them
   return (
     <div className="rounded-lg border overflow-hidden text-xs shadow">
       <div className="flex h-6 text-[10px] text-center text-white font-bold">
-        <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: primary }}>Primary</div>
-        <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: secondary }}>Secondary</div>
+        <div
+          className="flex-1 flex items-center justify-center"
+          style={{ backgroundColor: primary }}
+          role="img"
+          aria-label={`Primary color swatch ${primary}`}
+        >
+          Primary
+        </div>
+        <div
+          className="flex-1 flex items-center justify-center"
+          style={{ backgroundColor: secondary }}
+          role="img"
+          aria-label={`Secondary color swatch ${secondary}`}
+        >
+          Secondary
+        </div>
         <div
           className="flex-1 flex items-center justify-center"
           style={{ backgroundColor: background, color: coreColors.foreground }}
+          role="img"
+          aria-label={`Background color swatch ${background}`}
         >
           BG
         </div>
-        <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: foreground }}>FG</div>
+        <div
+          className="flex-1 flex items-center justify-center"
+          style={{ backgroundColor: foreground }}
+          role="img"
+          aria-label={`Foreground color swatch ${foreground}`}
+        >
+          FG
+        </div>
       </div>
       <div className="p-2">
         <strong className="block text-sm mb-1">{label}</strong>
