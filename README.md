@@ -96,6 +96,8 @@ curl http://localhost:3000/api/test
 
 Basic CRUD endpoints exist for working with mock plant data. When creating a plant you can include default care rules, and initial tasks will be scheduled automatically.
 
+Each plant also stores `waterIntervalDays` and `fertilizeIntervalDays` values to define how often those care tasks recur.
+
 - `GET /api/plants` – list all plants
 - `POST /api/plants` – create a plant with care defaults
 - `GET /api/plants/:id` – fetch a plant

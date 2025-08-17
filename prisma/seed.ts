@@ -17,6 +17,8 @@ async function main() {
       nextWater: p.nextWater ? new Date(p.nextWater) : undefined,
       lastFertilized: p.lastFertilized ? new Date(p.lastFertilized) : undefined,
       nextFertilize: p.nextFertilize ? new Date(p.nextFertilize) : undefined,
+      waterIntervalDays: p.waterIntervalDays,
+      fertilizeIntervalDays: p.fertilizeIntervalDays,
     })),
   });
 
