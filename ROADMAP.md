@@ -41,10 +41,10 @@ All items are **unchecked** to indicate upcoming work.
   - [x] Mark as done (with subtle animation or feedback)
   - [x] Defer (e.g., "Remind me tomorrow")
   - [x] Edit task details (date, type, etc.)
-- [ ] ** filters**: 
-- [x] Filter by room/location
+- [x] **Task filters**:
+  - [x] Filter by room/location
   - [x] Filter by task type
-  - [ ] Filter by overdue/urgent
+  - [x] Filter by overdue/urgent
 - [ ] **Mobile-first layout**: Design for one-handed thumb reach (FAB in lower right, swipe actions on cards)
 
 

@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 const TASK_WINDOW_DAYS = Number(
   process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7"
 );
+const URGENT_WINDOW_DAYS = 2;
 
 function isSameDay(a: Date, b: Date) {
   return (
@@ -129,9 +130,10 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
   const [plantsErr, setPlantsErr] = useState<string | null>(null);
   const [plantsLoading, setPlantsLoading] = useState(false);
 
-  // room & type filters
+  // room, type & status filters
   const [roomFilter, setRoomFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const rooms = useMemo(() => {
     const set = new Set<string>();
     tasks.forEach((t) => set.add(t.roomId));
@@ -142,15 +144,24 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
     tasks.forEach((t) => set.add(t.type));
     return Array.from(set);
   }, [tasks]);
-  const filteredTasks = useMemo(
-    () =>
-      tasks.filter(
-        (t) =>
-          (!roomFilter || t.roomId === roomFilter) &&
-          (!typeFilter || t.type === typeFilter)
-      ),
-    [tasks, roomFilter, typeFilter]
-  );
+  const filteredTasks = useMemo(() => {
+    const now = Date.now();
+    const urgentMax = now + URGENT_WINDOW_DAYS * 864e5;
+    return tasks.filter((t) => {
+      const due = new Date(t.dueAt).getTime();
+      const statusOk =
+        statusFilter === "overdue"
+          ? due < now
+          : statusFilter === "urgent"
+          ? due >= now && due <= urgentMax
+          : true;
+      return (
+        (!roomFilter || t.roomId === roomFilter) &&
+        (!typeFilter || t.type === typeFilter) &&
+        statusOk
+      );
+    });
+  }, [tasks, roomFilter, typeFilter, statusFilter]);
 
   async function refresh() {
     setLoading(true);
@@ -468,6 +479,15 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
                     {labelForType(t as any)}
                   </option>
                 ))}
+              </select>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="border rounded px-3 py-2 w-full"
+              >
+                <option value="">All statuses</option>
+                <option value="overdue">Overdue</option>
+                <option value="urgent">Due soon</option>
               </select>
             </div>
           </>
