@@ -83,7 +83,7 @@ All items are **unchecked** to indicate upcoming work.
 
 - [x] Integrate local weather (based on plant location)
 - [x] Adjust watering suggestions based on evapotranspiration (ET₀)
-- [ ] Notify users if conditions suggest watering/fertilizing soon
+- [x] Notify users if conditions suggest watering/fertilizing soon
 
 ### 🌿 AI-Powered Care Recommendations (via OpenAI API)
 
