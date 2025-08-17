@@ -112,7 +112,7 @@ All items are **unchecked** to indicate upcoming work.
 - [x] Timeline view of all plant care events
 - [ ] Filter by event type (water, fertilize, etc.)
 - [ ] Add plant photo journal entries
-- [ ] Mood/notes tagging per entry
+
 
 ---
 
