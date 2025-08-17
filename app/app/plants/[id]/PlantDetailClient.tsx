@@ -26,6 +26,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
   const nextFertilize = plant.nextFertilize ? new Date(plant.nextFertilize) : null;
   const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">("stats");
 
   const fmt = (d: Date) => new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(d);
 
@@ -89,61 +90,103 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
           </div>
         </div>
 
-        {/* Quick stats */}
-        <div className="grid grid-cols-2 gap-3 mt-4">
-          <Stat
-            label="Water"
-            value={
-              plant.waterIntervalDays
-                ? `Every ${plant.waterIntervalDays}d${nextWater ? ` • next ${fmt(nextWater)}` : ""}`
-                : "—"
-            }
-          />
-          <Stat
-            label="Fertilize"
-            value={
-              plant.fertilizeIntervalDays
-                ? `Every ${plant.fertilizeIntervalDays}d${nextFertilize ? ` • next ${fmt(nextFertilize)}` : ""}`
-                : "—"
-            }
-          />
-          <Stat label="Light" value={plant.light || "—"} />
-          <Stat label="Humidity" value={plant.humidity || "—"} />
-          <Stat
-            label="Pot"
-            value={
-              plant.potSize
-                ? `${plant.potSize}${plant.potMaterial ? ` ${plant.potMaterial}` : ""}`
-                : "—"
-            }
-          />
-          <Stat label="Soil" value={plant.soilType || "—"} />
+        {/* Tabs */}
+        <div className="mt-4 grid grid-cols-4 gap-2 text-sm">
+          <button
+            className={`py-2 rounded-lg border ${tab === "stats" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            onClick={() => setTab("stats")}
+          >
+            Stats
+          </button>
+          <button
+            className={`py-2 rounded-lg border ${tab === "timeline" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            onClick={() => setTab("timeline")}
+          >
+            Timeline
+          </button>
+          <button
+            className={`py-2 rounded-lg border ${tab === "notes" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            onClick={() => setTab("notes")}
+          >
+            Notes
+          </button>
+          <button
+            className={`py-2 rounded-lg border ${tab === "photos" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            onClick={() => setTab("photos")}
+          >
+            Photos
+          </button>
         </div>
 
-        {/* Timeline */}
-        <section className="mt-4 rounded-xl border bg-white shadow-sm">
-          <div className="px-4 py-3 border-b">
-            <div className="text-base font-medium">Timeline</div>
-            <div className="text-xs text-neutral-500">Upcoming &amp; recent care</div>
+        {tab === "stats" && (
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <Stat
+              label="Water"
+              value={
+                plant.waterIntervalDays
+                  ? `Every ${plant.waterIntervalDays}d${nextWater ? ` • next ${fmt(nextWater)}` : ""}`
+                  : "—"
+              }
+            />
+            <Stat
+              label="Fertilize"
+              value={
+                plant.fertilizeIntervalDays
+                  ? `Every ${plant.fertilizeIntervalDays}d${nextFertilize ? ` • next ${fmt(nextFertilize)}` : ""}`
+                  : "—"
+              }
+            />
+            <Stat label="Light" value={plant.light || "—"} />
+            <Stat label="Humidity" value={plant.humidity || "—"} />
+            <Stat
+              label="Pot"
+              value={
+                plant.potSize
+                  ? `${plant.potSize}${plant.potMaterial ? ` ${plant.potMaterial}` : ""}`
+                  : "—"
+              }
+            />
+            <Stat label="Soil" value={plant.soilType || "—"} />
           </div>
-          <ul className="text-sm px-4 py-2">
-            {err && <li className="py-3 text-red-600">{err}</li>}
-            {!err && plantTasks.length === 0 && <li className="py-3 text-neutral-500">No tasks yet</li>}
-            {!err && plantTasks.map(t => (
-              <li key={t.id} className="py-3 border-b last:border-b-0">
-                {t.type === "water" ? "💧" : t.type === "fertilize" ? "🧪" : "🪴"}{" "}
-                {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} —{" "}
-                {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
-                {(() => {
-                  const d = new Date(t.dueAt); const today = new Date();
-                  const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() -
-                                           new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime())/86400000);
-                  return diff > 0 ? ` (In ${diff}d)` : diff === 0 ? " (Today)" : "";
-                })()}
-              </li>
-            ))}
-          </ul>
-        </section>
+        )}
+
+        {tab === "timeline" && (
+          <section className="mt-4 rounded-xl border bg-white shadow-sm">
+            <div className="px-4 py-3 border-b">
+              <div className="text-base font-medium">Timeline</div>
+              <div className="text-xs text-neutral-500">Upcoming &amp; recent care</div>
+            </div>
+            <ul className="text-sm px-4 py-2">
+              {err && <li className="py-3 text-red-600">{err}</li>}
+              {!err && plantTasks.length === 0 && <li className="py-3 text-neutral-500">No tasks yet</li>}
+              {!err && plantTasks.map(t => (
+                <li key={t.id} className="py-3 border-b last:border-b-0">
+                  {t.type === "water" ? "💧" : t.type === "fertilize" ? "🧪" : "🪴"}{" "}
+                  {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} —{" "}
+                  {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
+                  {(() => {
+                    const d = new Date(t.dueAt); const today = new Date();
+                    const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() -
+                                             new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime())/86400000);
+                    return diff > 0 ? ` (In ${diff}d)` : diff === 0 ? " (Today)" : "";
+                  })()}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {tab === "notes" && (
+          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4 text-sm text-neutral-500">
+            No notes yet
+          </section>
+        )}
+
+        {tab === "photos" && (
+          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4 text-sm text-neutral-500">
+            No photos yet
+          </section>
+        )}
 
         <div className="h-16" />
       </main>
