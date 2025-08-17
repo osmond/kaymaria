@@ -72,6 +72,60 @@ export function getPlant(id: string): Plant | undefined {
   return PLANTS.find(p => p.id === id);
 }
 
+export function createPlant(partial: {
+  name: string;
+  roomId?: string;
+  species?: string;
+  rules?: Rule[];
+}): Plant {
+  const id = `p_${uuid()}`;
+  const plant: Plant = {
+    id,
+    name: partial.name || "New Plant",
+    roomId: partial.roomId ?? "living",
+    species: partial.species,
+    rules: partial.rules ?? [],
+  };
+  PLANTS.push(plant);
+
+  // schedule initial tasks based on provided rules
+  for (const rule of plant.rules) {
+    const interval =
+      rule.type === "water" ? rule.intervalDays :
+      rule.type === "fertilize" ? rule.intervalDays :
+      rule.intervalDays ?? 180;
+    const due = new Date(Date.now() + (interval * 864e5));
+    createTask({
+      plantId: plant.id,
+      plantName: plant.name,
+      type: rule.type,
+      dueAt: due.toISOString(),
+    });
+  }
+
+  return plant;
+}
+
+export function updatePlant(id: string, updates: Partial<Omit<Plant, "id" | "rules">> & { rules?: Rule[] }): Plant | undefined {
+  const p = getPlant(id);
+  if (!p) return undefined;
+  if (updates.name !== undefined) p.name = updates.name;
+  if (updates.roomId !== undefined) p.roomId = updates.roomId;
+  if (updates.species !== undefined) p.species = updates.species;
+  if (updates.rules !== undefined) p.rules = updates.rules;
+  return p;
+}
+
+export function deletePlant(id: string): boolean {
+  const idx = PLANTS.findIndex(p => p.id === id);
+  if (idx === -1) return false;
+  PLANTS.splice(idx, 1);
+  // remove any tasks/events for this plant
+  TASKS = TASKS.filter(t => t.plantId !== id);
+  EVENTS = EVENTS.filter(e => e.plantId !== id);
+  return true;
+}
+
 export function getTasks(windowDays = 7): TaskRec[] {
   const maxTs = Date.now() + windowDays * 864e5;
   return TASKS.filter(t => new Date(t.dueAt).getTime() <= maxTs);
@@ -205,3 +259,15 @@ export function getInsights() {
     taskCount: TASKS.length,
   };
 }
+
+export const _state = {
+  get plants() {
+    return PLANTS;
+  },
+  get events() {
+    return EVENTS.map(e => ({ plantId: e.plantId, type: e.type, occurredAt: e.at }));
+  },
+  get rules() {
+    return PLANTS.flatMap(p => p.rules.map(r => ({ ...r, plantId: p.id })));
+  }
+};

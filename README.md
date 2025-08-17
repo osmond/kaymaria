@@ -42,6 +42,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 
 - 🌼 **Today View** – See exactly which plants need attention today
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
+- 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care
 - 📸 **Photo Uploads** – Track growth and keep a visual plant diary
 - 📍 **Smart Care Suggestions** – Based on light, pot size, species, and weather
@@ -93,19 +94,19 @@ curl http://localhost:3000/api/test
 
 ## 🌿 Plant API
 
-Basic CRUD endpoints exist for working with mock plant data:
+Basic CRUD endpoints exist for working with mock plant data. When creating a plant you can include default care rules, and initial tasks will be scheduled automatically.
 
 - `GET /api/plants` – list all plants
-- `POST /api/plants` – create a plant
+- `POST /api/plants` – create a plant with care defaults
 - `GET /api/plants/:id` – fetch a plant
 - `PATCH /api/plants/:id` – update fields on a plant
-- `DELETE /api/plants/:id` – remove a plant
+- `DELETE /api/plants/:id` – remove a plant and its tasks
 
 Example:
 
 ```bash
-curl -X POST http://localhost:3000/api/plants \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Palm","waterEveryDays":5}'
+curl -X POST http://localhost:3000/api/plants \\
+  -H 'Content-Type: application/json' \\
+  -d '{"name":"Palm","rules":[{"type":"water","intervalDays":5},{"type":"fertilize","intervalDays":30}]}'
 ```
 
