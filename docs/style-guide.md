@@ -14,6 +14,16 @@ This document defines the foundational design language for the Kay Maria plant c
 | `foreground`  | `#111827`     | Main text color (dark gray)     |
 | `muted`       | `#9CA3AF`     | Descriptive text, timestamps    |
 
+| Theme              | Primary   | Secondary | Background | Foreground | Notes                          |
+| ------------------ | --------- | --------- | ---------- | ---------- | ------------------------------ |
+| **Spring (Light)** | `#6CA995` | `#E2F7F2` | `#FDFDFD`  | `#1F2937`  | Fresh, vibrant, soft greens    |
+| **Summer (Light)** | `#508C7E` | `#D3EDE6` | `#F9F9F9`  | `#111827`  | Current default theme          |
+| **Autumn (Light)** | `#C38154` | `#F5E7DA` | `#FBFAF8`  | `#3B2F2F`  | Warm tones for fall            |
+| **Winter (Light)** | `#6B7280` | `#E0E7FF` | `#F8FAFC`  | `#1E293B`  | Cool neutrals and quiet blue   |
+| **Default (Dark)** | `#7BD7C2` | `#1B2A2B` | `#0B0F10`  | `#E5E7EB`  | Calming green-teal highlights  |
+| **Winter (Dark)**  | `#6C82B3` | `#1C2431` | `#0A101A`  | `#E2E8F0`  | Frosted blue, low contrast     |
+| **Autumn (Dark)**  | `#D69F7E` | `#2E1E1E` | `#1A1410`  | `#F3F4F6`  | Cozy, moody brown-orange tones |
+
 ---
 
 ## 🖋️ Typography
