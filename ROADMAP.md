@@ -64,7 +64,7 @@ All items are **unchecked** to indicate upcoming work.
 - [x] **Tab layout**:
   - [x] **Quick Stats**: At-a-glance care summary
   - [x] **Timeline**: List of all completed and upcoming care tasks
-  - [ ] **Notes**: Free-form journaling or text entries
+  - [x] **Notes**: Free-form journaling or text entries
   - [ ] **Photos**: A visual gallery of growth over time
 - [ ] **Task completion feedback**:
   - [ ] Add a subtle animation when a task is marked done. don't use emojis
