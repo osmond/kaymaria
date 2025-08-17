@@ -415,7 +415,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
     <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
       <header className="px-4 pt-6 pb-2 sticky top-0 bg-gradient-to-b from-white/90 to-neutral-50/60 backdrop-blur border-b">
         <div className="flex items-baseline justify-between w-full">
-          <h1 className="text-xl font-semibold">
+          <h1 className="text-xl font-display font-semibold">
             {view === "today"
               ? homeTab === "today"
                 ? "Today"
@@ -596,7 +596,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
         {view === "plants" && (
           <section className="mt-4 space-y-6">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-medium text-neutral-600">My Plants</h2>
+              <h2 className="text-sm font-display font-medium text-neutral-600">My Plants</h2>
               {plantsLoading && (
                 <span className="text-xs text-neutral-500">Loading…</span>
               )}
