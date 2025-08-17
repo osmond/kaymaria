@@ -53,6 +53,10 @@ export default function StyleGuidePreviewPage() {
           Preview: {previewMode === "light" ? "Light" : "Dark"}
         </Button>
       </div>
+      <p className="text-sm text-muted-foreground">
+        Toggle the preview to inspect light or dark tokens. Expand any seasonal theme to see detailed values,
+        contrast ratios, and component examples.
+      </p>
 
       {/* Core Colors */}
       <Card>
@@ -112,43 +116,53 @@ function ThemeSwatch({ label, primary, secondary, background, foreground }: Them
   const active = adjustColor(primary, -20)
 
   return (
-    <div className="rounded-lg border overflow-hidden text-xs shadow">
-      <div className="flex h-6 text-[10px] text-center text-white font-bold">
-        <div
-          className="flex-1 flex items-center justify-center"
-          style={{ backgroundColor: primary }}
-          role="img"
-          aria-label={`Primary color swatch ${primary}`}
-        >
-          Primary
+    <details className="rounded-lg border text-xs shadow" role="group">
+      <summary className="cursor-pointer list-none">
+        <div className="p-2 space-y-1">
+          <div className="flex h-6 text-[10px] text-center text-white font-bold rounded overflow-hidden">
+            <div
+              className="flex-1 flex items-center justify-center"
+              style={{ backgroundColor: primary }}
+              role="img"
+              aria-label={`Primary color swatch ${primary}`}
+            >
+              Primary
+            </div>
+            <div
+              className="flex-1 flex items-center justify-center"
+              style={{ backgroundColor: secondary }}
+              role="img"
+              aria-label={`Secondary color swatch ${secondary}`}
+            >
+              Secondary
+            </div>
+            <div
+              className="flex-1 flex items-center justify-center"
+              style={{ backgroundColor: background, color: coreColors.foreground }}
+              role="img"
+              aria-label={`Background color swatch ${background}`}
+            >
+              BG
+            </div>
+            <div
+              className="flex-1 flex items-center justify-center"
+              style={{ backgroundColor: foreground }}
+              role="img"
+              aria-label={`Foreground color swatch ${foreground}`}
+            >
+              FG
+            </div>
+          </div>
+          <span className="block text-sm font-medium">{label}</span>
         </div>
-        <div
-          className="flex-1 flex items-center justify-center"
-          style={{ backgroundColor: secondary }}
-          role="img"
-          aria-label={`Secondary color swatch ${secondary}`}
-        >
-          Secondary
-        </div>
-        <div
-          className="flex-1 flex items-center justify-center"
-          style={{ backgroundColor: background, color: coreColors.foreground }}
-          role="img"
-          aria-label={`Background color swatch ${background}`}
-        >
-          BG
-        </div>
-        <div
-          className="flex-1 flex items-center justify-center"
-          style={{ backgroundColor: foreground }}
-          role="img"
-          aria-label={`Foreground color swatch ${foreground}`}
-        >
-          FG
-        </div>
+
+      </summary>
+      <div className="p-2 space-y-2 border-t" aria-label={`${label} theme details`}>
+
       </div>
       <div className="p-2 space-y-2">
         <strong className="block text-sm">{label}</strong>
+
         <ul className="space-y-1">
           <li><span className="font-medium">Primary:</span> {primary}</li>
           <li><span className="font-medium">Secondary:</span> {secondary}</li>
@@ -186,6 +200,6 @@ function ThemeSwatch({ label, primary, secondary, background, foreground }: Them
           </div>
         </div>
       </div>
-    </div>
+    </details>
   )
 }
