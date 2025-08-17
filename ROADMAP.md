@@ -55,12 +55,12 @@ All items are **unchecked** to indicate upcoming work.
 ### 🌿 Plant Detail View
 
 - [x] **Hero banner**: Show large plant photo, nickname, and species (optionally include age or acquired date)
-- [ ] **Quick Stats section**:
-  - [ ] Watering interval & next due
-  - [ ] Fertilizing interval & next due
-  - [ ] Light level
-  - [ ] Humidity preference
-  - [ ] Pot size, pot material,  & soil type
+- [x] **Quick Stats section**:
+  - [x] Watering interval & next due
+  - [x] Fertilizing interval & next due
+  - [x] Light level
+  - [x] Humidity preference
+  - [x] Pot size, pot material,  & soil type
 - [ ] **Tab layout**:
   - [ ] **Quick Stats**: At-a-glance care summary
   - [ ] **Timeline**: List of all completed and upcoming care tasks
