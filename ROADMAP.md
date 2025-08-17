@@ -39,9 +39,30 @@ All items are unchecked to indicate upcoming work.
 - [ ] Inline “Mark as Done” on Timeline view
 
 ### 🧠 Smart Features
+
 - [ ] Integrate local weather (based on plant location)
 - [ ] Adjust watering suggestions based on evapotranspiration (ET₀)
 - [ ] Notify users if conditions suggest watering/fertilizing soon
+
+#### 🌿 AI-Powered Care Recommendations (via OpenAI API)
+
+- [ ] Recommend plant-specific:
+  - [ ] Watering amount
+  - [ ] Fertilizer type and frequency
+  - [ ] Light level requirements
+  - [ ] Repotting schedule
+- [ ] Input factors for recommendations:
+  - [ ] Pot size
+  - [ ] Soil type
+  - [ ] Indoor light level
+  - [ ] Room humidity
+  - [ ] Seasonal changes
+  - [ ] Plant location (room/outdoor/etc.)
+- [ ] Learn from user input:
+  - [ ] Feedback (e.g. “too much water”)
+  - [ ] Adjust future care suggestions
+- [ ] Long-term idea: fine-tune a model using user care logs
+
 
 ---
 
