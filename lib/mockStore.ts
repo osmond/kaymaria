@@ -18,6 +18,7 @@ export type PlantDTO = {
   roomId?: string;
   species?: string;
   potSize?: string;
+  potMaterial?: string;
   lightLevel?: string;
   indoor?: boolean;
   soilType?: string;

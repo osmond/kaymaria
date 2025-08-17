@@ -30,6 +30,7 @@ export default function AddPlantModal({
   const [roomId, setRoomId] = useState(defaultRoomId);
   const [species, setSpecies] = useState('');
   const [pot, setPot] = useState('6 in');
+  const [potMaterial, setPotMaterial] = useState('Plastic');
   const [light, setLight] = useState('Medium');
   const [indoor, setIndoor] = useState<'Indoor'|'Outdoor'>('Indoor');
   const [drainage, setDrainage] = useState<'poor'|'ok'|'great'>('ok');
@@ -101,6 +102,7 @@ export default function AddPlantModal({
           roomId,
           species: species || undefined,
           potSize: pot,
+          potMaterial,
           lightLevel: light,
           indoor: indoor === 'Indoor',
           soilType: soil || undefined,
@@ -155,10 +157,15 @@ export default function AddPlantModal({
             <input className="input" value={species} onChange={e=>setSpecies(e.target.value)} placeholder="e.g., Monstera deliciosa" />
           </Field>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <Field label="Pot size">
               <select className="input" value={pot} onChange={e=>setPot(e.target.value)}>
                 <option>4 in</option><option>6 in</option><option>8 in</option>
+              </select>
+            </Field>
+            <Field label="Pot material">
+              <select className="input" value={potMaterial} onChange={e=>setPotMaterial(e.target.value)}>
+                <option>Plastic</option><option>Terracotta</option><option>Ceramic</option>
               </select>
             </Field>
             <Field label="Light">
