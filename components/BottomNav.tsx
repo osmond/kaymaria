@@ -27,20 +27,24 @@ export default function BottomNav({
       <button
         onClick={() => onChange(tab)}
         className={`py-3 flex flex-col items-center justify-center text-xs ${
-          active ? "text-neutral-900" : "text-neutral-600"
+          active
+            ? "text-neutral-900 dark:text-neutral-100"
+            : "text-neutral-600 dark:text-neutral-400"
         }`}
         aria-current={active ? "page" : undefined}
       >
         <div className={`mb-1 ${active ? "" : "opacity-80"}`}>{icon}</div>
         <span className="font-sans">{label}</span>
-        {active && <span className="mt-1 h-1 w-6 rounded-full bg-neutral-900" />}
+        {active && (
+          <span className="mt-1 h-1 w-6 rounded-full bg-neutral-900 dark:bg-neutral-100" />
+        )}
       </button>
     );
   };
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t"
+      className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t dark:bg-neutral-900/90 dark:border-neutral-800"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="max-w-screen-sm mx-auto grid grid-cols-5">

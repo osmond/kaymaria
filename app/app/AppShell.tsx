@@ -8,6 +8,7 @@ import TaskRow from "@/components/TaskRow";
 import QuickAddModal from "@/components/QuickAddModal";
 import AddPlantModal from "@/components/AddPlantModal";
 import EditTaskModal from "@/components/EditTaskModal";
+import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
@@ -735,9 +736,9 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
 
         {view === "settings" && (
           <section className="mt-4 grid gap-3">
-            <div className="rounded-xl border bg-white shadow-sm p-4">
+            <div className="rounded-xl border bg-white shadow-sm p-4 dark:bg-neutral-800 dark:border-neutral-700">
               <div className="text-base font-medium">Export / Import</div>
-              <div className="text-sm text-neutral-600">
+              <div className="text-sm text-neutral-600 dark:text-neutral-300">
                 Backup JSON / CSV; restore from file
               </div>
               <div className="mt-2 flex gap-2">
@@ -747,10 +748,14 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                 <button className="border rounded px-3 py-2 text-sm">
                   Export CSV
                 </button>
-                <button className="bg-neutral-900 text-white rounded px-3 py-2 text-sm">
+                <button className="bg-neutral-900 text-white rounded px-3 py-2 text-sm dark:bg-neutral-100 dark:text-neutral-900">
                   Import
                 </button>
               </div>
+            </div>
+            <div className="rounded-xl border bg-white shadow-sm p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
+              <div className="text-base font-medium">Theme</div>
+              <ThemeToggle />
             </div>
           </section>
         )}

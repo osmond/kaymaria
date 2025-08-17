@@ -68,6 +68,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
 - 📱 **Mobile-First Layout** – Bottom navigation, floating action button, and swipeable task cards optimized for one-handed use
+- 🌗 **Light/Dark Mode** – Toggle the interface theme from Settings
 - 🌤️ **Weather Awareness** – Current local weather for each plant using Open‑Meteo
 - 🔔 **Condition Alerts** – Notifies you when weather suggests watering or fertilizing soon
 - 🤖 **AI Care Recommendations** – Generates plant-specific watering, fertilizer, light, and repotting guidance

@@ -118,10 +118,10 @@ All items are **unchecked** to indicate upcoming work.
 
 ## Phase 4 – App Polish
 
-- [ ] Bottom nav and floating FAB
+- [x] Bottom nav and floating FAB
 - [ ] Swipeable task actions (mark done, edit, delete)
 
-- [ ] Light/dark mode toggle in settings
+- [x] Light/dark mode toggle in settings
 - [ ] Mobile UX refinements
 
 - [ ] Align design with [Style Guide](./style-guide/page.tsx)
