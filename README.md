@@ -52,13 +52,14 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - ⏰ **Overdue/Urgent Filters** – Show only overdue tasks or those due soon
 - 📝 **Quick Notes** – Jot down observations directly from any task card
 - ✅ **Inline Task Actions** – Mark tasks done, defer them, or edit details without leaving the dashboard
+- 👉 **Swipe Actions** – Swipe a task to quickly complete, edit, or delete it
 - 🎉 **Completion Feedback** – Subtle check animation and timestamp confirmation when tasks are marked done
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - 📜 **Global Timeline** – View all plant care events in a chronological feed
 - 🔁 **Timeline Task Actions** – Complete tasks directly from the timeline with undo support
 - 🔍 **Timeline Filters** – Narrow the timeline by event type (water, fertilize, repot)
-- 📸 **Photo Gallery** – View plant photos over time to track growth
+- 📸 **Photo Gallery** – Add and view plant photos over time to track growth
 - 🌿 **Plant Detail Hero** – Large photo banner with species and acquisition date
 - 🧭 **Tabbed Plant Details** – Switch between stats, timeline, notes, and photos
 - 📓 **Plant Notes** – Journal free-form entries from the plant detail view
@@ -68,6 +69,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
 - 📱 **Mobile-First Layout** – Bottom navigation, floating action button, and swipeable task cards optimized for one-handed use
+- 🌗 **Light/Dark Mode** – Toggle the interface theme from Settings
 - 🌤️ **Weather Awareness** – Current local weather for each plant using Open‑Meteo
 - 🔔 **Condition Alerts** – Notifies you when weather suggests watering or fertilizing soon
 - 🤖 **AI Care Recommendations** – Generates plant-specific watering, fertilizer, light, and repotting guidance
@@ -127,6 +129,8 @@ To enable local weather in the app, include `latitude` and `longitude` when crea
 - `DELETE /api/plants/:id` – remove a plant and its tasks
 - `GET /api/plants/:id/notes` – list notes for a plant
 - `POST /api/plants/:id/notes` – add a quick note
+- `GET /api/plants/:id/photos` – list photos for a plant
+- `POST /api/plants/:id/photos` – add a photo by URL
 - `GET /api/plants/:id/weather` – current weather for a plant
 
 Example:

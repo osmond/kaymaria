@@ -111,17 +111,17 @@ All items are **unchecked** to indicate upcoming work.
 
 - [x] Timeline view of all plant care events
 - [x] Filter by event type (water, fertilize, etc.)
-- [ ] Add plant photo journal entries
+- [x] Add plant photo journal entries
 
 
 ---
 
 ## Phase 4 – App Polish
 
-- [ ] Bottom nav and floating FAB
-- [ ] Swipeable task actions (mark done, edit, delete)
+- [x] Bottom nav and floating FAB
+ - [x] Swipeable task actions (mark done, edit, delete)
 
-- [ ] Light/dark mode toggle in settings
+- [x] Light/dark mode toggle in settings
 - [ ] Mobile UX refinements
 
 - [ ] Align design with [Style Guide](./style-guide/page.tsx)

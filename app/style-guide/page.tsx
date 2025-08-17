@@ -155,8 +155,14 @@ function ThemeSwatch({ label, primary, secondary, background, foreground }: Them
           </div>
           <span className="block text-sm font-medium">{label}</span>
         </div>
+
       </summary>
       <div className="p-2 space-y-2 border-t" aria-label={`${label} theme details`}>
+
+      </div>
+      <div className="p-2 space-y-2">
+        <strong className="block text-sm">{label}</strong>
+
         <ul className="space-y-1">
           <li><span className="font-medium">Primary:</span> {primary}</li>
           <li><span className="font-medium">Secondary:</span> {secondary}</li>
