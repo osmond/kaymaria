@@ -7,11 +7,12 @@
    - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` come from your Supabase project.
    - `NEXT_PUBLIC_BASE_URL` should point to the URL where the app runs.
    - `DATABASE_URL` is used by Prisma; the example file defaults to a local SQLite database.
-2. Install dependencies and start the development server:
+2. Install dependencies, seed the database, and start the development server:
 
 ```bash
 npm install
 npm run db:migrate
+npm run db:seed
 npm run dev
 # open http://localhost:3000/app
 ```

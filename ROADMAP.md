@@ -7,12 +7,14 @@ All items are **unchecked** to indicate upcoming work.
 
 ## Phase 0 – Foundation
 
-- [x] Set up Supabase project and env keys (`.env.local`)
-- [x] Run database migrations (Prisma)
-- [ ] Create seed scripts for mock data (plants, tasks)
-- [x] Add test route to fetch plants and tasks
+ - [x] Set up Supabase project and env keys (.env.local)
+ - [x] Run database migrations (Prisma)
+ - [x] Create seed scripts for mock data (plants, tasks)
+ - [x] Add test route to fetch plants and tasks
+
 
 > 🔧 Mock data is used in early development and will be replaced with Supabase queries in later phases.
+
 
 ---
 
@@ -20,7 +22,8 @@ All items are **unchecked** to indicate upcoming work.
 
 ### 🪴 Plant & Task Management
 
-- [ ] Create mock data for plants and tasks
+- [x] Create mock data for plants and tasks
+
 - [ ] Build CRUD endpoints for `/plants` and `/tasks`
 - [ ] Support plant onboarding with care defaults
 - [ ] Add care intervals (water, fertilize, etc.)
