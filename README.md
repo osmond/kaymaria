@@ -46,6 +46,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🗂️ **Grouped Tasks** – Today's tasks organized by plant for quick scanning
 - ⏱️ **Urgency Sorting** – Tasks within each plant group are ordered by due date
 - 💧 **Task Icons** – Visual cues for watering, fertilizing, and repotting tasks
+- 🏠 **Room Filters** – Focus on tasks for a specific room or location
 - 📝 **Quick Notes** – Jot down observations directly from any task card
 - ✅ **Inline Task Actions** – Mark tasks done, defer them, or edit details without leaving the dashboard
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries

@@ -31,6 +31,7 @@ export type TaskRec = {
   id: string;           // t_<uuid>
   plantId: string;
   plantName: string;
+  roomId: string;
   type: CareType;
   dueAt: string;        // ISO
   status: "due";
@@ -63,11 +64,11 @@ let EVENTS: Event[] = [
 ];
 
 let TASKS: TaskRec[] = [
-  { id: `t_${uuid()}`, plantId: "p1", plantName: "Aloe",   type: "water",     dueAt: new Date(now).toISOString(), status: "due" },
-  { id: `t_${uuid()}`, plantId: "p3", plantName: "Orchid", type: "repot",     dueAt: new Date(now).toISOString(), status: "due", lastEventAt: EVENTS[0].at },
-  { id: `t_${uuid()}`, plantId: "p2", plantName: "Monstera", type: "water",   dueAt: new Date(now + 2*864e5).toISOString(), status: "due" },
-  { id: `t_${uuid()}`, plantId: "p5", plantName: "Fern",   type: "water",     dueAt: new Date(now + 1*864e5).toISOString(), status: "due" },
-  { id: `t_${uuid()}`, plantId: "p6", plantName: "Fiddle Fig", type: "water", dueAt: new Date(now + 3*864e5).toISOString(), status: "due" },
+  { id: `t_${uuid()}`, plantId: "p1", plantName: "Aloe", roomId: "living", type: "water", dueAt: new Date(now).toISOString(), status: "due" },
+  { id: `t_${uuid()}`, plantId: "p3", plantName: "Orchid", roomId: "bed", type: "repot", dueAt: new Date(now).toISOString(), status: "due", lastEventAt: EVENTS[0].at },
+  { id: `t_${uuid()}`, plantId: "p2", plantName: "Monstera", roomId: "living", type: "water", dueAt: new Date(now + 2*864e5).toISOString(), status: "due" },
+  { id: `t_${uuid()}`, plantId: "p5", plantName: "Fern", roomId: "living", type: "water", dueAt: new Date(now + 1*864e5).toISOString(), status: "due" },
+  { id: `t_${uuid()}`, plantId: "p6", plantName: "Fiddle Fig", roomId: "living", type: "water", dueAt: new Date(now + 3*864e5).toISOString(), status: "due" },
 ];
 
 let NOTES: Note[] = [];
@@ -170,10 +171,12 @@ export function updateTask(id: string, updates: Partial<Pick<TaskRec, "type" | "
 
 export function createTask(partial: Partial<TaskRec>): TaskRec {
   const id = `t_${uuid()}`;
+  const plant = getPlant(partial.plantId ?? "p_new");
   const rec: TaskRec = {
     id,
     plantId: partial.plantId ?? "p_new",
-    plantName: partial.plantName ?? "New Plant",
+    plantName: partial.plantName ?? plant?.name ?? "New Plant",
+    roomId: plant?.roomId ?? "unknown",
     type: (partial.type ?? "water") as CareType,
     dueAt: partial.dueAt ?? new Date().toISOString(),
     status: "due",
