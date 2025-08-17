@@ -121,10 +121,12 @@ All items are **unchecked** to indicate upcoming work.
 - [ ] Bottom nav and floating FAB
 - [ ] Swipeable task actions (mark done, edit, delete)
 
-- [ ] Light/dark mode toggle
+- [ ] Light/dark mode toggle in settings
 - [ ] Mobile UX refinements
-- [ ] Shadcn/UI design polish and theming
+
 - [ ] Align design with [Style Guide](./style-guide/page.tsx)
+
+- [ ] Shadcn/UI design polish and theming
 
 ---
 
