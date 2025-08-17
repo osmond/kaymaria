@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
   const potMaterial = body.potMaterial ?? "plastic";
   const soilType = body.soilType ?? "well-draining";
   const lightLevel = body.lightLevel ?? "medium";
+  const humidity = body.humidity ?? "medium";
 
   try {
     const completion = await client.chat.completions.create({
@@ -27,10 +28,10 @@ export async function POST(req: NextRequest) {
           content:
             "You are a helpful plant care assistant that replies in JSON.",
         },
-        {
-          role: "user",
-          content: `Give care recommendations for a plant with the following details:\nSpecies: ${species}\nPot size: ${potSize}\nPot material: ${potMaterial}\nSoil type: ${soilType}\nLight level: ${lightLevel}\nRespond with a JSON object containing water (amountMl, frequencyDays), fertilizer (type, frequencyDays), light (level), repot (schedule).`,
-        },
+          {
+            role: "user",
+            content: `Give care recommendations for a plant with the following details:\nSpecies: ${species}\nPot size: ${potSize}\nPot material: ${potMaterial}\nSoil type: ${soilType}\nLight level: ${lightLevel}\nHumidity: ${humidity}\nRespond with a JSON object containing water (amountMl, frequencyDays), fertilizer (type, frequencyDays), light (level), repot (schedule).`,
+          },
       ],
       response_format: { type: "json_object" },
     });

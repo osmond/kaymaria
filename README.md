@@ -62,7 +62,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🧭 **Tabbed Plant Details** – Switch between stats, timeline, notes, and photos
 - 📓 **Plant Notes** – Journal free-form entries from the plant detail view
 - 📊 **Quick Stats** – At-a-glance summary of watering, fertilizing, and environment needs
-- 📍 **Smart Care Suggestions** – Based on light, pot size, species, and weather
+- 📍 **Smart Care Suggestions** – Based on light, humidity, pot size, species, and weather
 - 💧 **ET₀‑Aware Watering** – Adjusts suggested watering intervals using local evapotranspiration data
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
@@ -116,7 +116,7 @@ curl http://localhost:3000/api/test
 
 Basic CRUD endpoints exist for working with mock plant data. When creating a plant you can include default care rules, and initial tasks will be scheduled automatically.
 
-Each plant also stores `waterIntervalDays`, `fertilizeIntervalDays`, and optional `potSize`, `potMaterial`, and `soilType` information.
+Each plant also stores `waterIntervalDays`, `fertilizeIntervalDays`, and optional `potSize`, `potMaterial`, `soilType`, `light`, and `humidity` information.
 To enable local weather in the app, include `latitude` and `longitude` when creating a plant.
 
 - `GET /api/plants` – list all plants
@@ -157,7 +157,7 @@ Request plant-specific care guidance powered by OpenAI:
 ```bash
 curl -X POST http://localhost:3000/api/ai/care-recommend \\
   -H 'Content-Type: application/json' \\
-  -d '{"species":"Monstera deliciosa","potSize":"8in","potMaterial":"terracotta","soilType":"well-draining","lightLevel":"bright indirect"}'
+  -d '{"species":"Monstera deliciosa","potSize":"8in","potMaterial":"terracotta","soilType":"well-draining","lightLevel":"bright indirect","humidity":"medium"}'
 ```
 
 This returns JSON with recommended `water`, `fertilizer`, `light`, and `repot` fields.

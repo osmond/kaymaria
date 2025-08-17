@@ -96,8 +96,8 @@ All items are **unchecked** to indicate upcoming work.
   - [x] Pot size
   - [x] Pot material
   - [x] Soil type
-  - [ ] Indoor light level
-  - [ ] Room humidity
+  - [x] Indoor light level
+  - [x] Room humidity
   - [ ] Seasonal changes
   - [ ] Plant location (room/outdoor/etc.)
 - [ ] Learn from user input:
