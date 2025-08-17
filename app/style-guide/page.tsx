@@ -10,6 +10,31 @@ import {
   type ThemeTokens,
 } from "@/lib/design-tokens"
 
+function hexToRgb(hex: string) {
+  const cleaned = hex.replace("#", "")
+  const bigint = parseInt(cleaned.length === 3 ? cleaned.repeat(2) : cleaned, 16)
+  return [bigint >> 16 & 255, bigint >> 8 & 255, bigint & 255]
+}
+
+function luminance(hex: string) {
+  const [r, g, b] = hexToRgb(hex).map((v) => {
+    const channel = v / 255
+    return channel <= 0.03928 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4)
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+function contrastRatio(a: string, b: string) {
+  const L1 = luminance(a)
+  const L2 = luminance(b)
+  return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05)
+}
+
+function adjustColor(hex: string, amount: number) {
+  const [r, g, b] = hexToRgb(hex).map((v) => Math.max(0, Math.min(255, v + amount)))
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`
+}
+
 export default function StyleGuidePreviewPage() {
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("light")
 
@@ -28,6 +53,10 @@ export default function StyleGuidePreviewPage() {
           Preview: {previewMode === "light" ? "Light" : "Dark"}
         </Button>
       </div>
+      <p className="text-sm text-muted-foreground">
+        Toggle the preview to inspect light or dark tokens. Expand any seasonal theme to see detailed values,
+        contrast ratios, and component examples.
+      </p>
 
       {/* Core Colors */}
       <Card>
@@ -78,51 +107,93 @@ function ColorSwatch({ name, hex, text = "white" }: { name: string, hex: string,
 }
 
 function ThemeSwatch({ label, primary, secondary, background, foreground }: ThemeTokens) {
+  const contrastChecks = [
+    { label: "FG/BG", ratio: contrastRatio(foreground, background) },
+    { label: "Primary/BG", ratio: contrastRatio(primary, background) },
+    { label: "Secondary/BG", ratio: contrastRatio(secondary, background) },
+  ]
+  const hover = adjustColor(primary, 20)
+  const active = adjustColor(primary, -20)
+
   return (
-    <div className="rounded-lg border overflow-hidden text-xs shadow">
-      <div className="flex h-6 text-[10px] text-center text-white font-bold">
-        <div
-          className="flex-1 flex items-center justify-center"
-          style={{ backgroundColor: primary }}
-          role="img"
-          aria-label={`Primary color swatch ${primary}`}
-        >
-          Primary
+    <details className="rounded-lg border text-xs shadow" role="group">
+      <summary className="cursor-pointer list-none">
+        <div className="p-2 space-y-1">
+          <div className="flex h-6 text-[10px] text-center text-white font-bold rounded overflow-hidden">
+            <div
+              className="flex-1 flex items-center justify-center"
+              style={{ backgroundColor: primary }}
+              role="img"
+              aria-label={`Primary color swatch ${primary}`}
+            >
+              Primary
+            </div>
+            <div
+              className="flex-1 flex items-center justify-center"
+              style={{ backgroundColor: secondary }}
+              role="img"
+              aria-label={`Secondary color swatch ${secondary}`}
+            >
+              Secondary
+            </div>
+            <div
+              className="flex-1 flex items-center justify-center"
+              style={{ backgroundColor: background, color: coreColors.foreground }}
+              role="img"
+              aria-label={`Background color swatch ${background}`}
+            >
+              BG
+            </div>
+            <div
+              className="flex-1 flex items-center justify-center"
+              style={{ backgroundColor: foreground }}
+              role="img"
+              aria-label={`Foreground color swatch ${foreground}`}
+            >
+              FG
+            </div>
+          </div>
+          <span className="block text-sm font-medium">{label}</span>
         </div>
-        <div
-          className="flex-1 flex items-center justify-center"
-          style={{ backgroundColor: secondary }}
-          role="img"
-          aria-label={`Secondary color swatch ${secondary}`}
-        >
-          Secondary
-        </div>
-        <div
-          className="flex-1 flex items-center justify-center"
-          style={{ backgroundColor: background, color: coreColors.foreground }}
-          role="img"
-          aria-label={`Background color swatch ${background}`}
-        >
-          BG
-        </div>
-        <div
-          className="flex-1 flex items-center justify-center"
-          style={{ backgroundColor: foreground }}
-          role="img"
-          aria-label={`Foreground color swatch ${foreground}`}
-        >
-          FG
-        </div>
-      </div>
-      <div className="p-2">
-        <strong className="block text-sm mb-1">{label}</strong>
+      </summary>
+      <div className="p-2 space-y-2 border-t" aria-label={`${label} theme details`}>
         <ul className="space-y-1">
           <li><span className="font-medium">Primary:</span> {primary}</li>
           <li><span className="font-medium">Secondary:</span> {secondary}</li>
           <li><span className="font-medium">Background:</span> {background}</li>
           <li><span className="font-medium">Foreground:</span> {foreground}</li>
         </ul>
+        <ul className="space-y-1">
+          {contrastChecks.map((c) => (
+            <li key={c.label}>
+              {c.label}: {c.ratio.toFixed(2)} {c.ratio >= 4.5 ? "✅" : "⚠️"}
+            </li>
+          ))}
+        </ul>
+        <div
+          className="rounded p-2 space-y-2"
+          style={{ backgroundColor: background, color: foreground }}
+        >
+          <p>Example card</p>
+          <button
+            className="px-2 py-1 rounded text-xs font-medium"
+            style={{ backgroundColor: primary, color: foreground }}
+          >
+            Button
+          </button>
+        </div>
+        <div className="flex h-6 text-[10px] text-center text-white font-bold rounded overflow-hidden">
+          <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: primary }}>
+            Default
+          </div>
+          <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: hover }}>
+            Hover
+          </div>
+          <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: active }}>
+            Active
+          </div>
+        </div>
       </div>
-    </div>
+    </details>
   )
 }
