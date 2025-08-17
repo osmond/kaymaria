@@ -525,8 +525,9 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
 
       <AddPlantModal
         open={addPlantOpen}
-        onClose={() => setAddPlantOpen(false)}
+        onOpenChange={setAddPlantOpen}
         prefillName={prefillPlantName}
+        defaultRoomId="room-1"
         onCreate={(name) => onPlantCreated(name)}
       />
     </div>

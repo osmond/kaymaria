@@ -136,26 +136,26 @@ export default function AddPlantModal({
 
         <div className="p-5 space-y-4">
           <Field label="Name">
-            <input className="input" value={name} onClick={e=>setName(e.target.value)} placeholder="e.g., Monstera Deliciosa" />
+            <input className="input" value={name} onChange={e=>setName(e.target.value)} placeholder="e.g., Monstera Deliciosa" />
           </Field>
 
           <Field label="Room ID (internal)">
-            <input className="input" value={roomId} onClick={e=>setRoomId(e.target.value)} placeholder={defaultRoomId} />
+            <input className="input" value={roomId} onChange={e=>setRoomId(e.target.value)} placeholder={defaultRoomId} />
             <p className="hint">Stored locally in Settings → Defaults.</p>
           </Field>
 
           <Field label="Species (optional)">
-            <input className="input" value={species} onClick={e=>setSpecies(e.target.value)} placeholder="e.g., Monstera deliciosa" />
+            <input className="input" value={species} onChange={e=>setSpecies(e.target.value)} placeholder="e.g., Monstera deliciosa" />
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Pot size">
-              <select className="input" value={pot} onClick={e=>setPot(e.target.value)}>
+              <select className="input" value={pot} onChange={e=>setPot(e.target.value)}>
                 <option>4 in</option><option>6 in</option><option>8 in</option>
               </select>
             </Field>
             <Field label="Light">
-              <select className="input" value={light} onClick={e=>setLight(e.target.value)}>
+              <select className="input" value={light} onChange={e=>setLight(e.target.value)}>
                 <option>Low</option><option>Medium</option><option>Bright</option>
               </select>
             </Field>
@@ -163,22 +163,22 @@ export default function AddPlantModal({
 
           <Field label="Environment">
             <div className="grid grid-cols-2 gap-3">
-              <select className="input" value={indoor} onClick={e=>setIndoor(e.target.value as 'Indoor'|'Outdoor')}>
+              <select className="input" value={indoor} onChange={e=>setIndoor(e.target.value as 'Indoor'|'Outdoor')}>
                 <option>Indoor</option><option>Outdoor</option>
               </select>
-              <select className="input" value={drainage} onClick={e=>setDrainage(e.target.value as 'poor'|'ok'|'great')}>
+              <select className="input" value={drainage} onChange={e=>setDrainage(e.target.value as 'poor'|'ok'|'great')}>
                 <option value="poor">Poor drainage</option>
                 <option value="ok">OK drainage</option>
                 <option value="great">Great drainage</option>
               </select>
             </div>
-            <input className="input mt-2" value={soil} onClick={e=>setSoil(e.target.value)} placeholder="Soil type (e.g., Aroid mix)" />
+            <input className="input mt-2" value={soil} onChange={e=>setSoil(e.target.value)} placeholder="Soil type (e.g., Aroid mix)" />
           </Field>
 
           <Field label="Location (for weather)">
             <div className="grid grid-cols-2 gap-3">
-              <input className="input" value={lat} onClick={e=>setLat(e.target.value)} placeholder="Latitude" />
-              <input className="input" value={lon} onClick={e=>setLon(e.target.value)} placeholder="Longitude" />
+              <input className="input" value={lat} onChange={e=>setLat(e.target.value)} placeholder="Latitude" />
+              <input className="input" value={lon} onChange={e=>setLon(e.target.value)} placeholder="Longitude" />
             </div>
             <p className="hint">Used to tailor intervals based on local conditions.</p>
           </Field>
@@ -215,19 +215,19 @@ export default function AddPlantModal({
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Water every (days)">
-              <input className="input" type="number" min={1} value={waterEvery} onClick={e=>setWaterEvery(e.target.value)} />
+              <input className="input" type="number" min={1} value={waterEvery} onChange={e=>setWaterEvery(e.target.value)} />
             </Field>
             <Field label="Water amount (ml)">
-              <input className="input" type="number" min={50} step={10} value={waterAmount} onClick={e=>setWaterAmount(e.target.value)} />
+              <input className="input" type="number" min={50} step={10} value={waterAmount} onChange={e=>setWaterAmount(e.target.value)} />
             </Field>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Fertilize every (days)">
-              <input className="input" type="number" min={7} value={fertEvery} onClick={e=>setFertEvery(e.target.value)} />
+              <input className="input" type="number" min={7} value={fertEvery} onChange={e=>setFertEvery(e.target.value)} />
             </Field>
             <Field label="Formula">
-              <input className="input" value={fertFormula} onClick={e=>setFertFormula(e.target.value)} placeholder="e.g., 10-10-10 @ 1/2 strength" />
+              <input className="input" value={fertFormula} onChange={e=>setFertFormula(e.target.value)} placeholder="e.g., 10-10-10 @ 1/2 strength" />
             </Field>
           </div>
 

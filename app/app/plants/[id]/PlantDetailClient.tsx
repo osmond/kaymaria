@@ -1,10 +1,10 @@
-import type { Tab } from '../../../components/BottomNav';
+import type { Tab } from '@/components/BottomNav';
 
 "use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import BottomNav from "../../../../components/BottomNav";
+import BottomNav from '@/components/BottomNav';
 
 type CareType = "water" | "fertilize" | "repot";
 type TaskDTO = {
@@ -27,8 +27,9 @@ function timeAgo(d: Date) {
   const mins = Math.floor(diff / 60000); return `${mins}m ago`;
 }
 
-export default function PlantDetailClient({ id, initialName }: { id: string; initialName: string }) {
-  const [name] = useState(initialName);
+export default function PlantDetailClient({ plant }: { plant: { id: string; name: string } }) {
+  const id = plant.id;
+  const [name] = useState(plant.name);
   const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -151,7 +152,7 @@ export default function PlantDetailClient({ id, initialName }: { id: string; ini
       </div>
 
       {/* Bottom nav */}
-      <BottomNav active="plants" />
+      <BottomNav value="plants" onChange={() => {}} />
     </div>
   );
 }

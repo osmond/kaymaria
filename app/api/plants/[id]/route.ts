@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import {
   getPlant,
-  computedWaterInfo,
+  getComputedWaterInfo,
   updatePlant,
   deletePlant,
-} from "@/lib/plantstore";
+} from "@/lib/mockdb";
 
 // In Next 15, params may be a Promise — await it.
 export async function GET(
@@ -15,7 +15,7 @@ export async function GET(
     const params = await (ctx as any).params;
     const p = getPlant(params.id);
     if (!p) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    const water = computedWaterInfo(p);
+    const water = getComputedWaterInfo(p.id);
     return NextResponse.json({ ...p, water });
   } catch (e: any) {
     console.error("GET /api/plants/[id] failed:", e);
