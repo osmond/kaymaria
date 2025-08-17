@@ -129,6 +129,18 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
   const [plantsErr, setPlantsErr] = useState<string | null>(null);
   const [plantsLoading, setPlantsLoading] = useState(false);
 
+  // room filter
+  const [roomFilter, setRoomFilter] = useState("");
+  const rooms = useMemo(() => {
+    const set = new Set<string>();
+    tasks.forEach((t) => set.add(t.roomId));
+    return Array.from(set);
+  }, [tasks]);
+  const filteredTasks = useMemo(
+    () => (roomFilter ? tasks.filter((t) => t.roomId === roomFilter) : tasks),
+    [tasks, roomFilter]
+  );
+
   async function refresh() {
     setLoading(true);
     setErr(null);
@@ -329,13 +341,13 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
       today.getMonth(),
       today.getDate() + 1
     );
-    return tasks
+    return filteredTasks
       .filter((t) => new Date(t.dueAt) < tomorrow)
       .sort(
         (a, b) =>
           new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
       );
-  }, [tasks]);
+  }, [filteredTasks]);
   const tasksTodayGrouped = useMemo(() => {
     const m = new Map<string, TaskDTO[]>();
     tasksToday.forEach((t) => {
@@ -368,7 +380,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
       today.getDate() + TASK_WINDOW_DAYS
     );
     const m = new Map<string, TaskDTO[]>();
-    tasks
+    filteredTasks
       .filter((t) => {
         const d = new Date(t.dueAt);
         return d >= tomorrow && d < windowEnd;
@@ -382,7 +394,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
         m.set(label, [...(m.get(label) || []), t]);
       });
     return Array.from(m.entries());
-  }, [tasks]);
+  }, [filteredTasks]);
 
   return (
     <div className="min-h-[100dvh] flex flex-col">
@@ -398,28 +410,44 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
           <ClientDate />
         </div>
         {view === "today" && (
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <button
-              className={
-                homeTab === "today"
-                  ? "bg-neutral-900 text-white rounded px-3 py-2"
-                  : "border rounded px-3 py-2"
-              }
-              onClick={() => setHomeTab("today")}
-            >
-              Today
-            </button>
-            <button
-              className={
-                homeTab === "upcoming"
-                  ? "bg-neutral-900 text-white rounded px-3 py-2"
-                  : "border rounded px-3 py-2"
-              }
-              onClick={() => setHomeTab("upcoming")}
-            >
-              Upcoming
-            </button>
-          </div>
+          <>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button
+                className={
+                  homeTab === "today"
+                    ? "bg-neutral-900 text-white rounded px-3 py-2"
+                    : "border rounded px-3 py-2"
+                }
+                onClick={() => setHomeTab("today")}
+              >
+                Today
+              </button>
+              <button
+                className={
+                  homeTab === "upcoming"
+                    ? "bg-neutral-900 text-white rounded px-3 py-2"
+                    : "border rounded px-3 py-2"
+                }
+                onClick={() => setHomeTab("upcoming")}
+              >
+                Upcoming
+              </button>
+            </div>
+            <div className="mt-3">
+              <select
+                value={roomFilter}
+                onChange={(e) => setRoomFilter(e.target.value)}
+                className="border rounded px-3 py-2 w-full"
+              >
+                <option value="">All rooms</option>
+                {rooms.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
         )}
       </header>
 

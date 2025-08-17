@@ -5,6 +5,7 @@ export type TaskDTO = {
   id: string;
   plantId: string;
   plantName: string;
+  roomId?: string;
   type: CareType;
   dueAt: string; // ISO
   status: "due";
@@ -38,6 +39,7 @@ function initialTasks(): TaskDTO[] {
       id: "t_seed_1",
       plantId: "p_orchid",
       plantName: "Orchid",
+      roomId: "room-1",
       type: "repot",
       dueAt: iso(today),
       status: "due",
@@ -70,6 +72,7 @@ export function listTasks(): TaskDTO[] {
 export function addTask(input: {
   plant: string;
   plantId?: string;
+  roomId?: string;
   type: CareType;
   dueAt: Date;
 }): TaskDTO {
@@ -83,6 +86,7 @@ export function addTask(input: {
     id,
     plantId,
     plantName: input.plant,
+    roomId: input.roomId,
     type: input.type,
     dueAt: input.dueAt.toISOString(),
     status: "due",
