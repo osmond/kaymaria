@@ -49,6 +49,23 @@ export default function TaskRow({
   }
   const [noteOpen, setNoteOpen] = useState(false);
   const [note, setNote] = useState('');
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [longPress, setLongPress] = useState(false);
+
+  function handlePointerDown() {
+    const t = setTimeout(() => {
+      setLongPress(true);
+      setNoteOpen(true);
+    }, 600);
+    setPressTimer(t);
+  }
+
+  function handlePointerUp() {
+    if (pressTimer) clearTimeout(pressTimer);
+    setPressTimer(null);
+    setLongPress(false);
+  }
   return (
     <div className="relative">
       <div className="absolute inset-0 rounded-xl overflow-hidden">
@@ -58,10 +75,10 @@ export default function TaskRow({
             Complete
           </div>
         </div>
-        <div className="absolute inset-y-0 right-0 w-1/2 grid place-items-center bg-red-100 text-red-600">
+        <div className="absolute inset-y-0 right-0 w-1/2 grid place-items-center bg-blue-100 text-blue-600">
           <div className="flex items-center gap-2 text-xs font-medium">
-            <Trash2 className="h-4 w-4" />
-            Delete
+            <Edit2 className="h-4 w-4" />
+            Edit
           </div>
         </div>
       </div>
@@ -71,19 +88,22 @@ export default function TaskRow({
         dragElastic={0.2}
         onDragEnd={(_, i) => {
           if (i.offset.x > 80) onComplete();
-          else if (i.offset.x < -80) onDelete();
+          else if (i.offset.x < -80) onEdit();
         }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
         className="relative"
       >
         <div className="rounded-xl border bg-white shadow-sm">
           <div className="p-3 flex items-center gap-3">
             <button
-              onClick={onOpen}
+              onClick={() => !longPress && onOpen()}
               className="h-10 w-10 rounded-xl bg-neutral-100 grid place-items-center"
             >
               <Leaf className="h-5 w-5" />
             </button>
-            <div className="flex-1" onClick={onOpen}>
+            <div className="flex-1" onClick={() => !longPress && onOpen()}>
               {showPlant ? (
                 <div className="flex items-center justify-between">
                   <div className="font-medium">{plant}</div>
@@ -147,18 +167,26 @@ export default function TaskRow({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (!note.trim()) return;
-              onAddNote(note.trim());
+              if (!note.trim() && !photo) return;
+              if (note.trim()) onAddNote(note.trim());
+              if (photo) console.log('photo added', photo);
               setNote('');
+              setPhoto(null);
               setNoteOpen(false);
             }}
-            className="flex items-center gap-2 border-t p-3"
+            className="flex items-center gap-2 border-t p-3 flex-wrap"
           >
             <input
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Quick note..."
               className="flex-1 text-sm border rounded px-2 py-1"
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setPhoto(e.target.files?.[0] || null)}
+              className="text-sm"
             />
             <button
               type="submit"
