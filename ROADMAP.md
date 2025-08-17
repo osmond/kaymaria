@@ -93,7 +93,7 @@ All items are **unchecked** to indicate upcoming work.
   - [x] Light level requirements
   - [x] Repotting schedule
 - [ ] Input factors for recommendations:
-  - [ ] Pot size
+  - [x] Pot size
   - [ ] Pot material
   - [ ] Soil type
   - [ ] Indoor light level

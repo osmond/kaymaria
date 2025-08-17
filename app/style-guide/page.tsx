@@ -12,7 +12,7 @@ export default function StyleGuidePreviewPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-display">Style Guide</h1>
         <Button
-          variant="outline"
+          variant="secondary"
           onClick={() => setPreviewMode(previewMode === "light" ? "dark" : "light")}
         >
           Preview: {previewMode === "light" ? "Light" : "Dark"}
