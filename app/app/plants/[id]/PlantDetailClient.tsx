@@ -37,7 +37,25 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
     const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
-  const [careTips, setCareTips] = useState<string[]>([]);
+  const careTips = useMemo(() => {
+    const tips: string[] = [];
+    const now = Date.now();
+    if (nextWater) {
+      const diff = (nextWater.getTime() - now) / 864e5;
+      if (weather && weather.temperature > 28 && diff > 2) {
+        tips.push("Hot weather—consider watering sooner.");
+      } else if (diff <= 2) {
+        tips.push("Watering due soon.");
+      }
+    }
+    if (nextFertilize) {
+      const diffF = (nextFertilize.getTime() - now) / 864e5;
+      if (diffF <= 7) {
+        tips.push("Fertilizing due soon.");
+      }
+    }
+    return tips;
+  }, [nextWater?.getTime(), nextFertilize?.getTime(), weather]);
 
   const fmt = (d: Date) => new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(d);
 
@@ -94,25 +112,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
     return () => { alive = false; };
   }, [id, plant.latitude, plant.longitude]);
 
-  useEffect(() => {
-    const tips: string[] = [];
-    const now = Date.now();
-    if (nextWater) {
-      const diff = (nextWater.getTime() - now) / 864e5;
-      if (weather && weather.temperature > 28 && diff > 2) {
-        tips.push("Hot weather—consider watering sooner.");
-      } else if (diff <= 2) {
-        tips.push("Watering due soon.");
-      }
-    }
-    if (nextFertilize) {
-      const diffF = (nextFertilize.getTime() - now) / 864e5;
-      if (diffF <= 7) {
-        tips.push("Fertilizing due soon.");
-      }
-    }
-    setCareTips(tips);
-  }, [nextWater, nextFertilize, weather]);
+
 
   const plantTasks = useMemo(() => (allTasks ?? []).filter(t => t.plantId === id), [allTasks, id]);
 
