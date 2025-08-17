@@ -58,7 +58,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 📍 **Smart Care Suggestions** – Based on light, pot size, species, and weather
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
-- 📱 **Mobile-First UI** – Fast, clean, swipeable interface with offline support
+- 📱 **Mobile-First Layout** – Bottom navigation, floating action button, and swipeable task cards optimized for one-handed use
 - 🌤️ **Weather Awareness** – Adjust care based on location and evapotranspiration
 
 ---
