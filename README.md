@@ -40,7 +40,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 
 ## ✨ Features
 
-- 🌼 **Today View** – See exactly which plants need attention today
+ - 🌼 **Today View** – See exactly which plants need attention today, including overdue tasks
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care
