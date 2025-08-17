@@ -10,7 +10,7 @@ All items are unchecked to indicate upcoming work.
 - [x] Set up Supabase project and env keys (.env.local)
 - [ ] Run database migrations (Prisma)
 - [ ] Create seed scripts for mock data (plants, tasks)
-- [ ] Add test route to fetch plants and tasks
+- [x] Add test route to fetch plants and tasks
 
 ---
 
