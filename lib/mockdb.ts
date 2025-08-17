@@ -12,6 +12,7 @@ export type Plant = {
   species?: string;
   potSize?: string;
   potMaterial?: string;
+  soilType?: string;
   rules: Rule[];
 };
 
@@ -59,6 +60,7 @@ let PLANTS: Plant[] = [
     species: "Aloe vera",
     potSize: "6in",
     potMaterial: "plastic",
+    soilType: "cactus mix",
     rules: [
       { type: "water", intervalDays: 7 },
       { type: "fertilize", intervalDays: 30 },
@@ -71,6 +73,7 @@ let PLANTS: Plant[] = [
     species: "Monstera deliciosa",
     potSize: "8in",
     potMaterial: "terracotta",
+    soilType: "aroid mix",
     rules: [
       { type: "water", intervalDays: 5 },
       { type: "fertilize", intervalDays: 28 },
@@ -83,6 +86,7 @@ let PLANTS: Plant[] = [
     species: "Phalaenopsis",
     potSize: "4in",
     potMaterial: "ceramic",
+    soilType: "orchid bark",
     rules: [
       { type: "water", intervalDays: 10 },
       { type: "fertilize", intervalDays: 45 },
@@ -95,6 +99,7 @@ let PLANTS: Plant[] = [
     species: "Sansevieria",
     potSize: "6in",
     potMaterial: "plastic",
+    soilType: "sandy mix",
     rules: [
       { type: "water", intervalDays: 14 },
     ],
@@ -106,6 +111,7 @@ let PLANTS: Plant[] = [
     species: "Boston fern",
     potSize: "6in",
     potMaterial: "ceramic",
+    soilType: "peaty mix",
     rules: [
       { type: "water", intervalDays: 3 },
     ],
@@ -117,6 +123,7 @@ let PLANTS: Plant[] = [
     species: "Ficus lyrata",
     potSize: "10in",
     potMaterial: "plastic",
+    soilType: "rich potting mix",
     rules: [
       { type: "water", intervalDays: 7 },
     ],
@@ -153,6 +160,7 @@ export function createPlant(partial: {
   species?: string;
   potSize?: string;
   potMaterial?: string;
+  soilType?: string;
   rules?: Rule[];
 }): Plant {
   const id = `p_${uuid()}`;
@@ -163,6 +171,7 @@ export function createPlant(partial: {
     species: partial.species,
     potSize: partial.potSize,
     potMaterial: partial.potMaterial,
+    soilType: partial.soilType,
     rules: partial.rules ?? [],
   };
   PLANTS.push(plant);
@@ -193,6 +202,7 @@ export function updatePlant(id: string, updates: Partial<Omit<Plant, "id" | "rul
   if (updates.species !== undefined) p.species = updates.species;
   if (updates.potSize !== undefined) p.potSize = updates.potSize;
   if (updates.potMaterial !== undefined) p.potMaterial = updates.potMaterial;
+  if (updates.soilType !== undefined) p.soilType = updates.soilType;
   if (updates.rules !== undefined) p.rules = updates.rules;
   return p;
 }

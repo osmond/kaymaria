@@ -95,7 +95,7 @@ All items are **unchecked** to indicate upcoming work.
 - [ ] Input factors for recommendations:
   - [x] Pot size
   - [x] Pot material
-  - [ ] Soil type
+  - [x] Soil type
   - [ ] Indoor light level
   - [ ] Room humidity
   - [ ] Seasonal changes
