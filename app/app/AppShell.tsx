@@ -273,9 +273,22 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
   const tasksTodayGrouped = useMemo(() => {
     const m = new Map<string, TaskDTO[]>();
     tasksToday.forEach((t) => {
-      m.set(t.plantName, [...(m.get(t.plantName) || []), t]);
+      const arr = m.get(t.plantName) || [];
+      arr.push(t);
+      m.set(t.plantName, arr);
     });
-    return Array.from(m.entries());
+    const groups = Array.from(m.entries()).map(([plant, items]) => [
+      plant,
+      items.sort(
+        (a, b) =>
+          new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
+      ),
+    ]) as [string, TaskDTO[]][];
+    groups.sort(
+      (a, b) =>
+        new Date(a[1][0].dueAt).getTime() - new Date(b[1][0].dueAt).getTime()
+    );
+    return groups;
   }, [tasksToday]);
   const upcoming = useMemo(() => {
     const tomorrow = new Date(

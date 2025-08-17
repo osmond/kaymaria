@@ -44,6 +44,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🌼 **Today View** – See exactly which plants need attention today, including overdue tasks
 - 🌅 **Upcoming View** – Preview tasks due in the next 7 days (configurable)
 - 🗂️ **Grouped Tasks** – Today's tasks organized by plant for quick scanning
+- ⏱️ **Urgency Sorting** – Tasks within each plant group are ordered by due date
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care
