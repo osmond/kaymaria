@@ -58,7 +58,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 📜 **Global Timeline** – View all plant care events in a chronological feed
 - 🔁 **Timeline Task Actions** – Complete tasks directly from the timeline with undo support
 - 🔍 **Timeline Filters** – Narrow the timeline by event type (water, fertilize, repot)
-- 📸 **Photo Gallery** – View plant photos over time to track growth
+- 📸 **Photo Gallery** – Add and view plant photos over time to track growth
 - 🌿 **Plant Detail Hero** – Large photo banner with species and acquisition date
 - 🧭 **Tabbed Plant Details** – Switch between stats, timeline, notes, and photos
 - 📓 **Plant Notes** – Journal free-form entries from the plant detail view
@@ -127,6 +127,8 @@ To enable local weather in the app, include `latitude` and `longitude` when crea
 - `DELETE /api/plants/:id` – remove a plant and its tasks
 - `GET /api/plants/:id/notes` – list notes for a plant
 - `POST /api/plants/:id/notes` – add a quick note
+- `GET /api/plants/:id/photos` – list photos for a plant
+- `POST /api/plants/:id/photos` – add a photo by URL
 - `GET /api/plants/:id/weather` – current weather for a plant
 
 Example:

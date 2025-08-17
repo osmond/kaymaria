@@ -24,16 +24,17 @@ type Note = { id: string; text: string; at: string };
 export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string; nextWater?: string; waterIntervalDays?: number; nextFertilize?: string; fertilizeIntervalDays?: number; light?: string; humidity?: string; potSize?: string; potMaterial?: string; soilType?: string; latitude?: number; longitude?: number } }) {
   const id = plant.id;
   const router = useRouter();
-  const [name] = useState(plant.name);
-  const photo = plant.photos?.[0] || "https://placehold.co/600x400?text=Plant";
-  const acquired = plant.acquiredAt ? new Date(plant.acquiredAt) : null;
+    const [name] = useState(plant.name);
+    const [photos, setPhotos] = useState<string[]>(plant.photos ?? []);
+    const heroPhoto = photos[0] || "https://placehold.co/600x400?text=Plant";
+    const acquired = plant.acquiredAt ? new Date(plant.acquiredAt) : null;
   const nextWater = plant.nextWater ? new Date(plant.nextWater) : null;
   const nextFertilize = plant.nextFertilize ? new Date(plant.nextFertilize) : null;
-  const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">("stats");
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [noteText, setNoteText] = useState("");
+    const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
+    const [err, setErr] = useState<string | null>(null);
+    const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">("stats");
+    const [notes, setNotes] = useState<Note[]>([]);
+    const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
   const [careTips, setCareTips] = useState<string[]>([]);
@@ -53,18 +54,31 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
     return () => { alive = false; };
   }, []);
 
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const r = await fetch(`/api/plants/${id}/notes`, { cache: "no-store" });
-        if (!r.ok) throw new Error();
-        const data: Note[] = await r.json();
-        if (alive) setNotes(data);
-      } catch {}
-    })();
-    return () => { alive = false; };
-  }, [id]);
+    useEffect(() => {
+      let alive = true;
+      (async () => {
+        try {
+          const r = await fetch(`/api/plants/${id}/notes`, { cache: "no-store" });
+          if (!r.ok) throw new Error();
+          const data: Note[] = await r.json();
+          if (alive) setNotes(data);
+        } catch {}
+      })();
+      return () => { alive = false; };
+    }, [id]);
+
+    useEffect(() => {
+      let alive = true;
+      (async () => {
+        try {
+          const r = await fetch(`/api/plants/${id}/photos`, { cache: "no-store" });
+          if (!r.ok) throw new Error();
+          const data: string[] = await r.json();
+          if (alive) setPhotos(data);
+        } catch {}
+      })();
+      return () => { alive = false; };
+    }, [id]);
 
   useEffect(() => {
     let alive = true;
@@ -146,6 +160,21 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
 
   };
 
+  const addPhoto = async () => {
+    const url = prompt("Photo URL");
+    if (!url) return;
+    try {
+      const r = await fetch(`/api/plants/${id}/photos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ src: url }),
+      });
+      if (!r.ok) throw new Error();
+      const rec: { src: string } = await r.json();
+      setPhotos((p) => [...p, rec.src]);
+    } catch {}
+  };
+
   const markTimelineDone = async (task: TaskDTO) => {
     try {
       const r = await fetch(`/api/tasks/${encodeURIComponent(task.id)}`, {
@@ -196,7 +225,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       <main className="flex-1 px-4 pb-28">
         {/* Hero */}
         <div className="rounded-2xl overflow-hidden border bg-white shadow-sm mt-4">
-          <img src={photo} alt={name} className="h-40 w-full object-cover bg-neutral-200" />
+        <img src={heroPhoto} alt={name} className="h-40 w-full object-cover bg-neutral-200" />
           <div className="p-4">
             <h2 className="text-lg font-display font-semibold">{name}</h2>
             <div className="text-sm text-neutral-500">
@@ -342,9 +371,9 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
 
         {tab === "photos" && (
           <section className="mt-4 rounded-xl border bg-white shadow-sm p-4">
-            {plant.photos && plant.photos.length > 0 ? (
+            {photos && photos.length > 0 ? (
               <div className="grid grid-cols-3 gap-2">
-                {plant.photos.map((src, i) => (
+                {photos.map((src, i) => (
                   <img
                     key={i}
                     src={src}
@@ -366,7 +395,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       <div className="fixed bottom-16 left-0 right-0 px-4">
         <div className="max-w-screen-sm mx-auto flex gap-2">
           <button onClick={markWatered} className="flex-1 h-10 rounded-lg bg-neutral-900 text-white text-sm font-medium">Mark Watered</button>
-          <button className="flex-1 h-10 rounded-lg bg-white border text-sm font-medium">Add Photo</button>
+            <button onClick={addPhoto} className="flex-1 h-10 rounded-lg bg-white border text-sm font-medium">Add Photo</button>
         </div>
       </div>
 
