@@ -62,7 +62,14 @@ export default function AddPlantModal({
     setSuggestError(null);
     setLoadingSuggest(true);
     try {
-      const r = await fetch('/api/ai/care-suggest', { method: 'POST' });
+      const r = await fetch('/api/ai/care-suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lat: Number(lat),
+          lon: Number(lon),
+        }),
+      });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const json: CareSuggest = await r.json();
       setSuggest(json);

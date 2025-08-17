@@ -62,6 +62,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 📓 **Plant Notes** – Journal free-form entries from the plant detail view
 - 📊 **Quick Stats** – At-a-glance summary of watering, fertilizing, and environment needs
 - 📍 **Smart Care Suggestions** – Based on light, pot size, species, and weather
+- 💧 **ET₀‑Aware Watering** – Adjusts suggested watering intervals using local evapotranspiration data
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
 - 📱 **Mobile-First Layout** – Bottom navigation, floating action button, and swipeable task cards optimized for one-handed use
