@@ -1,1 +1,103 @@
-'use client'; import {motion} from 'framer-motion'; import {Check,Pencil,Trash2} from 'lucide-react'; export default function TaskRow({plant,action,last,due,onOpen,onComplete,onDelete}:{plant:string;action:'Water'|'Fertilize'|'Repot';last:string;due:string;onOpen:()=>void;onComplete:()=>void;onDelete:()=>void;}){return(<div className='relative'><div className='absolute inset-0 rounded-xl overflow-hidden'><div className='absolute inset-y-0 left-0 w-1/2 grid place-items-center bg-emerald-100 text-emerald-700'><div className='flex items-center gap-2 text-xs font-medium'><Check className='h-4 w-4'/>Complete</div></div><div className='absolute inset-y-0 right-0 w-1/2 grid place-items-center bg-red-100 text-red-600'><div className='flex items-center gap-2 text-xs font-medium'><Trash2 className='h-4 w-4'/>Delete</div></div></div><motion.div drag='x' dragConstraints={{left:-120,right:120}} dragElastic={0.2} onDragEnd={(_,i)=>{if(i.offset.x>80)onComplete(); else if(i.offset.x<-80)onDelete();}} className='relative'><div className='rounded-xl border bg-white shadow-sm'><div className='p-3 flex items-center gap-3'><button onClick={onOpen} className='h-10 w-10 rounded-xl bg-neutral-100 grid place-items-center'>🪴</button><div className='flex-1' onClick={onOpen}><div className='flex items-center justify-between'><div className='font-medium'>{plant}</div><span className='text-xs text-neutral-500'>{action}</span></div><div className='text-xs text-neutral-500'>Last: {last} • Due: {due}</div></div><div className='flex items-center gap-1'><button aria-label='Done' onClick={onComplete} className='p-2 rounded hover:bg-neutral-100'><Check className='h-4 w-4'/></button><button aria-label='Edit' onClick={onOpen} className='p-2 rounded hover:bg-neutral-100'><Pencil className='h-4 w-4'/></button><button aria-label='Delete' onClick={onDelete} className='p-2 rounded hover:bg-neutral-100'><Trash2 className='h-4 w-4'/></button></div></div></div></motion.div></div>);}
+'use client';
+
+import { motion } from 'framer-motion';
+import { Check, Pencil, Trash2 } from 'lucide-react';
+
+export default function TaskRow({
+  plant,
+  action,
+  last,
+  due,
+  onOpen,
+  onComplete,
+  onDelete,
+  showPlant = true,
+}: {
+  plant: string;
+  action: 'Water' | 'Fertilize' | 'Repot';
+  last: string;
+  due: string;
+  onOpen: () => void;
+  onComplete: () => void;
+  onDelete: () => void;
+  showPlant?: boolean;
+}) {
+  return (
+    <div className="relative">
+      <div className="absolute inset-0 rounded-xl overflow-hidden">
+        <div className="absolute inset-y-0 left-0 w-1/2 grid place-items-center bg-emerald-100 text-emerald-700">
+          <div className="flex items-center gap-2 text-xs font-medium">
+            <Check className="h-4 w-4" />
+            Complete
+          </div>
+        </div>
+        <div className="absolute inset-y-0 right-0 w-1/2 grid place-items-center bg-red-100 text-red-600">
+          <div className="flex items-center gap-2 text-xs font-medium">
+            <Trash2 className="h-4 w-4" />
+            Delete
+          </div>
+        </div>
+      </div>
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: -120, right: 120 }}
+        dragElastic={0.2}
+        onDragEnd={(_, i) => {
+          if (i.offset.x > 80) onComplete();
+          else if (i.offset.x < -80) onDelete();
+        }}
+        className="relative"
+      >
+        <div className="rounded-xl border bg-white shadow-sm">
+          <div className="p-3 flex items-center gap-3">
+            <button
+              onClick={onOpen}
+              className="h-10 w-10 rounded-xl bg-neutral-100 grid place-items-center"
+            >
+              🪴
+            </button>
+            <div className="flex-1" onClick={onOpen}>
+              {showPlant ? (
+                <div className="flex items-center justify-between">
+                  <div className="font-medium">{plant}</div>
+                  <span className="text-xs text-neutral-500">{action}</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="font-medium">{action}</div>
+                </div>
+              )}
+              <div className="text-xs text-neutral-500">
+                Last: {last} • Due: {due}
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                aria-label="Done"
+                onClick={onComplete}
+                className="p-2 rounded hover:bg-neutral-100"
+              >
+                <Check className="h-4 w-4" />
+              </button>
+              <button
+                aria-label="Edit"
+                onClick={onOpen}
+                className="p-2 rounded hover:bg-neutral-100"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+              <button
+                aria-label="Delete"
+                onClick={onDelete}
+                className="p-2 rounded hover:bg-neutral-100"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
