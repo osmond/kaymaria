@@ -160,6 +160,14 @@ export function deferTask(id: string, days: number): TaskRec | null {
   return rec;
 }
 
+export function updateTask(id: string, updates: Partial<Pick<TaskRec, "type" | "dueAt" >>): TaskRec | null {
+  const rec = TASKS.find(t => t.id === id);
+  if (!rec) return null;
+  if (updates.type) rec.type = updates.type;
+  if (updates.dueAt) rec.dueAt = updates.dueAt;
+  return rec;
+}
+
 export function createTask(partial: Partial<TaskRec>): TaskRec {
   const id = `t_${uuid()}`;
   const rec: TaskRec = {

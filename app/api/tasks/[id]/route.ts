@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { completeTask, addEvent, CareType, deferTask } from "@/lib/mockdb";
+import { completeTask, addEvent, CareType, deferTask, updateTask } from "@/lib/mockdb";
 import { touchWatered } from "@/lib/plantstore";
 
 // Accept both "t_<uuid>" and "plantId:type" (e.g. "p3:water")
@@ -38,6 +38,15 @@ export async function PATCH(req: Request, ctx: any) {
     }
 
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  if (body?.type || body?.dueAt) {
+    const rec = updateTask(id, {
+      type: body.type,
+      dueAt: body.dueAt,
+    });
+    if (!rec) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(rec);
   }
 
   return NextResponse.json({ error: "Unsupported" }, { status: 400 });
