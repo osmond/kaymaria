@@ -19,6 +19,8 @@ type TaskDTO = {
   lastEventAt?: string;
 };
 
+type Note = { id: string; text: string; at: string };
+
 export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string; nextWater?: string; waterIntervalDays?: number; nextFertilize?: string; fertilizeIntervalDays?: number; light?: string; humidity?: string; potSize?: string; potMaterial?: string; soilType?: string } }) {
   const id = plant.id;
   const router = useRouter();
@@ -30,6 +32,8 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
   const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">("stats");
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [noteText, setNoteText] = useState("");
 
   const fmt = (d: Date) => new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(d);
 
@@ -45,6 +49,19 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
     })();
     return () => { alive = false; };
   }, []);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const r = await fetch(`/api/plants/${id}/notes`, { cache: "no-store" });
+        if (!r.ok) throw new Error();
+        const data: Note[] = await r.json();
+        if (alive) setNotes(data);
+      } catch {}
+    })();
+    return () => { alive = false; };
+  }, [id]);
 
   const plantTasks = useMemo(() => (allTasks ?? []).filter(t => t.plantId === id), [allTasks, id]);
 
@@ -62,6 +79,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
     } catch { /* keep UX smooth in mock */ }
   };
 
+
   const iconFor = (type: CareType) => {
     const className = "inline h-4 w-4";
     switch (type) {
@@ -72,6 +90,22 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       default:
         return <Sprout className={className} />;
     }
+
+  const addNote = async () => {
+    const text = noteText.trim();
+    if (!text) return;
+    try {
+      const r = await fetch(`/api/plants/${id}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!r.ok) throw new Error();
+      const rec: Note = await r.json();
+      setNotes((n) => [rec, ...n]);
+      setNoteText("");
+    } catch {}
+
   };
 
   return (
@@ -191,14 +225,55 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
         )}
 
         {tab === "notes" && (
-          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4 text-sm text-neutral-500">
-            No notes yet
+          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4 text-sm">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                addNote();
+              }}
+            >
+              <textarea
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                placeholder="Write a note..."
+                className="w-full border rounded p-2 text-sm"
+              />
+              <div className="text-right mt-2">
+                <button type="submit" className="px-3 py-1 rounded bg-neutral-900 text-white text-xs">
+                  Add Note
+                </button>
+              </div>
+            </form>
+            <ul className="mt-4 space-y-3">
+              {notes.length === 0 && <li className="text-neutral-500">No notes yet</li>}
+              {notes.map((n) => (
+                <li key={n.id} className="border-t pt-2 first:border-t-0 first:pt-0">
+                  <div>{n.text}</div>
+                  <div className="text-xs text-neutral-500">
+                    {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(n.at))}
+                  </div>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 
         {tab === "photos" && (
-          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4 text-sm text-neutral-500">
-            No photos yet
+          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4">
+            {plant.photos && plant.photos.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2">
+                {plant.photos.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`${plant.name} photo ${i + 1}`}
+                    className="w-full h-24 object-cover rounded"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-neutral-500 text-center">No photos yet</div>
+            )}
           </section>
         )}
 

@@ -51,12 +51,14 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - ⏰ **Overdue/Urgent Filters** – Show only overdue tasks or those due soon
 - 📝 **Quick Notes** – Jot down observations directly from any task card
 - ✅ **Inline Task Actions** – Mark tasks done, defer them, or edit details without leaving the dashboard
+- 🎉 **Completion Feedback** – Subtle check animation and timestamp confirmation when tasks are marked done
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care
-- 📸 **Photo Uploads** – Track growth and keep a visual plant diary
+- 📸 **Photo Gallery** – View plant photos over time to track growth
 - 🌿 **Plant Detail Hero** – Large photo banner with species and acquisition date
 - 🧭 **Tabbed Plant Details** – Switch between stats, timeline, notes, and photos
+- 📓 **Plant Notes** – Journal free-form entries from the plant detail view
 - 📊 **Quick Stats** – At-a-glance summary of watering, fertilizing, and environment needs
 - 📍 **Smart Care Suggestions** – Based on light, pot size, species, and weather
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
