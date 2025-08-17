@@ -67,7 +67,7 @@ All items are **unchecked** to indicate upcoming work.
   - [ ] **Notes**: Free-form journaling or text entries
   - [ ] **Photos**: A visual gallery of growth over time
 - [ ] **Task completion feedback**:
-  - [ ] Add a subtle animation or emoji burst when a task is marked done
+  - [ ] Add a subtle animation when a task is marked done. don't use emojis
   - [ ] Temporary confirmation message (e.g., “Watered!” with timestamp)
 - [ ] **Inline “Mark as Done” on Timeline**:
   - [ ] Let users complete tasks directly from the timeline view
