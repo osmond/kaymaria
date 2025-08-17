@@ -32,7 +32,7 @@ All items are **unchecked** to indicate upcoming work.
 ### 📅 Home View (Task Dashboard)
 
 - [x] **Today view**: Show only tasks due today, including overdue ones
-- [ ] **Upcoming view**: Show tasks due in the next 7 days (or a configurable range)
+- [x] **Upcoming view**: Show tasks due in the next 7 days (or a configurable range)
 - [ ] **Group tasks by plant**: Visual hierarchy that nests or groups tasks under each plant
 - [ ] **Sort by urgency**: Sort tasks by due date/time within each plant group
 - [ ] **Task icons**: Use visual icons (💧 Water, 🌱 Fertilize, 🪴 Repot) for quick scanning

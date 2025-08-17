@@ -10,6 +10,10 @@ import AddPlantModal from "@/components/AddPlantModal";
 import { TaskDTO } from "@/lib/types";
 import { motion } from "framer-motion";
 
+const TASK_WINDOW_DAYS = Number(
+  process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7"
+);
+
 function isSameDay(a: Date, b: Date) {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -127,7 +131,9 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
     setLoading(true);
     setErr(null);
     try {
-      const r = await fetch("/api/tasks?window=7d", { cache: "no-store" });
+      const r = await fetch(`/api/tasks?window=${TASK_WINDOW_DAYS}d`, {
+        cache: "no-store",
+      });
       if (!r.ok) throw new Error("HTTP " + r.status);
       setTasks(await r.json());
     } catch (e: any) {
@@ -270,9 +276,17 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
       today.getMonth(),
       today.getDate() + 1
     );
+    const windowEnd = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + TASK_WINDOW_DAYS
+    );
     const m = new Map<string, TaskDTO[]>();
     tasks
-      .filter((t) => new Date(t.dueAt) >= tomorrow)
+      .filter((t) => {
+        const d = new Date(t.dueAt);
+        return d >= tomorrow && d < windowEnd;
+      })
       .forEach((t) => {
         const label = new Intl.DateTimeFormat(undefined, {
           weekday: "short",
