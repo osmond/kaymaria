@@ -11,20 +11,12 @@ export async function PATCH(
 
   const id = decodeURIComponent(params.id);
 
-  // If composite id "plantId:type", also update plant lastWaterAt
-  if (id.includes(":")) {
-    const [plantId, type] = id.split(":");
-    if (!plantId || !type) {
-      return NextResponse.json({ error: "bad id" }, { status: 400 });
-    }
-    if (type === "water") touchWatered(plantId);
-    // Also try to remove task if it matches any mock task id
-    completeTask(id);
-    return NextResponse.json({ ok: true });
+  const result = completeTask(id);
+  if (!result) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Normal task id
-  const ok = completeTask(id);
-  if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (result.type === "water") touchWatered(result.plantId);
+
   return NextResponse.json({ ok: true });
 }

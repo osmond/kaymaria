@@ -131,15 +131,21 @@ export function getTasks(windowDays = 7): TaskRec[] {
   return TASKS.filter(t => new Date(t.dueAt).getTime() <= maxTs);
 }
 
-export function completeTask(idOrComposite: string): boolean {
+export function completeTask(
+  idOrComposite: string
+): { plantId: string; type: CareType } | null {
   // Supports both "t_<uuid>" and "plantId:type"
-  const idx = TASKS.findIndex(t =>
-    t.id === idOrComposite ||
-    (idOrComposite.includes(":") && `${t.plantId}:${t.type}` === idOrComposite)
+  const idx = TASKS.findIndex(
+    (t) =>
+      t.id === idOrComposite ||
+      `${t.plantId}:${t.type}` === idOrComposite
   );
-  if (idx === -1) return false;
+  if (idx === -1) return null;
+  const task = TASKS[idx];
   TASKS.splice(idx, 1);
-  return true;
+  // Record care event and schedule the next task
+  addEvent(task.plantId, task.type);
+  return { plantId: task.plantId, type: task.type };
 }
 
 export function createTask(partial: Partial<TaskRec>): TaskRec {
