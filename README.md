@@ -57,6 +57,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - 📜 **Global Timeline** – View all plant care events in a chronological feed
 - 🔁 **Timeline Task Actions** – Complete tasks directly from the timeline with undo support
+- 🔍 **Timeline Filters** – Narrow the timeline by event type (water, fertilize, repot)
 - 📸 **Photo Gallery** – View plant photos over time to track growth
 - 🌿 **Plant Detail Hero** – Large photo banner with species and acquisition date
 - 🧭 **Tabbed Plant Details** – Switch between stats, timeline, notes, and photos
