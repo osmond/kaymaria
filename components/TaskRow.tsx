@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check, Pencil, Trash2, Clock } from 'lucide-react';
+import { Check, Trash2, Clock, Edit2, StickyNote } from 'lucide-react';
 import { useState } from 'react';
 
 export default function TaskRow({
@@ -14,6 +14,7 @@ export default function TaskRow({
   onAddNote,
   onDelete,
   onDefer,
+  onEdit,
   showPlant = true,
 }: {
   plant: string;
@@ -25,6 +26,7 @@ export default function TaskRow({
   onAddNote: (note: string) => void;
   onDelete: () => void;
   onDefer: () => void;
+  onEdit: () => void;
   showPlant?: boolean;
 }) {
   function iconFor(action: 'Water' | 'Fertilize' | 'Repot') {
@@ -103,11 +105,18 @@ export default function TaskRow({
                 <Clock className="h-4 w-4" />
               </button>
               <button
+                aria-label="Edit"
+                onClick={onEdit}
+                className="p-2 rounded hover:bg-neutral-100"
+              >
+                <Edit2 className="h-4 w-4" />
+              </button>
+              <button
                 aria-label="Add note"
                 onClick={() => setNoteOpen((v) => !v)}
                 className="p-2 rounded hover:bg-neutral-100"
               >
-                <Pencil className="h-4 w-4" />
+                <StickyNote className="h-4 w-4" />
               </button>
               <button
                 aria-label="Delete"

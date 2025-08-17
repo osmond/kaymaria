@@ -37,10 +37,10 @@ All items are **unchecked** to indicate upcoming work.
 - [x] **Sort by urgency**: Sort tasks by due date/time within each plant group
 - [x] **Task icons**: Use visual icons (💧 Water, 🌱 Fertilize, 🪴 Repot) for quick scanning
 - [x] **Quick Notes**: Allow inline note-taking for a plant directly from the task card (e.g., "drooping today" or "spotted new growth")
-- [ ] **Inline task actions**:
+- [x] **Inline task actions**:
   - [x] Mark as done (with subtle animation or feedback)
   - [x] Defer (e.g., "Remind me tomorrow")
-  - [ ] Edit task details (date, type, etc.)
+  - [x] Edit task details (date, type, etc.)
 - [ ] ** filters**: 
   - [ ] Filter by room/location
   - [ ] Filter by task type
