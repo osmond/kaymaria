@@ -1,33 +1,20 @@
-"use client"
-
-import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
-import { Moon, Sun } from "lucide-react"
+import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-export default function StyleGuidePage() {
-  const { theme, setTheme, resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => setMounted(true), [])
-
-  const isDark = resolvedTheme === "dark"
+export default function StyleGuidePreviewPage() {
+  const [previewMode, setPreviewMode] = useState<"light" | "dark">("light")
 
   return (
-    <div className="p-6 space-y-8 min-h-screen transition-colors duration-300">
+    <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-display">Style Guide</h1>
-        {mounted && (
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            aria-label="Toggle theme"
-          >
-            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          onClick={() => setPreviewMode(previewMode === "light" ? "dark" : "light")}
+        >
+          Preview: {previewMode === "light" ? "Light" : "Dark"}
+        </Button>
       </div>
 
       {/* Core Colors */}
@@ -44,29 +31,17 @@ export default function StyleGuidePage() {
         </CardContent>
       </Card>
 
-      {/* Seasonal Palettes */}
+      {/* Seasonal Themes */}
       <Card>
         <CardContent className="p-6 space-y-6">
           <h2 className="text-xl font-semibold">Seasonal Themes</h2>
 
-          {/* Light Mode */}
           <div>
-            <h3 className="text-md font-medium mb-2">Light Mode</h3>
+            <h3 className="text-md font-medium mb-2">{previewMode === "light" ? "Light Mode" : "Dark Mode"}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <ThemeSwatch label="Spring" primary="#6CA995" secondary="#E2F7F2" background="#FDFDFD" foreground="#1F2937" />
-              <ThemeSwatch label="Summer (Default)" primary="#508C7E" secondary="#D3EDE6" background="#F9F9F9" foreground="#111827" />
-              <ThemeSwatch label="Autumn" primary="#C38154" secondary="#F5E7DA" background="#FBFAF8" foreground="#3B2F2F" />
-              <ThemeSwatch label="Winter" primary="#6B7280" secondary="#E0E7FF" background="#F8FAFC" foreground="#1E293B" />
-            </div>
-          </div>
-
-          {/* Dark Mode */}
-          <div>
-            <h3 className="text-md font-medium mt-6 mb-2">Dark Mode</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <ThemeSwatch label="Default" primary="#7BD7C2" secondary="#1B2A2B" background="#0B0F10" foreground="#E5E7EB" />
-              <ThemeSwatch label="Winter" primary="#6C82B3" secondary="#1C2431" background="#0A101A" foreground="#E2E8F0" />
-              <ThemeSwatch label="Autumn" primary="#D69F7E" secondary="#2E1E1E" background="#1A1410" foreground="#F3F4F6" />
+              {(previewMode === "light" ? seasonalLight : seasonalDark).map((theme) => (
+                <ThemeSwatch key={theme.label} {...theme} />
+              ))}
             </div>
           </div>
         </CardContent>
@@ -85,14 +60,14 @@ function ColorSwatch({ name, hex, text = "white" }: { name: string, hex: string,
   )
 }
 
-function ThemeSwatch({ label, primary, secondary, background, foreground }: { label: string, primary: string, secondary: string, background: string, foreground: string }) {
+function ThemeSwatch({ label, primary, secondary, background, foreground }: ThemeProps) {
   return (
     <div className="rounded-lg border overflow-hidden text-xs shadow">
-      <div className="flex h-6">
-        <div className="flex-1" style={{ backgroundColor: primary }} />
-        <div className="flex-1" style={{ backgroundColor: secondary }} />
-        <div className="flex-1" style={{ backgroundColor: background }} />
-        <div className="flex-1" style={{ backgroundColor: foreground }} />
+      <div className="flex h-6 text-[10px] text-center text-white font-bold">
+        <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: primary }}>Primary</div>
+        <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: secondary }}>Secondary</div>
+        <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: background, color: '#000' }}>BG</div>
+        <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: foreground }}>FG</div>
       </div>
       <div className="p-2">
         <strong className="block text-sm mb-1">{label}</strong>
@@ -106,3 +81,66 @@ function ThemeSwatch({ label, primary, secondary, background, foreground }: { la
     </div>
   )
 }
+
+interface ThemeProps {
+  label: string
+  primary: string
+  secondary: string
+  background: string
+  foreground: string
+}
+
+const seasonalLight: ThemeProps[] = [
+  {
+    label: "Spring",
+    primary: "#6CA995",
+    secondary: "#E2F7F2",
+    background: "#FDFDFD",
+    foreground: "#1F2937"
+  },
+  {
+    label: "Summer (Default)",
+    primary: "#508C7E",
+    secondary: "#D3EDE6",
+    background: "#F9F9F9",
+    foreground: "#111827"
+  },
+  {
+    label: "Autumn",
+    primary: "#C38154",
+    secondary: "#F5E7DA",
+    background: "#FBFAF8",
+    foreground: "#3B2F2F"
+  },
+  {
+    label: "Winter",
+    primary: "#6B7280",
+    secondary: "#E0E7FF",
+    background: "#F8FAFC",
+    foreground: "#1E293B"
+  },
+]
+
+const seasonalDark: ThemeProps[] = [
+  {
+    label: "Default",
+    primary: "#7BD7C2",
+    secondary: "#1B2A2B",
+    background: "#0B0F10",
+    foreground: "#E5E7EB"
+  },
+  {
+    label: "Winter",
+    primary: "#6C82B3",
+    secondary: "#1C2431",
+    background: "#0A101A",
+    foreground: "#E2E8F0"
+  },
+  {
+    label: "Autumn",
+    primary: "#D69F7E",
+    secondary: "#2E1E1E",
+    background: "#1A1410",
+    foreground: "#F3F4F6"
+  }
+]
