@@ -49,23 +49,23 @@ export const seasonalDark: ThemeTokens[] = [
   {
     label: "Default",
     primary: "#7BD7C2",
-    secondary: "#1B2A2B",
-    background: "#0B0F10",
+    secondary: "#1CA2B3",
+    background: "#0A0D0E",
     foreground: "#E5E7EB",
   },
   {
     label: "Winter",
-    primary: "#6C82B3",
-    secondary: "#1C2431",
+    primary: "#6D83C4",
+    secondary: "#98A9C5",
     background: "#0A101A",
     foreground: "#E2E8F0",
   },
   {
     label: "Autumn",
-    primary: "#D69F7E",
-    secondary: "#2E1E1E",
+    primary: "#E09567",
+    secondary: "#3A2B2B",
     background: "#1A1410",
-    foreground: "#F3F4F6",
+    foreground: "#F8F8F8",
   },
 ]
 
