@@ -64,4 +64,13 @@ cd kaymaria
 npm install
 cp .env.local.example .env.local
 npm run dev
+```
+
+## 🔌 Test API
+
+A simple endpoint is available for experimenting with mock data:
+
+```bash
+curl http://localhost:3000/api/test
+```
 
