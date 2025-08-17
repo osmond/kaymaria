@@ -62,7 +62,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🧭 **Tabbed Plant Details** – Switch between stats, timeline, notes, and photos
 - 📓 **Plant Notes** – Journal free-form entries from the plant detail view
 - 📊 **Quick Stats** – At-a-glance summary of watering, fertilizing, and environment needs
-- 📍 **Smart Care Suggestions** – Based on light, humidity, pot size, species, weather, and season
+- 📍 **Smart Care Suggestions** – Based on location, light, humidity, pot size, species, weather, and season
 - 💧 **ET₀‑Aware Watering** – Adjusts suggested watering intervals using local evapotranspiration data
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
@@ -157,10 +157,10 @@ Request plant-specific care guidance powered by OpenAI:
 ```bash
 curl -X POST http://localhost:3000/api/ai/care-recommend \\
   -H 'Content-Type: application/json' \\
-  -d '{"species":"Monstera deliciosa","potSize":"8in","potMaterial":"terracotta","soilType":"well-draining","lightLevel":"bright indirect","humidity":"medium","season":"winter"}'
+  -d '{"species":"Monstera deliciosa","potSize":"8in","potMaterial":"terracotta","soilType":"well-draining","lightLevel":"bright indirect","humidity":"medium","season":"winter","location":"living room"}'
 ```
 
 This returns JSON with recommended `water`, `fertilizer`, `light`, and `repot` fields.
 
-Include the optional `season` field to tailor care advice to the time of year. If omitted, the current season is used.
+Include the optional `season` and `location` fields to tailor care advice to the time of year and environment. If omitted, the current season is used and location defaults to `unspecified`.
 
