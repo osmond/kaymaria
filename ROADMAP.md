@@ -96,6 +96,7 @@ All items are **unchecked** to indicate upcoming work.
   - [ ] Repotting schedule
 - [ ] Input factors for recommendations:
   - [ ] Pot size
+  - [ ] Pot material
   - [ ] Soil type
   - [ ] Indoor light level
   - [ ] Room humidity
