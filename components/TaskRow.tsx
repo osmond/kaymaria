@@ -22,6 +22,9 @@ export default function TaskRow({
   onDelete: () => void;
   showPlant?: boolean;
 }) {
+  function iconFor(action: 'Water' | 'Fertilize' | 'Repot') {
+    return action === 'Water' ? '💧' : action === 'Fertilize' ? '🌱' : '🪴';
+  }
   return (
     <div className="relative">
       <div className="absolute inset-0 rounded-xl overflow-hidden">
@@ -60,11 +63,17 @@ export default function TaskRow({
               {showPlant ? (
                 <div className="flex items-center justify-between">
                   <div className="font-medium">{plant}</div>
-                  <span className="text-xs text-neutral-500">{action}</span>
+                  <span className="text-xs text-neutral-500 flex items-center gap-1">
+                    <span>{iconFor(action)}</span>
+                    {action}
+                  </span>
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
-                  <div className="font-medium">{action}</div>
+                  <div className="font-medium flex items-center gap-1">
+                    <span>{iconFor(action)}</span>
+                    {action}
+                  </div>
                 </div>
               )}
               <div className="text-xs text-neutral-500">
