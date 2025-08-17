@@ -1,7 +1,7 @@
 # 🌱 Kay Maria
 
 **Tend to what matters.**  
-_A calm, intelligent plant care companion — designed for clarity, beauty, and emotional connection._
+_A calm, intelligent plant care companion designed for clarity, beauty, and emotional connection._
 
 ---
 
