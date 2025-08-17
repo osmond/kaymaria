@@ -4,6 +4,7 @@ import type { Tab } from '@/components/BottomNav';
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import BottomNav from '@/components/BottomNav';
 
 type CareType = "water" | "fertilize" | "repot";
@@ -19,6 +20,7 @@ type TaskDTO = {
 
 export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string; nextWater?: string; waterIntervalDays?: number; nextFertilize?: string; fertilizeIntervalDays?: number; light?: string; humidity?: string; potSize?: string; potMaterial?: string; soilType?: string } }) {
   const id = plant.id;
+  const router = useRouter();
   const [name] = useState(plant.name);
   const photo = plant.photos?.[0] || "https://placehold.co/600x400?text=Plant";
   const acquired = plant.acquiredAt ? new Date(plant.acquiredAt) : null;
@@ -157,7 +159,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       </div>
 
       {/* Bottom nav */}
-      <BottomNav value="plants" onChange={() => {}} />
+      <BottomNav value="plants" onChange={(t: Tab) => router.push(`/app?tab=${t}`)} />
     </div>
   );
 }
