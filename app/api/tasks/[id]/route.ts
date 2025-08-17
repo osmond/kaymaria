@@ -5,11 +5,9 @@ import { touchWatered } from "@/lib/plantstore";
 // Accept both "t_<uuid>" and "plantId:type" (e.g. "p3:water")
 export async function PATCH(
   _req: Request,
-  ctx: { params: Promise<{ id: string }> } | { params: { id: string } }
+  ctx: any
 ) {
-  const params = "then" in (ctx as any).params
-    ? await (ctx as any).params
-    : (ctx as any).params;
+  const params = await ctx.params;
 
   const id = decodeURIComponent(params.id);
 

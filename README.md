@@ -91,3 +91,21 @@ A simple endpoint is available for experimenting with mock data:
 curl http://localhost:3000/api/test
 ```
 
+## 🌿 Plant API
+
+Basic CRUD endpoints exist for working with mock plant data:
+
+- `GET /api/plants` – list all plants
+- `POST /api/plants` – create a plant
+- `GET /api/plants/:id` – fetch a plant
+- `PATCH /api/plants/:id` – update fields on a plant
+- `DELETE /api/plants/:id` – remove a plant
+
+Example:
+
+```bash
+curl -X POST http://localhost:3000/api/plants \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Palm","waterEveryDays":5}'
+```
+
