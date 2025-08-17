@@ -22,7 +22,7 @@ export default function StyleGuidePreviewPage() {
       {/* Core Colors */}
       <Card>
         <CardContent className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Core Tokens</h2>
+          <h2 className="text-xl font-display font-semibold mb-4">Core Tokens</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <ColorSwatch name="Primary" hex="#508C7E" />
             <ColorSwatch name="Secondary" hex="#D3EDE6" />
@@ -36,7 +36,7 @@ export default function StyleGuidePreviewPage() {
       {/* Seasonal Themes */}
       <Card>
         <CardContent className="p-6 space-y-6">
-          <h2 className="text-xl font-semibold">Seasonal Themes</h2>
+          <h2 className="text-xl font-display font-semibold">Seasonal Themes</h2>
 
           <div>
             <h3 className="text-md font-medium mb-2">{previewMode === "light" ? "Light Mode" : "Dark Mode"}</h3>

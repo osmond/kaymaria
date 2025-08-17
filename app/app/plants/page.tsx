@@ -25,7 +25,7 @@ export default function PlantsPage() {
     <section className="mt-4 space-y-6">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-medium text-neutral-600">My Plants</h2>
+          <h2 className="text-sm font-display font-medium text-neutral-600">My Plants</h2>
           <span className="text-xs text-neutral-500">
             {items?.length ?? 0} total
           </span>

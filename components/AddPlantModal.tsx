@@ -139,7 +139,7 @@ export default function AddPlantModal({
       {/* panel */}
       <div className="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto">
         <div className="p-5 border-b">
-          <h2 className="text-lg font-semibold">Add Plant</h2>
+          <h2 className="text-lg font-display font-semibold">Add Plant</h2>
           <p className="text-sm text-neutral-600">Use a canned AI suggestion for MVP.</p>
         </div>
 

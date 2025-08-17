@@ -184,7 +184,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-baseline justify-between w-full">
-            <h1 className="text-xl font-semibold tracking-tight">{name}</h1>
+            <h1 className="text-xl font-display font-semibold tracking-tight">{name}</h1>
             <span className="text-sm text-neutral-500">
               {new Intl.DateTimeFormat(undefined, { weekday:"short", month:"short", day:"numeric" }).format(new Date())}
             </span>
@@ -198,7 +198,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
         <div className="rounded-2xl overflow-hidden border bg-white shadow-sm mt-4">
           <img src={photo} alt={name} className="h-40 w-full object-cover bg-neutral-200" />
           <div className="p-4">
-            <h2 className="text-lg font-semibold">{name}</h2>
+            <h2 className="text-lg font-display font-semibold">{name}</h2>
             <div className="text-sm text-neutral-500">
               {plant.species || "—"}
               {acquired && ` • Acquired ${new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(acquired)}`}
