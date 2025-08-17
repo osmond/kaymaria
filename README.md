@@ -53,6 +53,20 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 
 This project is under active development.  
 Check out [ROADMAP.md](./ROADMAP.md) for upcoming milestones and goals.
+## 🧑‍🎨 Design System
+
+Kay Maria is built with a focus on calm, clarity, and emotional connection. Our visual language is defined in the [Visual Style Guide](./docs/style-guide.md), including:
+
+- Brand colors
+- Typography
+- Layout and spacing rules
+- UI components
+- Microinteractions
+- Tone and voice guidelines
+
+To view a live preview of the design tokens and color palette in the app, visit:
+
+🔗 [`/style-guide`](http://localhost:3000/style-guide) (dev only)
 
 ---
 
