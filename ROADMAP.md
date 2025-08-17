@@ -54,10 +54,28 @@ All items are **unchecked** to indicate upcoming work.
 
 ### 🌿 Plant Detail View
 
-- [ ] Hero banner with photo and stats
-- [ ] Tabs: Quick Stats, Timeline, Notes, Photos
-- [ ] Animated task completion feedback
-- [ ] Inline “Mark as Done” on Timeline view
+- [ ] **Hero banner**: Show large plant photo, nickname, and species (optionally include age or acquired date)
+- [ ] **Quick Stats section**:
+  - [ ] Watering interval & next due
+  - [ ] Fertilizing schedule
+  - [ ] Light level
+  - [ ] Humidity preference
+  - [ ] Pot size & soil type
+- [ ] **Tab layout**:
+  - [ ] **Quick Stats**: At-a-glance care summary
+  - [ ] **Timeline**: List of all completed and upcoming care tasks
+  - [ ] **Notes**: Free-form journaling or text entries
+  - [ ] **Photos**: A visual gallery of growth over time
+- [ ] **Task completion feedback**:
+  - [ ] Add a subtle animation or emoji burst when a task is marked done
+  - [ ] Temporary confirmation message (e.g., “Watered!” with timestamp)
+- [ ] **Inline “Mark as Done” on Timeline**:
+  - [ ] Let users complete tasks directly from the timeline view
+  - [ ] Support undo in case of accidental tap
+- [ ] **Mobile gesture support**:
+  - [ ] Swipe to mark as done or edit a task
+  - [ ] Tap-and-hold to add a journal entry or photo
+
 
 ---
 
