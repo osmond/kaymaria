@@ -1,5 +1,17 @@
 import "./globals.css";
+import type { Metadata, Viewport } from "next";
 import { use } from "react";
+
+export const metadata: Metadata = {
+  title: "Kay Maria",
+  description: "Plant care companion",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export default function RootLayout({
   children,

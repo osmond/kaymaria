@@ -45,7 +45,7 @@ All items are **unchecked** to indicate upcoming work.
   - [x] Filter by room/location
   - [x] Filter by task type
   - [x] Filter by overdue/urgent
-- [ ] **Mobile-first layout**: Design for one-handed thumb reach (FAB in lower right, swipe actions on cards)
+- [x] **Mobile-first layout**: Design for one-handed thumb reach (FAB in lower right, swipe actions on cards)
 
 
 ---
