@@ -90,6 +90,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       default:
         return <Sprout className={className} />;
     }
+  };
 
   const addNote = async () => {
     const text = noteText.trim();
