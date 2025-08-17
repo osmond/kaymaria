@@ -1,13 +1,13 @@
 # 🌱 Kay Maria Roadmap
 
-This roadmap outlines the development milestones for the Kay Maria plant care app.  
+This roadmap outlines the development milestones for the Kay Maria plant care app.
 All items are unchecked to indicate upcoming work.
 
 ---
 
 ## Phase 0 – Foundation
 
-- [ ] Set up Supabase project and env keys (.env.local)
+- [x] Set up Supabase project and env keys (.env.local)
 - [ ] Run database migrations (Prisma)
 - [ ] Create seed scripts for mock data (plants, tasks)
 - [ ] Add test route to fetch plants and tasks
