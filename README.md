@@ -112,3 +112,11 @@ curl -X POST http://localhost:3000/api/plants \\
   -d '{"name":"Palm","rules":[{"type":"water","intervalDays":5},{"type":"fertilize","intervalDays":30}]}'
 ```
 
+## ✅ Task API
+
+Tasks represent upcoming care actions for your plants.
+
+- `GET /api/tasks?window=7d` – list tasks due within the next N days (default `7d`)
+- `POST /api/tasks` – create a new task
+- `PATCH /api/tasks/:id` – mark a task as complete using either `t_<uuid>` or a composite `plantId:type` id. Completing a water task updates the plant's last watered date and schedules the next occurrence.
+
