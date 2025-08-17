@@ -54,7 +54,7 @@ All items are **unchecked** to indicate upcoming work.
 
 ### 🌿 Plant Detail View
 
-- [ ] **Hero banner**: Show large plant photo, nickname, and species (optionally include age or acquired date)
+- [x] **Hero banner**: Show large plant photo, nickname, and species (optionally include age or acquired date)
 - [ ] **Quick Stats section**:
   - [ ] Watering interval & next due
   - [ ] Fertilizing interval & next due

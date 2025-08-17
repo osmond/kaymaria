@@ -55,6 +55,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care
 - 📸 **Photo Uploads** – Track growth and keep a visual plant diary
+- 🌿 **Plant Detail Hero** – Large photo banner with species and acquisition date
 - 📍 **Smart Care Suggestions** – Based on light, pot size, species, and weather
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
