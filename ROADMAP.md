@@ -57,10 +57,10 @@ All items are **unchecked** to indicate upcoming work.
 - [ ] **Hero banner**: Show large plant photo, nickname, and species (optionally include age or acquired date)
 - [ ] **Quick Stats section**:
   - [ ] Watering interval & next due
-  - [ ] Fertilizing schedule
+  - [ ] Fertilizing interval & next due
   - [ ] Light level
   - [ ] Humidity preference
-  - [ ] Pot size & soil type
+  - [ ] Pot size, pot material,  & soil type
 - [ ] **Tab layout**:
   - [ ] **Quick Stats**: At-a-glance care summary
   - [ ] **Timeline**: List of all completed and upcoming care tasks
