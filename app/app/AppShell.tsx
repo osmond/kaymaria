@@ -129,16 +129,27 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
   const [plantsErr, setPlantsErr] = useState<string | null>(null);
   const [plantsLoading, setPlantsLoading] = useState(false);
 
-  // room filter
+  // room & type filters
   const [roomFilter, setRoomFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
   const rooms = useMemo(() => {
     const set = new Set<string>();
     tasks.forEach((t) => set.add(t.roomId));
     return Array.from(set);
   }, [tasks]);
+  const types = useMemo(() => {
+    const set = new Set<string>();
+    tasks.forEach((t) => set.add(t.type));
+    return Array.from(set);
+  }, [tasks]);
   const filteredTasks = useMemo(
-    () => (roomFilter ? tasks.filter((t) => t.roomId === roomFilter) : tasks),
-    [tasks, roomFilter]
+    () =>
+      tasks.filter(
+        (t) =>
+          (!roomFilter || t.roomId === roomFilter) &&
+          (!typeFilter || t.type === typeFilter)
+      ),
+    [tasks, roomFilter, typeFilter]
   );
 
   async function refresh() {
@@ -433,7 +444,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
                 Upcoming
               </button>
             </div>
-            <div className="mt-3">
+            <div className="mt-3 space-y-2">
               <select
                 value={roomFilter}
                 onChange={(e) => setRoomFilter(e.target.value)}
@@ -443,6 +454,18 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
                 {rooms.map((r) => (
                   <option key={r} value={r}>
                     {r}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="border rounded px-3 py-2 w-full"
+              >
+                <option value="">All task types</option>
+                {types.map((t) => (
+                  <option key={t} value={t}>
+                    {labelForType(t as any)}
                   </option>
                 ))}
               </select>
