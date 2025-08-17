@@ -270,6 +270,13 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
           new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
       );
   }, [tasks]);
+  const tasksTodayGrouped = useMemo(() => {
+    const m = new Map<string, TaskDTO[]>();
+    tasksToday.forEach((t) => {
+      m.set(t.plantName, [...(m.get(t.plantName) || []), t]);
+    });
+    return Array.from(m.entries());
+  }, [tasksToday]);
   const upcoming = useMemo(() => {
     const tomorrow = new Date(
       today.getFullYear(),
@@ -357,17 +364,27 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
             )}
             {!loading &&
               !err &&
-              tasksToday.map((t) => (
-                <TaskRow
-                  key={t.id}
-                  plant={t.plantName}
-                  action={labelForType(t.type) as any}
-                  last={t.lastEventAt ? timeAgo(new Date(t.lastEventAt)) : "—"}
-                  due={dueLabel(new Date(t.dueAt), today)}
-                  onOpen={() => {}}
-                  onComplete={() => complete(t)}
-                  onDelete={() => remove(t)}
-                />
+              tasksTodayGrouped.map(([plantName, items]) => (
+                <div key={plantName} className="space-y-2">
+                  <div className="text-xs font-medium text-neutral-600 uppercase tracking-wide">
+                    {plantName}
+                  </div>
+                  <div className="space-y-3">
+                    {items.map((t) => (
+                      <TaskRow
+                        key={t.id}
+                        plant={t.plantName}
+                        action={labelForType(t.type) as any}
+                        last={t.lastEventAt ? timeAgo(new Date(t.lastEventAt)) : "—"}
+                        due={dueLabel(new Date(t.dueAt), today)}
+                        onOpen={() => {}}
+                        onComplete={() => complete(t)}
+                        onDelete={() => remove(t)}
+                        showPlant={false}
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
             {!loading && !err && tasksToday.length === 0 && (
               <div className="rounded-xl border bg-white shadow-sm p-6 text-center text-sm text-neutral-500">
