@@ -69,9 +69,9 @@ All items are **unchecked** to indicate upcoming work.
 - [x] **Task completion feedback**:
   - [x] Add a subtle animation when a task is marked done. don't use emojis
   - [x] Temporary confirmation message (e.g., “Watered!” with timestamp)
-- [ ] **Inline “Mark as Done” on Timeline**:
-  - [ ] Let users complete tasks directly from the timeline view
-  - [ ] Support undo in case of accidental tap
+- [x] **Inline “Mark as Done” on Timeline**:
+  - [x] Let users complete tasks directly from the timeline view
+  - [x] Support undo in case of accidental tap
 - [ ] **Mobile gesture support**:
   - [ ] Swipe to mark as done or edit a task
   - [ ] Tap-and-hold to add a journal entry or photo

@@ -34,6 +34,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
   const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">("stats");
   const [notes, setNotes] = useState<Note[]>([]);
   const [noteText, setNoteText] = useState("");
+  const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
 
   const fmt = (d: Date) => new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(d);
 
@@ -107,6 +108,35 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       setNoteText("");
     } catch {}
 
+  };
+
+  const markTimelineDone = async (task: TaskDTO) => {
+    try {
+      const r = await fetch(`/api/tasks/${encodeURIComponent(task.id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "done" }),
+      });
+      if (!r.ok) throw new Error();
+      const data = await r.json();
+      setUndoInfo({ task, eventAt: data.eventAt });
+      const r2 = await fetch(`/api/tasks?window=365d`, { cache: "no-store" });
+      if (r2.ok) setAllTasks(await r2.json());
+    } catch {}
+  };
+
+  const undoTimeline = async () => {
+    if (!undoInfo) return;
+    try {
+      await fetch(`/api/tasks/${encodeURIComponent(undoInfo.task.id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ undo: true, task: undoInfo.task, eventAt: undoInfo.eventAt }),
+      });
+      const r2 = await fetch(`/api/tasks?window=365d`, { cache: "no-store" });
+      if (r2.ok) setAllTasks(await r2.json());
+    } catch {}
+    setUndoInfo(null);
   };
 
   return (
@@ -206,19 +236,26 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
               <div className="text-base font-medium">Timeline</div>
               <div className="text-xs text-neutral-500">Upcoming &amp; recent care</div>
             </div>
+            {undoInfo && (
+              <div className="px-4 py-2 text-xs bg-green-50 text-green-800 flex justify-between">
+                <span>Task completed.</span>
+                <button onClick={undoTimeline} className="underline">Undo</button>
+              </div>
+            )}
             <ul className="text-sm px-4 py-2">
               {err && <li className="py-3 text-red-600">{err}</li>}
               {!err && plantTasks.length === 0 && <li className="py-3 text-neutral-500">No tasks yet</li>}
               {!err && plantTasks.map(t => (
-                <li key={t.id} className="py-3 border-b last:border-b-0">
-                  {iconFor(t.type)} {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} —{" "}
-                  {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
-                  {(() => {
-                    const d = new Date(t.dueAt); const today = new Date();
-                    const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() -
-                                             new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime())/86400000);
-                    return diff > 0 ? ` (In ${diff}d)` : diff === 0 ? " (Today)" : "";
-                  })()}
+                <li key={t.id} className="py-3 border-b last:border-b-0 flex justify-between items-center">
+                  <span>
+                    {iconFor(t.type)} {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} — {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
+                    {(() => {
+                      const d = new Date(t.dueAt); const today = new Date();
+                      const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime())/86400000);
+                      return diff > 0 ? ` (In ${diff}d)` : diff === 0 ? " (Today)" : "";
+                    })()}
+                  </span>
+                  <button onClick={() => markTimelineDone(t)} className="text-xs text-blue-600">Done</button>
                 </li>
               ))}
             </ul>
