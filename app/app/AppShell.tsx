@@ -10,6 +10,7 @@ import AddPlantModal from "@/components/AddPlantModal";
 import EditTaskModal from "@/components/EditTaskModal";
 import { TaskDTO } from "@/lib/types";
 import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 
 const TASK_WINDOW_DAYS = Number(
   process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7"
@@ -44,6 +45,14 @@ function labelForType(t: "water" | "fertilize" | "repot") {
   return t === "water" ? "Water" : t === "fertilize" ? "Fertilize" : "Repot";
 }
 
+function pastTenseLabel(t: "water" | "fertilize" | "repot") {
+  return t === "water"
+    ? "Watered"
+    : t === "fertilize"
+    ? "Fertilized"
+    : "Repotted";
+}
+
 // Client-only date to avoid hydration drift
 function ClientDate() {
   const [text, setText] = useState("");
@@ -63,37 +72,17 @@ function ClientDate() {
   );
 }
 
-function LeafConfetti() {
-  const leaves = Array.from({ length: 12 });
+function CompleteFlash() {
   return (
-    <div className="absolute inset-0 pointer-events-none">
-      {leaves.map((_, i) => {
-        const sx = 40 + Math.random() * 20;
-        const ex = sx + (Math.random() * 20 - 10);
-        const sy = 60 + Math.random() * 10;
-        const ey = sy - (20 + Math.random() * 25);
-        const rot = Math.random() * 120 - 60;
-        const dur = 0.9 + Math.random() * 0.4;
-        const scale = 0.8 + Math.random() * 0.6;
-        const char = ["🍃", "🌿", "🍂"][Math.floor(Math.random() * 3)];
-        return (
-          <motion.div
-            key={i}
-            initial={{ x: `${sx}vw`, y: `${sy}vh`, rotate: 0, opacity: 0 }}
-            animate={{
-              x: `${ex}vw`,
-              y: `${ey}vh`,
-              rotate: rot,
-              opacity: 1,
-              scale,
-            }}
-            transition={{ duration: dur, ease: "easeOut" }}
-            className="absolute text-xl"
-          >
-            {char}
-          </motion.div>
-        );
-      })}
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1.2, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="rounded-full bg-emerald-500 p-4 text-white"
+      >
+        <Check className="h-6 w-6" />
+      </motion.div>
     </div>
   );
 }
@@ -237,7 +226,11 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
       });
       if (!r.ok) throw new Error();
       trigger();
-      toast(`${labelForType(t.type)} • ${t.plantName} completed`, {
+      const time = new Date().toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+      toast(`${pastTenseLabel(t.type)}! ${time}`, {
         label: "Undo",
         onClick: () => setTasks((prev) => [t, ...prev]),
       });
@@ -702,7 +695,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
 
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {confetti.map((id) => (
-          <LeafConfetti key={id} />
+          <CompleteFlash key={id} />
         ))}
       </div>
 
