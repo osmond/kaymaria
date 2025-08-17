@@ -14,6 +14,8 @@ This document defines the foundational design language for the Kay Maria plant c
 | `foreground`  | `#111827`     | Main text color (dark gray)     |
 | `muted`       | `#9CA3AF`     | Descriptive text, timestamps    |
 
+### 🎨 Theme Variants
+
 | Theme              | Primary   | Secondary | Background | Foreground | Notes                          |
 | ------------------ | --------- | --------- | ---------- | ---------- | ------------------------------ |
 | **Spring (Light)** | `#6CA995` | `#E2F7F2` | `#FDFDFD`  | `#1F2937`  | Fresh, vibrant, soft greens    |
