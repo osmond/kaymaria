@@ -67,6 +67,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
 - 📱 **Mobile-First Layout** – Bottom navigation, floating action button, and swipeable task cards optimized for one-handed use
 - 🌤️ **Weather Awareness** – Current local weather for each plant using Open‑Meteo
+- 🔔 **Condition Alerts** – Notifies you when weather suggests watering or fertilizing soon
 
 ---
 
