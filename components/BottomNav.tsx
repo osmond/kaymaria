@@ -1,7 +1,8 @@
 "use client";
 import * as React from "react";
-import { IconLeaf, IconChart, IconCog } from "./InlineIcons";
-import { Sprout } from "lucide-react";
+
+import { Leaf, Sprout, BarChart3, Cog } from "lucide-react";
+
 
 export type Tab = "today" | "plants" | "insights" | "settings";
 
@@ -43,10 +44,12 @@ export default function BottomNav({
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="max-w-screen-sm mx-auto grid grid-cols-4">
+
         <Item tab="today" label="Today" icon={<IconLeaf />} />
-        <Item tab="plants" label="Plants" icon={<Sprout className="h-5 w-5" />} />
+        <Item tab="plants" label="Plants" icon={<Sprout />} />
         <Item tab="insights" label="Insights" icon={<IconChart />} />
         <Item tab="settings" label="Settings" icon={<IconCog />} />
+
       </div>
     </nav>
   );

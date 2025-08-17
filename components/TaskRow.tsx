@@ -1,7 +1,17 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check, Trash2, Clock, Edit2, StickyNote } from 'lucide-react';
+import {
+  Check,
+  Trash2,
+  Clock,
+  Edit2,
+  StickyNote,
+  Droplet,
+  FlaskConical,
+  Sprout,
+  Leaf,
+} from 'lucide-react';
 import { useState } from 'react';
 
 export default function TaskRow({
@@ -30,7 +40,12 @@ export default function TaskRow({
   showPlant?: boolean;
 }) {
   function iconFor(action: 'Water' | 'Fertilize' | 'Repot') {
-    return action === 'Water' ? '💧' : action === 'Fertilize' ? '🌱' : '🪴';
+    const className = "h-3 w-3";
+    return action === 'Water'
+      ? <Droplet className={className} />
+      : action === 'Fertilize'
+      ? <FlaskConical className={className} />
+      : <Sprout className={className} />;
   }
   const [noteOpen, setNoteOpen] = useState(false);
   const [note, setNote] = useState('');
@@ -66,21 +81,21 @@ export default function TaskRow({
               onClick={onOpen}
               className="h-10 w-10 rounded-xl bg-neutral-100 grid place-items-center"
             >
-              🪴
+              <Leaf className="h-5 w-5" />
             </button>
             <div className="flex-1" onClick={onOpen}>
               {showPlant ? (
                 <div className="flex items-center justify-between">
                   <div className="font-medium">{plant}</div>
                   <span className="text-xs text-neutral-500 flex items-center gap-1">
-                    <span>{iconFor(action)}</span>
+                    {iconFor(action)}
                     {action}
                   </span>
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
                   <div className="font-medium flex items-center gap-1">
-                    <span>{iconFor(action)}</span>
+                    {iconFor(action)}
                     {action}
                   </div>
                 </div>
