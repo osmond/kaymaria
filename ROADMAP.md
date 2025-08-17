@@ -29,11 +29,24 @@ All items are **unchecked** to indicate upcoming work.
 - [x] Add care intervals (water, fertilize, etc.)
 - [ ] Support marking tasks as complete
 
-### 📅 Home View
+### 📅 Home View (Task Dashboard)
 
-- [ ] "Today" and "Upcoming" views for care tasks
-- [ ] Show due tasks sorted by plant, with icons
-- [ ] Support adding Quick Notes to a plant from task card
+- [ ] **Today view**: Show only tasks due today, including overdue ones
+- [ ] **Upcoming view**: Show tasks due in the next 7 days (or a configurable range)
+- [ ] **Group tasks by plant**: Visual hierarchy that nests or groups tasks under each plant
+- [ ] **Sort by urgency**: Sort tasks by due date/time within each plant group
+- [ ] **Task icons**: Use visual icons (💧 Water, 🌱 Fertilize, 🪴 Repot) for quick scanning
+- [ ] **Quick Notes**: Allow inline note-taking for a plant directly from the task card (e.g., "drooping today" or "spotted new growth")
+- [ ] **Inline task actions**:
+  - [ ] Mark as done (with subtle animation or feedback)
+  - [ ] Defer (e.g., "Remind me tomorrow")
+  - [ ] Edit task details (date, type, etc.)
+- [ ] ** filters**: 
+  - [ ] Filter by room/location
+  - [ ] Filter by task type
+  - [ ] Filter by overdue/urgent
+- [ ] **Mobile-first layout**: Design for one-handed thumb reach (FAB in lower right, swipe actions on cards)
+
 
 ---
 
