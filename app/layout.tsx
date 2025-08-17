@@ -1,0 +1,17 @@
+import "./globals.css";
+import { use } from "react";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    // Avoid hydration mismatches when extensions add attributes to <html>
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen bg-neutral-50 text-neutral-900">
+        {children}
+      </body>
+    </html>
+  );
+}

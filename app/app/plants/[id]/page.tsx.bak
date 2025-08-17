@@ -1,0 +1,9 @@
+import { notFound } from "next/navigation";
+import { getPlantById } from "@/lib/mockdb";
+import PlantDetailClient from "./PlantDetailClient";
+
+export default async function PlantDetailPage({ params }: { params: { id: string } }) {
+  const plant = await getPlantById(params.id);
+  if (!plant) return notFound();
+  return <PlantDetailClient plant={plant} />;
+}
