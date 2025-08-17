@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       species: body?.species,
       potSize: body?.potSize,
       potMaterial: body?.potMaterial,
+      soilType: body?.soilType,
       rules: Array.isArray(body?.rules)
         ? body.rules.map((r: any) => ({
             type: r?.type,
