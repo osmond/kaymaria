@@ -40,6 +40,24 @@ export function addPlant(input: Partial<Plant>): Plant {
   PLANTS.push(rec);
   return rec;
 }
+
+export function updatePlant(id: string, updates: Partial<Plant>): Plant | undefined {
+  const p = getPlant(id);
+  if (!p) return undefined;
+  if (updates.name !== undefined) p.name = updates.name;
+  if (updates.room !== undefined) p.room = updates.room;
+  if (updates.species !== undefined) p.species = updates.species;
+  if (updates.waterEveryDays !== undefined) p.waterEveryDays = updates.waterEveryDays;
+  if (updates.lastWaterAt !== undefined) p.lastWaterAt = updates.lastWaterAt;
+  return p;
+}
+
+export function deletePlant(id: string): boolean {
+  const idx = PLANTS.findIndex(p => p.id === id);
+  if (idx === -1) return false;
+  PLANTS.splice(idx, 1);
+  return true;
+}
 export function touchWatered(id: string) {
   const p = getPlant(id);
   if (p) p.lastWaterAt = new Date().toISOString();

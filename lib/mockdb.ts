@@ -189,3 +189,19 @@ export async function getPlants() {
     }
   ];
 }
+
+export function dump() {
+  return TASKS.slice();
+}
+
+export function load(tasks: TaskRec[] = []) {
+  TASKS = tasks.slice();
+  return TASKS.length;
+}
+
+export function getInsights() {
+  return {
+    plantCount: PLANTS.length,
+    taskCount: TASKS.length,
+  };
+}
