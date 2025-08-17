@@ -14,7 +14,10 @@ export default function StyleGuidePreviewPage() {
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("light")
 
   return (
-    <div className="p-6 space-y-8">
+    <div
+      data-theme={previewMode}
+      className="p-6 space-y-8 min-h-screen bg-neutral-50 text-neutral-900 transition-colors dark:bg-neutral-900 dark:text-neutral-50"
+    >
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-display">Style Guide</h1>
         <Button
