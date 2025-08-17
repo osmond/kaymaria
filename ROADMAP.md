@@ -119,7 +119,7 @@ All items are **unchecked** to indicate upcoming work.
 ## Phase 4 – App Polish
 
 - [x] Bottom nav and floating FAB
-- [ ] Swipeable task actions (mark done, edit, delete)
+ - [x] Swipeable task actions (mark done, edit, delete)
 
 - [x] Light/dark mode toggle in settings
 - [ ] Mobile UX refinements
