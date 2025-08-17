@@ -99,7 +99,7 @@ All items are **unchecked** to indicate upcoming work.
   - [x] Indoor light level
   - [x] Room humidity
   - [x] Seasonal changes
-  - [ ] Plant location (room/outdoor/etc.)
+  - [x] Plant location (room/outdoor/etc.)
 - [ ] Learn from user input:
   - [ ] Feedback (e.g. “too much water”)
   - [ ] Adjust future care suggestions

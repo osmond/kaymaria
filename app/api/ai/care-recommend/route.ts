@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
   const lightLevel = body.lightLevel ?? "medium";
   const humidity = body.humidity ?? "medium";
   const season = body.season ?? getSeason();
+  const location = body.location ?? "unspecified";
 
   try {
     const completion = await client.chat.completions.create({
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
         },
           {
             role: "user",
-            content: `Give care recommendations for a plant with the following details:\nSpecies: ${species}\nPot size: ${potSize}\nPot material: ${potMaterial}\nSoil type: ${soilType}\nLight level: ${lightLevel}\nHumidity: ${humidity}\nSeason: ${season}\nRespond with a JSON object containing water (amountMl, frequencyDays), fertilizer (type, frequencyDays), light (level), repot (schedule).`,
+              content: `Give care recommendations for a plant with the following details:\nSpecies: ${species}\nPot size: ${potSize}\nPot material: ${potMaterial}\nSoil type: ${soilType}\nLight level: ${lightLevel}\nHumidity: ${humidity}\nSeason: ${season}\nLocation: ${location}\nRespond with a JSON object containing water (amountMl, frequencyDays), fertilizer (type, frequencyDays), light (level), repot (schedule).`,
           },
       ],
       response_format: { type: "json_object" },
