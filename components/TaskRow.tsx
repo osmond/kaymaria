@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Check, Pencil, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function TaskRow({
   plant,
@@ -10,6 +11,7 @@ export default function TaskRow({
   due,
   onOpen,
   onComplete,
+  onAddNote,
   onDelete,
   showPlant = true,
 }: {
@@ -19,12 +21,15 @@ export default function TaskRow({
   due: string;
   onOpen: () => void;
   onComplete: () => void;
+  onAddNote: (note: string) => void;
   onDelete: () => void;
   showPlant?: boolean;
 }) {
   function iconFor(action: 'Water' | 'Fertilize' | 'Repot') {
     return action === 'Water' ? '💧' : action === 'Fertilize' ? '🌱' : '🪴';
   }
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [note, setNote] = useState('');
   return (
     <div className="relative">
       <div className="absolute inset-0 rounded-xl overflow-hidden">
@@ -89,8 +94,8 @@ export default function TaskRow({
                 <Check className="h-4 w-4" />
               </button>
               <button
-                aria-label="Edit"
-                onClick={onOpen}
+                aria-label="Add note"
+                onClick={() => setNoteOpen((v) => !v)}
                 className="p-2 rounded hover:bg-neutral-100"
               >
                 <Pencil className="h-4 w-4" />
@@ -105,6 +110,31 @@ export default function TaskRow({
             </div>
           </div>
         </div>
+        {noteOpen && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!note.trim()) return;
+              onAddNote(note.trim());
+              setNote('');
+              setNoteOpen(false);
+            }}
+            className="flex items-center gap-2 border-t p-3"
+          >
+            <input
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Quick note..."
+              className="flex-1 text-sm border rounded px-2 py-1"
+            />
+            <button
+              type="submit"
+              className="text-sm px-2 py-1 rounded bg-neutral-100"
+            >
+              Save
+            </button>
+          </form>
+        )}
       </motion.div>
     </div>
   );
