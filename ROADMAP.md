@@ -24,7 +24,7 @@ All items are **unchecked** to indicate upcoming work.
 
 - [x] Create mock data for plants and tasks
 
-- [ ] Build CRUD endpoints for `/plants` and `/tasks`
+- [ ] Build CRUD endpoints for `/plants` 
 - [ ] Support plant onboarding with care defaults
 - [ ] Add care intervals (water, fertilize, etc.)
 - [ ] Support marking tasks as complete
