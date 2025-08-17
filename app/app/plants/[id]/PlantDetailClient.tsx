@@ -17,23 +17,17 @@ type TaskDTO = {
   lastEventAt?: string;
 };
 
-function isSameDay(a: Date, b: Date) {
-  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
-}
-function timeAgo(d: Date) {
-  const diff = Math.max(0, Date.now() - d.getTime());
-  const days = Math.floor(diff / 86400000); if (days>0) return `${days}d ago`;
-  const hours = Math.floor(diff / 3600000); if (hours>0) return `${hours}h ago`;
-  const mins = Math.floor(diff / 60000); return `${mins}m ago`;
-}
-
-export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string } }) {
+export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string; nextWater?: string; waterIntervalDays?: number; nextFertilize?: string; fertilizeIntervalDays?: number; light?: string; humidity?: string; potSize?: string; potMaterial?: string; soilType?: string } }) {
   const id = plant.id;
   const [name] = useState(plant.name);
   const photo = plant.photos?.[0] || "https://placehold.co/600x400?text=Plant";
   const acquired = plant.acquiredAt ? new Date(plant.acquiredAt) : null;
+  const nextWater = plant.nextWater ? new Date(plant.nextWater) : null;
+  const nextFertilize = plant.nextFertilize ? new Date(plant.nextFertilize) : null;
   const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
+
+  const fmt = (d: Date) => new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(d);
 
   useEffect(() => {
     let alive = true;
@@ -49,23 +43,6 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
   }, []);
 
   const plantTasks = useMemo(() => (allTasks ?? []).filter(t => t.plantId === id), [allTasks, id]);
-
-  const latestWater = useMemo(() => {
-    return plantTasks
-      .filter(t => t.type === "water" && t.lastEventAt)
-      .map(t => new Date(t.lastEventAt as string))
-      .sort((a,b)=> b.getTime()-a.getTime())[0];
-  }, [plantTasks]);
-
-  const nextWater = useMemo(() => {
-    const today = new Date();
-    const upcoming = plantTasks
-      .filter(t => t.type === "water")
-      .map(t => new Date(t.dueAt))
-      .filter(d => !isSameDay(d, today) && d.getTime() >= new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime())
-      .sort((a,b)=> a.getTime()-b.getTime())[0];
-    return upcoming;
-  }, [plantTasks]);
 
   const markWatered = async () => {
     try {
@@ -114,10 +91,33 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
 
         {/* Quick stats */}
         <div className="grid grid-cols-2 gap-3 mt-4">
-          <Stat label="Last Watered" value={latestWater ? timeAgo(latestWater) : "—"} />
-          <Stat label="Next Water" value={nextWater ? new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(nextWater) : "—"} />
-          <Stat label="Last Fertilized" value="—" />
-          <Stat label="Next Fertilize" value="—" />
+          <Stat
+            label="Water"
+            value={
+              plant.waterIntervalDays
+                ? `Every ${plant.waterIntervalDays}d${nextWater ? ` • next ${fmt(nextWater)}` : ""}`
+                : "—"
+            }
+          />
+          <Stat
+            label="Fertilize"
+            value={
+              plant.fertilizeIntervalDays
+                ? `Every ${plant.fertilizeIntervalDays}d${nextFertilize ? ` • next ${fmt(nextFertilize)}` : ""}`
+                : "—"
+            }
+          />
+          <Stat label="Light" value={plant.light || "—"} />
+          <Stat label="Humidity" value={plant.humidity || "—"} />
+          <Stat
+            label="Pot"
+            value={
+              plant.potSize
+                ? `${plant.potSize}${plant.potMaterial ? ` ${plant.potMaterial}` : ""}`
+                : "—"
+            }
+          />
+          <Stat label="Soil" value={plant.soilType || "—"} />
         </div>
 
         {/* Timeline */}
