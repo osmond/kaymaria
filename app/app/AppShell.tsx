@@ -251,11 +251,28 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
   }
 
   const today = new Date();
-  const tasksToday = tasks.filter((t) => isSameDay(new Date(t.dueAt), today));
+  const tasksToday = useMemo(() => {
+    const tomorrow = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + 1
+    );
+    return tasks
+      .filter((t) => new Date(t.dueAt) < tomorrow)
+      .sort(
+        (a, b) =>
+          new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
+      );
+  }, [tasks]);
   const upcoming = useMemo(() => {
+    const tomorrow = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + 1
+    );
     const m = new Map<string, TaskDTO[]>();
     tasks
-      .filter((t) => !isSameDay(new Date(t.dueAt), today))
+      .filter((t) => new Date(t.dueAt) >= tomorrow)
       .forEach((t) => {
         const label = new Intl.DateTimeFormat(undefined, {
           weekday: "short",
