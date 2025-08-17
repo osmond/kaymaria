@@ -20,6 +20,13 @@ export type Event = {
   at: string;           // ISO
 };
 
+export type Note = {
+  id: string;           // n_<uuid>
+  plantId: string;
+  text: string;
+  at: string;           // ISO
+};
+
 export type TaskRec = {
   id: string;           // t_<uuid>
   plantId: string;
@@ -62,6 +69,8 @@ let TASKS: TaskRec[] = [
   { id: `t_${uuid()}`, plantId: "p5", plantName: "Fern",   type: "water",     dueAt: new Date(now + 1*864e5).toISOString(), status: "due" },
   { id: `t_${uuid()}`, plantId: "p6", plantName: "Fiddle Fig", type: "water", dueAt: new Date(now + 3*864e5).toISOString(), status: "due" },
 ];
+
+let NOTES: Note[] = [];
 
 // ----- Query helpers -----
 export function listPlants(): Plant[] {
@@ -197,6 +206,24 @@ export function getLastEvent(plantId: string, type: CareType): Event | undefined
 export function getRule(plantId: string, type: CareType): Rule | undefined {
   const p = getPlant(plantId);
   return p?.rules.find(r => r.type === type);
+}
+
+// ----- Notes helpers -----
+export function addNote(plantId: string, text: string): Note {
+  const note: Note = {
+    id: `n_${uuid()}`,
+    plantId,
+    text,
+    at: new Date().toISOString(),
+  };
+  NOTES.push(note);
+  return note;
+}
+
+export function listNotes(plantId: string): Note[] {
+  return NOTES
+    .filter(n => n.plantId === plantId)
+    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
 }
 
 export function getComputedWaterInfo(plantId: string): {

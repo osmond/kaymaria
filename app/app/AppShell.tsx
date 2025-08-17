@@ -220,6 +220,20 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
     });
   };
 
+  const addNote = async (plantId: string, text: string) => {
+    try {
+      const r = await fetch(`/api/plants/${plantId}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!r.ok) throw new Error();
+      toast("Note added");
+    } catch {
+      toast("Failed to add note");
+    }
+  };
+
   const openAddPlant = (name: string) => {
     setAddOpen(false);
     setPrefillPlantName(name);
@@ -392,6 +406,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
                         due={dueLabel(new Date(t.dueAt), today)}
                         onOpen={() => {}}
                         onComplete={() => complete(t)}
+                        onAddNote={(note) => addNote(t.plantId, note)}
                         onDelete={() => remove(t)}
                         showPlant={false}
                       />
@@ -443,6 +458,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"plants
                         due={dueLabel(new Date(t.dueAt), today)}
                         onOpen={() => {}}
                         onComplete={() => complete(t)}
+                        onAddNote={(note) => addNote(t.plantId, note)}
                         onDelete={() => remove(t)}
                       />
                     ))}

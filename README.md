@@ -46,6 +46,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🗂️ **Grouped Tasks** – Today's tasks organized by plant for quick scanning
 - ⏱️ **Urgency Sorting** – Tasks within each plant group are ordered by due date
 - 💧 **Task Icons** – Visual cues for watering, fertilizing, and repotting tasks
+- 📝 **Quick Notes** – Jot down observations directly from any task card
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care
@@ -108,6 +109,8 @@ Each plant also stores `waterIntervalDays` and `fertilizeIntervalDays` values to
 - `GET /api/plants/:id` – fetch a plant
 - `PATCH /api/plants/:id` – update fields on a plant
 - `DELETE /api/plants/:id` – remove a plant and its tasks
+- `GET /api/plants/:id/notes` – list notes for a plant
+- `POST /api/plants/:id/notes` – add a quick note
 
 Example:
 
