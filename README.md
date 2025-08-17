@@ -116,7 +116,7 @@ curl http://localhost:3000/api/test
 
 Basic CRUD endpoints exist for working with mock plant data. When creating a plant you can include default care rules, and initial tasks will be scheduled automatically.
 
-Each plant also stores `waterIntervalDays`, `fertilizeIntervalDays`, and optional `potSize` information.
+Each plant also stores `waterIntervalDays`, `fertilizeIntervalDays`, and optional `potSize` and `potMaterial` information.
 To enable local weather in the app, include `latitude` and `longitude` when creating a plant.
 
 - `GET /api/plants` – list all plants
@@ -133,7 +133,7 @@ Example:
 ```bash
 curl -X POST http://localhost:3000/api/plants \\
   -H 'Content-Type: application/json' \\
-  -d '{"name":"Palm","potSize":"10in","latitude":40.71,"longitude":-74.00,"rules":[{"type":"water","intervalDays":5},{"type":"fertilize","intervalDays":30}]}'
+  -d '{"name":"Palm","potSize":"10in","potMaterial":"plastic","latitude":40.71,"longitude":-74.00,"rules":[{"type":"water","intervalDays":5},{"type":"fertilize","intervalDays":30}]}'
 ```
 
 ## ✅ Task API

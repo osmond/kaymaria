@@ -11,6 +11,7 @@ export type Plant = {
   roomId: string;
   species?: string;
   potSize?: string;
+  potMaterial?: string;
   rules: Rule[];
 };
 
@@ -57,6 +58,7 @@ let PLANTS: Plant[] = [
     roomId: "living",
     species: "Aloe vera",
     potSize: "6in",
+    potMaterial: "plastic",
     rules: [
       { type: "water", intervalDays: 7 },
       { type: "fertilize", intervalDays: 30 },
@@ -68,6 +70,7 @@ let PLANTS: Plant[] = [
     roomId: "living",
     species: "Monstera deliciosa",
     potSize: "8in",
+    potMaterial: "terracotta",
     rules: [
       { type: "water", intervalDays: 5 },
       { type: "fertilize", intervalDays: 28 },
@@ -79,6 +82,7 @@ let PLANTS: Plant[] = [
     roomId: "bed",
     species: "Phalaenopsis",
     potSize: "4in",
+    potMaterial: "ceramic",
     rules: [
       { type: "water", intervalDays: 10 },
       { type: "fertilize", intervalDays: 45 },
@@ -90,6 +94,7 @@ let PLANTS: Plant[] = [
     roomId: "bed",
     species: "Sansevieria",
     potSize: "6in",
+    potMaterial: "plastic",
     rules: [
       { type: "water", intervalDays: 14 },
     ],
@@ -100,6 +105,7 @@ let PLANTS: Plant[] = [
     roomId: "living",
     species: "Boston fern",
     potSize: "6in",
+    potMaterial: "ceramic",
     rules: [
       { type: "water", intervalDays: 3 },
     ],
@@ -110,6 +116,7 @@ let PLANTS: Plant[] = [
     roomId: "living",
     species: "Ficus lyrata",
     potSize: "10in",
+    potMaterial: "plastic",
     rules: [
       { type: "water", intervalDays: 7 },
     ],
@@ -145,6 +152,7 @@ export function createPlant(partial: {
   roomId?: string;
   species?: string;
   potSize?: string;
+  potMaterial?: string;
   rules?: Rule[];
 }): Plant {
   const id = `p_${uuid()}`;
@@ -154,6 +162,7 @@ export function createPlant(partial: {
     roomId: partial.roomId ?? "living",
     species: partial.species,
     potSize: partial.potSize,
+    potMaterial: partial.potMaterial,
     rules: partial.rules ?? [],
   };
   PLANTS.push(plant);
@@ -183,6 +192,7 @@ export function updatePlant(id: string, updates: Partial<Omit<Plant, "id" | "rul
   if (updates.roomId !== undefined) p.roomId = updates.roomId;
   if (updates.species !== undefined) p.species = updates.species;
   if (updates.potSize !== undefined) p.potSize = updates.potSize;
+  if (updates.potMaterial !== undefined) p.potMaterial = updates.potMaterial;
   if (updates.rules !== undefined) p.rules = updates.rules;
   return p;
 }
