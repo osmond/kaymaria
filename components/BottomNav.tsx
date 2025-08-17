@@ -45,10 +45,10 @@ export default function BottomNav({
     >
       <div className="max-w-screen-sm mx-auto grid grid-cols-4">
 
-        <Item tab="today" label="Today" icon={<IconLeaf />} />
+        <Item tab="today" label="Today" icon={<Leaf />} />
         <Item tab="plants" label="Plants" icon={<Sprout />} />
-        <Item tab="insights" label="Insights" icon={<IconChart />} />
-        <Item tab="settings" label="Settings" icon={<IconCog />} />
+        <Item tab="insights" label="Insights" icon={<BarChart3 />} />
+        <Item tab="settings" label="Settings" icon={<Cog />} />
 
       </div>
     </nav>
