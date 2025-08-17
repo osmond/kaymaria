@@ -7,6 +7,7 @@
    - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` come from your Supabase project.
    - `NEXT_PUBLIC_BASE_URL` should point to the URL where the app runs.
    - `DATABASE_URL` is used by Prisma; the example file defaults to a local SQLite database.
+   - `NEXT_PUBLIC_TASK_WINDOW_DAYS` controls how many days ahead the Upcoming view looks (default `7`)
 2. Install dependencies, seed the database, and start the development server:
 
 ```bash
@@ -41,6 +42,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 ## ✨ Features
 
  - 🌼 **Today View** – See exactly which plants need attention today, including overdue tasks
+ - 🌅 **Upcoming View** – Preview tasks due in the next 7 days (configurable)
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care
