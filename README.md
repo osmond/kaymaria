@@ -66,7 +66,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
 - 📱 **Mobile-First Layout** – Bottom navigation, floating action button, and swipeable task cards optimized for one-handed use
-- 🌤️ **Weather Awareness** – Adjust care based on location and evapotranspiration
+- 🌤️ **Weather Awareness** – Current local weather for each plant using Open‑Meteo
 
 ---
 
@@ -114,6 +114,7 @@ curl http://localhost:3000/api/test
 Basic CRUD endpoints exist for working with mock plant data. When creating a plant you can include default care rules, and initial tasks will be scheduled automatically.
 
 Each plant also stores `waterIntervalDays` and `fertilizeIntervalDays` values to define how often those care tasks recur.
+To enable local weather in the app, include `latitude` and `longitude` when creating a plant.
 
 - `GET /api/plants` – list all plants
 - `POST /api/plants` – create a plant with care defaults
@@ -122,13 +123,14 @@ Each plant also stores `waterIntervalDays` and `fertilizeIntervalDays` values to
 - `DELETE /api/plants/:id` – remove a plant and its tasks
 - `GET /api/plants/:id/notes` – list notes for a plant
 - `POST /api/plants/:id/notes` – add a quick note
+- `GET /api/plants/:id/weather` – current weather for a plant
 
 Example:
 
 ```bash
 curl -X POST http://localhost:3000/api/plants \\
   -H 'Content-Type: application/json' \\
-  -d '{"name":"Palm","rules":[{"type":"water","intervalDays":5},{"type":"fertilize","intervalDays":30}]}'
+  -d '{"name":"Palm","latitude":40.71,"longitude":-74.00,"rules":[{"type":"water","intervalDays":5},{"type":"fertilize","intervalDays":30}]}'
 ```
 
 ## ✅ Task API

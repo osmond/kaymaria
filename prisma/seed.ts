@@ -19,6 +19,8 @@ async function main() {
       nextFertilize: p.nextFertilize ? new Date(p.nextFertilize) : undefined,
       waterIntervalDays: p.waterIntervalDays,
       fertilizeIntervalDays: p.fertilizeIntervalDays,
+      latitude: p.latitude,
+      longitude: p.longitude,
     })),
   });
 
