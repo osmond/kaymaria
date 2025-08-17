@@ -55,6 +55,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🪴 **Room-Based Organization** – Organize plants by room with photo galleries
 - 🧪 **Care Defaults** – Onboard new plants with preset watering and fertilizing intervals
 - ⏳ **Timeline Journaling** – Visual history of waterings, notes, and care
+- 🔁 **Timeline Task Completion** – Mark care tasks done directly from the timeline with undo support
 - 📸 **Photo Gallery** – View plant photos over time to track growth
 - 🌿 **Plant Detail Hero** – Large photo banner with species and acquisition date
 - 🧭 **Tabbed Plant Details** – Switch between stats, timeline, notes, and photos

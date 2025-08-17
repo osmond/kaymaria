@@ -33,6 +33,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
   const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">("stats");
   const [notes, setNotes] = useState<Note[]>([]);
   const [noteText, setNoteText] = useState("");
+  const [undo, setUndo] = useState<{ task: TaskDTO; timer: ReturnType<typeof setTimeout> } | null>(null);
 
   const fmt = (d: Date) => new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(d);
 
@@ -76,6 +77,35 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       const r2 = await fetch(`/api/tasks?window=365d`, { cache: "no-store" });
       if (r2.ok) setAllTasks(await r2.json());
     } catch { /* keep UX smooth in mock */ }
+  };
+
+  const markTaskDone = (t: TaskDTO) => {
+    // Optimistically remove from list
+    setAllTasks(ts => (ts ?? []).filter(x => x.id !== t.id));
+    if (undo?.timer) clearTimeout(undo.timer);
+    const timer = setTimeout(async () => {
+      try {
+        await fetch(`/api/tasks/${encodeURIComponent(t.id)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "done" }),
+        });
+        const r = await fetch(`/api/tasks?window=365d`, { cache: "no-store" });
+        if (r.ok) setAllTasks(await r.json());
+      } catch {}
+      setUndo(null);
+    }, 5000);
+    setUndo({ task: t, timer });
+  };
+
+  const undoLast = () => {
+    if (!undo) return;
+    clearTimeout(undo.timer);
+    setAllTasks(ts => {
+      const arr = [...(ts ?? []), undo.task];
+      return arr.sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime());
+    });
+    setUndo(null);
   };
 
   const addNote = async () => {
@@ -195,19 +225,39 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
               {err && <li className="py-3 text-red-600">{err}</li>}
               {!err && plantTasks.length === 0 && <li className="py-3 text-neutral-500">No tasks yet</li>}
               {!err && plantTasks.map(t => (
-                <li key={t.id} className="py-3 border-b last:border-b-0">
-                  {t.type === "water" ? "💧" : t.type === "fertilize" ? "🧪" : "🪴"}{" "}
-                  {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} —{" "}
-                  {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
-                  {(() => {
-                    const d = new Date(t.dueAt); const today = new Date();
-                    const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() -
-                                             new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime())/86400000);
-                    return diff > 0 ? ` (In ${diff}d)` : diff === 0 ? " (Today)" : "";
-                  })()}
+                <li key={t.id} className="py-3 border-b last:border-b-0 flex items-center justify-between">
+                  <span>
+                    {t.type === "water" ? "💧" : t.type === "fertilize" ? "🧪" : "🪴"}{" "}
+                    {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} —{" "}
+                    {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(t.dueAt))}
+                    {(() => {
+                      const d = new Date(t.dueAt);
+                      const today = new Date();
+                      const diff = Math.round(
+                        (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() -
+                          new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()) /
+                          86400000
+                      );
+                      return diff > 0 ? ` (In ${diff}d)` : diff === 0 ? " (Today)" : "";
+                    })()}
+                  </span>
+                  <button
+                    onClick={() => markTaskDone(t)}
+                    className="ml-2 px-2 py-1 text-xs rounded bg-neutral-900 text-white"
+                  >
+                    Done
+                  </button>
                 </li>
               ))}
             </ul>
+            {undo && (
+              <div className="px-4 py-2 text-xs flex items-center justify-between border-t bg-neutral-50">
+                <span>Task marked done.</span>
+                <button onClick={undoLast} className="text-blue-600">
+                  Undo
+                </button>
+              </div>
+            )}
           </section>
         )}
 
