@@ -26,7 +26,7 @@ All items are **unchecked** to indicate upcoming work.
 
 - [x] Build CRUD endpoints for `/plants`
 - [x] Support plant onboarding with care defaults
-- [ ] Add care intervals (water, fertilize, etc.)
+- [x] Add care intervals (water, fertilize, etc.)
 - [ ] Support marking tasks as complete
 
 ### 📅 Home View
