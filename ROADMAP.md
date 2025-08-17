@@ -65,7 +65,7 @@ All items are **unchecked** to indicate upcoming work.
   - [x] **Quick Stats**: At-a-glance care summary
   - [x] **Timeline**: List of all completed and upcoming care tasks
   - [x] **Notes**: Free-form journaling or text entries
-  - [ ] **Photos**: A visual gallery of growth over time
+  - [x] **Photos**: A visual gallery of growth over time
 - [ ] **Task completion feedback**:
   - [ ] Add a subtle animation when a task is marked done. don't use emojis
   - [ ] Temporary confirmation message (e.g., “Watered!” with timestamp)

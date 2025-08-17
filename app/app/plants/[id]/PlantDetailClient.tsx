@@ -246,8 +246,21 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
         )}
 
         {tab === "photos" && (
-          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4 text-sm text-neutral-500">
-            No photos yet
+          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4">
+            {plant.photos && plant.photos.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2">
+                {plant.photos.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`${plant.name} photo ${i + 1}`}
+                    className="w-full h-24 object-cover rounded"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-neutral-500 text-center">No photos yet</div>
+            )}
           </section>
         )}
 
