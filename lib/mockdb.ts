@@ -216,6 +216,12 @@ export function addEvent(plantId: string, type: CareType, at = new Date()): void
   });
 }
 
+export function undoTaskCompletion(task: TaskRec, eventAt: string): void {
+  EVENTS = EVENTS.filter(e => !(e.plantId === task.plantId && e.type === task.type && e.at === eventAt));
+  TASKS = TASKS.filter(t => !(t.plantId === task.plantId && t.type === task.type && t.lastEventAt === eventAt));
+  TASKS.push(task);
+}
+
 export function getLastEvent(plantId: string, type: CareType): Event | undefined {
   const events = EVENTS
     .filter(e => e.plantId === plantId && e.type === type)
