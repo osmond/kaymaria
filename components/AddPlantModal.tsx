@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { useRouter } from 'next/navigation';
-import PlantForm, { PlantFormSubmit } from './PlantForm';
+import PlantForm, { PlantFormSubmit, PlantFormValues } from './PlantForm';
 
 export default function AddPlantModal({
   open,
@@ -19,9 +19,50 @@ export default function AddPlantModal({
   onCreate: (name: string) => void;
 }) {
   const router = useRouter();
+  const [initial, setInitial] = useState<PlantFormValues | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   function close() {
     onOpenChange(false);
   }
+
+  useEffect(() => {
+    if (!open) return;
+    async function loadDefaults() {
+      setLoading(true);
+      setLoadError(null);
+      const base: PlantFormValues = {
+        name: prefillName || '',
+        roomId: defaultRoomId,
+        species: prefillName || '',
+        pot: '6 in',
+        potMaterial: 'Plastic',
+        light: 'Medium',
+        indoor: 'Indoor',
+        drainage: 'ok',
+        soil: 'Well-draining mix',
+        lat: '44.9778',
+        lon: '-93.2650',
+        waterEvery: '7',
+        waterAmount: '500',
+        fertEvery: '30',
+        fertFormula: '10-10-10 @ 1/2 strength',
+      };
+      try {
+        const r = await fetch(`/api/species-care?species=${encodeURIComponent(prefillName || '')}`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const json = await r.json();
+        setInitial({ ...base, ...json });
+      } catch (e) {
+        setLoadError('Failed to load species defaults.');
+        setInitial(base);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDefaults();
+  }, [open, prefillName, defaultRoomId]);
 
   async function handleSubmit(data: PlantFormSubmit) {
     const r = await fetch('/api/plants', {
@@ -45,33 +86,23 @@ export default function AddPlantModal({
         <Dialog.Panel className="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto">
           <div className="p-5 border-b">
             <Dialog.Title className="text-lg font-display font-semibold">Add Plant</Dialog.Title>
-            <p className="text-sm text-neutral-600">Use a canned AI suggestion for MVP.</p>
           </div>
-          <PlantForm
-            initial={{
-              name: prefillName || '',
-              roomId: defaultRoomId,
-              species: '',
-              pot: '6 in',
-              potMaterial: 'Plastic',
-              light: 'Medium',
-              indoor: 'Indoor',
-              drainage: 'ok',
-              soil: 'Well-draining mix',
-              lat: '44.9778',
-              lon: '-93.2650',
-              waterEvery: '7',
-              waterAmount: '500',
-              fertEvery: '30',
-              fertFormula: '10-10-10 @ 1/2 strength',
-            }}
-            submitLabel="Create Plant"
-            onSubmit={handleSubmit}
-            onCancel={close}
-          />
+          {loading && <div className="p-5">Loading defaults…</div>}
+          {!loading && initial && (
+            <>
+              {loadError && (
+                <div className="p-5 text-sm text-red-600">{loadError}</div>
+              )}
+              <PlantForm
+                initial={initial}
+                submitLabel="Create Plant"
+                onSubmit={handleSubmit}
+                onCancel={close}
+              />
+            </>
+          )}
         </Dialog.Panel>
       </div>
     </Dialog>
   );
 }
-
