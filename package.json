@@ -9,7 +9,8 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "ai:fine-tune": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/fine-tune.ts",
-    "test": "jest"
+    "test": "jest",
+    "sample-images": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/fetch-sample-images.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",

@@ -18,7 +18,7 @@ export const mockPlants = [
     potMaterial: "Ceramic",
     soilType: "Well-draining mix",
     acquiredAt: "2024-03-01",
-    photos: ["https://placehold.co/600x400?text=Fiddle"],
+    photos: ["https://source.unsplash.com/600x400/?fiddle-leaf-fig"],
     notes: [],
   },
   {
@@ -40,7 +40,7 @@ export const mockPlants = [
     potMaterial: "Plastic",
     soilType: "Cactus mix",
     acquiredAt: "2023-11-12",
-    photos: ["https://placehold.co/600x400?text=Snake"],
+    photos: ["https://source.unsplash.com/600x400/?snake-plant"],
     notes: [],
   },
   {
@@ -62,7 +62,7 @@ export const mockPlants = [
     potMaterial: "Plastic",
     soilType: "Potting mix",
     acquiredAt: "2024-01-15",
-    photos: ["https://placehold.co/600x400?text=Spider"],
+    photos: ["https://source.unsplash.com/600x400/?spider-plant"],
     notes: [],
   },
   {
@@ -84,7 +84,7 @@ export const mockPlants = [
     potMaterial: "Ceramic",
     soilType: "All-purpose mix",
     acquiredAt: "2024-02-10",
-    photos: ["https://placehold.co/600x400?text=Pothos"],
+    photos: ["https://source.unsplash.com/600x400/?pothos"],
     notes: [],
   },
   {
@@ -106,7 +106,7 @@ export const mockPlants = [
     potMaterial: "Plastic",
     soilType: "Moisture-retentive mix",
     acquiredAt: "2024-04-05",
-    photos: ["https://placehold.co/600x400?text=PeaceLily"],
+    photos: ["https://source.unsplash.com/600x400/?peace-lily"],
     notes: [],
   },
   {
@@ -128,7 +128,7 @@ export const mockPlants = [
     potMaterial: "Ceramic",
     soilType: "Well-draining mix",
     acquiredAt: "2023-09-20",
-    photos: ["https://placehold.co/600x400?text=ZZ"],
+    photos: ["https://source.unsplash.com/600x400/?zz-plant"],
     notes: [],
   },
   {
@@ -150,7 +150,7 @@ export const mockPlants = [
     potMaterial: "Terracotta",
     soilType: "Cactus mix",
     acquiredAt: "2024-05-20",
-    photos: ["https://placehold.co/600x400?text=Aloe"],
+    photos: ["https://source.unsplash.com/600x400/?aloe-vera"],
     notes: [],
   },
   {
@@ -172,7 +172,7 @@ export const mockPlants = [
     potMaterial: "Hanging basket",
     soilType: "Peat-based mix",
     acquiredAt: "2024-06-12",
-    photos: ["https://placehold.co/600x400?text=Fern"],
+    photos: ["https://source.unsplash.com/600x400/?boston-fern"],
     notes: [],
   },
   {
@@ -194,7 +194,7 @@ export const mockPlants = [
     potMaterial: "Ceramic",
     soilType: "Well-draining mix",
     acquiredAt: "2024-03-18",
-    photos: ["https://placehold.co/600x400?text=Rubber"],
+    photos: ["https://source.unsplash.com/600x400/?rubber-plant"],
     notes: [],
   },
   {
@@ -216,7 +216,7 @@ export const mockPlants = [
     potMaterial: "Plastic",
     soilType: "Potting mix",
     acquiredAt: "2024-02-25",
-    photos: ["https://placehold.co/600x400?text=Philodendron"],
+    photos: ["https://source.unsplash.com/600x400/?philodendron"],
     notes: [],
   },
   {
@@ -238,7 +238,7 @@ export const mockPlants = [
     potMaterial: "Ceramic",
     soilType: "Well-draining mix",
     acquiredAt: "2024-01-30",
-    photos: ["https://placehold.co/600x400?text=Aglaonema"],
+    photos: ["https://source.unsplash.com/600x400/?chinese-evergreen"],
     notes: [],
   },
   {
@@ -260,7 +260,7 @@ export const mockPlants = [
     potMaterial: "Terracotta",
     soilType: "Cactus mix",
     acquiredAt: "2023-12-05",
-    photos: ["https://placehold.co/600x400?text=Jade"],
+    photos: ["https://source.unsplash.com/600x400/?jade-plant"],
     notes: [],
   },
   {
@@ -282,7 +282,7 @@ export const mockPlants = [
     potMaterial: "Ceramic",
     soilType: "Aroid mix",
     acquiredAt: "2024-05-01",
-    photos: ["https://placehold.co/600x400?text=Monstera"],
+    photos: ["https://source.unsplash.com/600x400/?monstera"],
     notes: [],
   },
   {
@@ -304,7 +304,7 @@ export const mockPlants = [
     potMaterial: "Plastic",
     soilType: "Potting mix",
     acquiredAt: "2024-03-14",
-    photos: ["https://placehold.co/600x400?text=Ivy"],
+    photos: ["https://source.unsplash.com/600x400/?english-ivy"],
     notes: [],
   },
   {
@@ -326,7 +326,7 @@ export const mockPlants = [
     potMaterial: "Plastic",
     soilType: "Peat-based mix",
     acquiredAt: "2024-02-28",
-    photos: ["https://placehold.co/600x400?text=ParlorPalm"],
+    photos: ["https://source.unsplash.com/600x400/?parlor-palm"],
     notes: [],
   },
   {
@@ -348,7 +348,7 @@ export const mockPlants = [
     potMaterial: "Ceramic",
     soilType: "Well-draining mix",
     acquiredAt: "2024-04-18",
-    photos: ["https://placehold.co/600x400?text=MoneyTree"],
+    photos: ["https://source.unsplash.com/600x400/?money-tree"],
     notes: [],
   },
   {
@@ -370,7 +370,7 @@ export const mockPlants = [
     potMaterial: "Plastic",
     soilType: "Well-draining mix",
     acquiredAt: "2024-03-08",
-    photos: ["https://placehold.co/600x400?text=Croton"],
+    photos: ["https://source.unsplash.com/600x400/?croton-plant"],
     notes: [],
   },
   {
@@ -392,7 +392,7 @@ export const mockPlants = [
     potMaterial: "Ceramic",
     soilType: "Well-draining mix",
     acquiredAt: "2023-10-10",
-    photos: ["https://placehold.co/600x400?text=Dracaena"],
+    photos: ["https://source.unsplash.com/600x400/?dracaena"],
     notes: [],
   },
   {
@@ -414,7 +414,7 @@ export const mockPlants = [
     potMaterial: "Plastic",
     soilType: "Orchid bark",
     acquiredAt: "2024-07-07",
-    photos: ["https://placehold.co/600x400?text=Orchid"],
+    photos: ["https://source.unsplash.com/600x400/?orchid"],
     notes: [],
   },
   {
@@ -436,7 +436,7 @@ export const mockPlants = [
     potMaterial: "Plastic",
     soilType: "African violet mix",
     acquiredAt: "2024-06-22",
-    photos: ["https://placehold.co/600x400?text=Violet"],
+    photos: ["https://source.unsplash.com/600x400/?african-violet"],
     notes: [],
   }
 ];
