@@ -19,7 +19,7 @@ export default function QuickAddModal({
   if (!open) return null;
   return (
     <div
-      className='fixed inset-0 bg-black/30 grid place-items-center p-4'
+      className='fixed inset-0 z-50 bg-black/30 grid place-items-center p-4'
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
