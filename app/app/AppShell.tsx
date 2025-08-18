@@ -3,10 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
-import Fab from "@/components/Fab";
 import TaskRow from "@/components/TaskRow";
-import QuickAddModal from "@/components/QuickAddModal";
-import AddPlantModal from "@/components/AddPlantModal";
 import EditTaskModal from "@/components/EditTaskModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
@@ -112,9 +109,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   const [taskWindow, setTaskWindow] = useState(DEFAULT_TASK_WINDOW_DAYS);
 
   // modals
-  const [addOpen, setAddOpen] = useState(false);
-  const [addPlantOpen, setAddPlantOpen] = useState(false);
-  const [prefillPlantName, setPrefillPlantName] = useState("");
   const [editTask, setEditTask] = useState<TaskDTO | null>(null);
 
   // ui
@@ -381,42 +375,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       toast("Failed to add note");
     }
   };
-
-  const openAddPlant = (name: string) => {
-    setAddOpen(false);
-    setPrefillPlantName(name);
-    setTimeout(() => setAddPlantOpen(true), 50);
-  };
-
-  const onPlantCreated = (name: string) => {
-    setAddPlantOpen(false);
-    toast(`${name} created`);
-    refresh();
-    // Optionally refresh plants list next time user visits the tab
-    setPlants([]);
-  };
-
-  // create task from Quick Add -> POST /api/tasks (mock)
-  async function createQuickTask(payload: {
-    plant: string;
-    action: "Water" | "Fertilize" | "Repot";
-    due: string;
-  }) {
-    try {
-      const r = await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      const created: TaskDTO = await r.json();
-      setTasks((prev) => [created, ...prev]);
-      trigger();
-      toast(`${payload.action} • ${payload.plant} added`);
-    } catch (e: any) {
-      toast("Failed to add task");
-    }
-  }
 
   const today = new Date();
   const tasksToday = useMemo(() => {
@@ -895,7 +853,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       </main>
 
       <BottomNav value={view} onChange={(v) => setView(v as any)} />
-      <Fab onClick={() => setAddOpen(true)} />
 
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {confetti.map((id) => (
@@ -927,24 +884,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
         }
         onClose={() => setEditTask(null)}
         onSave={(u) => updateTaskDetails(u)}
-      />
-
-      <QuickAddModal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        onSave={(t) => {
-          setAddOpen(false);
-          createQuickTask({ plant: t.plant, action: t.action, due: t.due });
-        }}
-        onAddPlant={(name) => openAddPlant(name)}
-      />
-
-      <AddPlantModal
-        open={addPlantOpen}
-        onOpenChange={setAddPlantOpen}
-        prefillName={prefillPlantName}
-        defaultRoomId="room-1"
-        onCreate={(name) => onPlantCreated(name)}
       />
     </div>
   );
