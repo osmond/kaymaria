@@ -19,7 +19,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
    cd kaymaria
    npm install
    ```
-2. Copy `.env.local.example` to `.env.local` and fill in your values.
+2. Copy `.env.example` to `.env` and fill in your values.
    - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` come from your Supabase project.
    - `NEXT_PUBLIC_BASE_URL` should point to the URL where the app runs.
    - `DATABASE_URL` is used by Prisma; the example file defaults to a local SQLite database.
