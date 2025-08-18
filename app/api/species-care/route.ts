@@ -7,9 +7,9 @@ export async function GET(req: NextRequest) {
     const species = searchParams.get('species') || '';
     const defaults = await getCareDefaults(species);
     if (!defaults) {
-      return NextResponse.json({ error: 'not found' }, { status: 404 });
+      return NextResponse.json({ presets: null });
     }
-    return NextResponse.json(defaults);
+    return NextResponse.json({ presets: defaults });
   } catch (e: any) {
     console.error('GET /api/species-care failed:', e);
     return NextResponse.json({ error: 'server' }, { status: 500 });

@@ -22,6 +22,7 @@ export default function AddPlantModal({
   const [initial, setInitial] = useState<PlantFormValues | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   function close() {
     onOpenChange(false);
@@ -32,6 +33,7 @@ export default function AddPlantModal({
     async function loadDefaults() {
       setLoading(true);
       setLoadError(null);
+      setNotice(null);
       const base: PlantFormValues = {
         name: prefillName || '',
         roomId: defaultRoomId,
@@ -53,7 +55,12 @@ export default function AddPlantModal({
         const r = await fetch(`/api/species-care?species=${encodeURIComponent(prefillName || '')}`);
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const json = await r.json();
-        setInitial({ ...base, ...json });
+        if (json.presets) {
+          setInitial({ ...base, ...json.presets });
+        } else {
+          setNotice('No presets found—please adjust manually or request AI suggestions');
+          setInitial(base);
+        }
       } catch (e) {
         setLoadError('Failed to load species defaults.');
         setInitial(base);
@@ -93,6 +100,9 @@ export default function AddPlantModal({
             <>
               {loadError && (
                 <div className="p-5 text-sm text-red-600">{loadError}</div>
+              )}
+              {notice && (
+                <div className="p-5 text-sm text-gray-600">{notice}</div>
               )}
               <PlantForm
                 initial={initial}
