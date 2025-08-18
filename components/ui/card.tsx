@@ -8,7 +8,7 @@ type PProps = React.HTMLAttributes<HTMLParagraphElement>;
 export function Card({ className = "", ...props }: DivProps) {
   return (
     <div
-      className={`rounded-xl border bg-white shadow-sm dark:bg-neutral-800 dark:border-neutral-700 ${className}`}
+      className={`rounded-xl border bg-white shadow-md dark:bg-neutral-800 dark:border-neutral-700 ${className}`}
       {...props}
     />
   );
@@ -20,7 +20,7 @@ export function CardTitle({ className = "", ...props }: HProps) {
   return <h3 className={`text-base font-medium ${className}`} {...props} />;
 }
 export function CardDescription({ className = "", ...props }: PProps) {
-  return <p className={`text-sm text-neutral-500 dark:text-neutral-400 ${className}`} {...props} />;
+  return <p className={`text-sm text-muted dark:text-neutral-400 ${className}`} {...props} />;
 }
 export function CardContent({ className = "", ...props }: DivProps) {
   return <div className={`p-4 ${className}`} {...props} />;

@@ -125,7 +125,7 @@ All items are **unchecked** to indicate upcoming work.
  - [x] Mobile UX refinements
    - [x] Respect device safe areas for notched screens
 
-- [ ] Align design with [Style Guide](./style-guide/page.tsx)
+ - [x] Align design with [Style Guide](./style-guide/page.tsx)
 
 - [ ] Shadcn/UI design polish and theming
 
