@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import PlantForm, { PlantFormSubmit } from './PlantForm';
 
 export default function AddPlantModal({
@@ -16,6 +17,7 @@ export default function AddPlantModal({
   defaultRoomId: string;
   onCreate: (name: string) => void;
 }) {
+  const router = useRouter();
   function close() {
     onOpenChange(false);
   }
@@ -27,8 +29,10 @@ export default function AddPlantModal({
       body: JSON.stringify(data),
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const created = await r.json();
     onCreate(data.name);
     close();
+    router.push(`/app/plants/${created.id}?tab=photos`);
   }
 
   if (!open) return null;

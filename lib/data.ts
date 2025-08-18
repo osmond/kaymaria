@@ -16,3 +16,12 @@ export async function addPhoto(id: string, src: string): Promise<{ src: string }
   plant.photos.push(src);
   return { src };
 }
+
+export async function removePhoto(id: string, src: string): Promise<boolean> {
+  const plant = mockPlants.find((p) => p.id === id);
+  if (!plant || !plant.photos) return false;
+  const idx = plant.photos.indexOf(src);
+  if (idx === -1) return false;
+  plant.photos.splice(idx, 1);
+  return true;
+}

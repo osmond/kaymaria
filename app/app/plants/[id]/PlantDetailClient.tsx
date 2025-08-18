@@ -4,7 +4,7 @@ import type { Tab } from '@/components/BottomNav';
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
 import BottomNav from '@/components/BottomNav';
@@ -49,16 +49,19 @@ export default function PlantDetailClient({ plant }: { plant: {
   const [plantState, setPlantState] = useState(plant);
   const id = plantState.id;
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState(plant.name);
   const [species, setSpecies] = useState(plant.species || "");
   const [photos, setPhotos] = useState<string[]>(plant.photos ?? []);
+  const [newPhoto, setNewPhoto] = useState("");
   const heroPhoto = photos[0] || "https://placehold.co/600x400?text=Plant";
   const acquired = plantState.acquiredAt ? new Date(plantState.acquiredAt) : null;
   const nextWater = plantState.nextWater ? new Date(plantState.nextWater) : null;
   const nextFertilize = plantState.nextFertilize ? new Date(plantState.nextFertilize) : null;
     const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
     const [err, setErr] = useState<string | null>(null);
-    const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">("stats");
+    const initialTab = (searchParams.get("tab") as "stats" | "timeline" | "notes" | "photos") || "stats";
+    const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">(initialTab);
     const [notes, setNotes] = useState<Note[]>([]);
     const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
@@ -199,6 +202,32 @@ export default function PlantDetailClient({ plant }: { plant: {
       if (r2.ok) setAllTasks(await r2.json());
     } catch {}
     setUndoInfo(null);
+  };
+
+  const addPhotoUrl = async () => {
+    const src = newPhoto.trim();
+    if (!src) return;
+    try {
+      const r = await fetch(`/api/plants/${id}/photos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ src }),
+      });
+      if (!r.ok) throw new Error();
+      setPhotos((p) => [...p, src]);
+      setNewPhoto("");
+    } catch {}
+  };
+
+  const removePhotoUrl = async (src: string) => {
+    try {
+      await fetch(`/api/plants/${id}/photos`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ src }),
+      });
+      setPhotos((p) => p.filter((s) => s !== src));
+    } catch {}
   };
 
   return (
@@ -379,15 +408,45 @@ export default function PlantDetailClient({ plant }: { plant: {
 
         {tab === "photos" && (
           <section className="mt-4 rounded-xl border bg-white shadow-sm p-4">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                addPhotoUrl();
+              }}
+              className="flex gap-2 mb-4"
+            >
+              <input
+                type="url"
+                value={newPhoto}
+                onChange={(e) => setNewPhoto(e.target.value)}
+                placeholder="Image URL"
+                className="flex-1 border rounded p-2 text-sm"
+              />
+              <button
+                type="submit"
+                className="px-3 py-2 rounded bg-neutral-900 text-white text-sm"
+              >
+                Add
+              </button>
+            </form>
             {photos.length > 0 ? (
               <div className="grid grid-cols-3 gap-2">
                 {photos.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src}
-                    alt={`${plantState.name} photo ${i + 1}`}
-                    className="w-full h-24 object-cover rounded"
-                  />
+                  <div key={i} className="relative">
+                    <img
+                      src={src}
+                      alt={`${plantState.name} photo ${i + 1}`}
+                      className="w-full h-24 object-cover rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePhotoUrl(src)}
+                      className="absolute top-1 right-1 text-xs bg-white/80 rounded-full px-1"
+                      aria-label="Remove photo"
+                    >
+                      ×
+                    </button>
+                  </div>
                 ))}
               </div>
             ) : (
