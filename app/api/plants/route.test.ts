@@ -1,8 +1,9 @@
 import { GET, POST } from './route';
-import { createRouteHandlerClient } from '@/lib/supabase';
+import { listPlants, createPlant } from '@/lib/prisma/plants';
 
-jest.mock('@/lib/supabase', () => ({
-  createRouteHandlerClient: jest.fn(),
+jest.mock('@/lib/prisma/plants', () => ({
+  listPlants: jest.fn(),
+  createPlant: jest.fn(),
 }));
 
 describe('GET/POST /api/plants', () => {
@@ -10,40 +11,20 @@ describe('GET/POST /api/plants', () => {
     jest.resetAllMocks();
   });
 
-  it('returns plants for authenticated user', async () => {
-    const plants = [{ id: 'p1', user_id: 'user1', name: 'Fiddle' }];
-    const order = jest.fn().mockResolvedValue({ data: plants, error: null });
-    const supabase = {
-      auth: { getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'user1' } }, error: null }) },
-      from: jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        order,
-      }),
-    };
-    (createRouteHandlerClient as jest.Mock).mockResolvedValue(supabase);
+  it('returns plants', async () => {
+    const plants = [{ id: 'p1', name: 'Fiddle' }];
+    (listPlants as jest.Mock).mockResolvedValue(plants);
 
     const res = await GET();
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toEqual(plants);
-    expect(order).toHaveBeenCalledWith('name');
+    expect(listPlants).toHaveBeenCalled();
   });
 
-  it('creates plant for authenticated user', async () => {
-    const newPlant = { id: 'p_new', name: 'New Plant', user_id: 'user1' };
-    const single = jest.fn().mockResolvedValue({ data: newPlant, error: null });
-    const supabase = {
-      auth: { getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'user1' } }, error: null }) },
-      from: jest.fn().mockReturnValue({
-        insert: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single,
-          }),
-        }),
-      }),
-    };
-    (createRouteHandlerClient as jest.Mock).mockResolvedValue(supabase);
+  it('creates plant', async () => {
+    const newPlant = { id: 'p_new', name: 'New Plant' };
+    (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
@@ -54,6 +35,6 @@ describe('GET/POST /api/plants', () => {
     expect(res.status).toBe(201);
     const json = await res.json();
     expect(json).toEqual(newPlant);
-    expect(single).toHaveBeenCalled();
+    expect(createPlant).toHaveBeenCalledWith({ name: 'New Plant' });
   });
 });

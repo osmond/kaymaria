@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getPlantById } from "@/lib/data";
+import { getPlant } from "@/lib/prisma/plants";
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await ctx.params;
-    const plant = await getPlantById(id);
+    const plant = await getPlant(id);
     if (!plant || plant.latitude === undefined || plant.longitude === undefined) {
       return NextResponse.json({ error: "location unavailable" }, { status: 404 });
     }
