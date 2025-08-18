@@ -127,7 +127,7 @@ All items are **unchecked** to indicate upcoming work.
 
  - [x] Align design with [Style Guide](./style-guide/page.tsx)
 
-- [ ] Shadcn/UI design polish and theming
+- [x] Shadcn/UI design polish and theming
 
 ---
 
