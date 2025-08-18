@@ -158,11 +158,11 @@ curl -X PATCH http://localhost:3000/api/tasks/t_<uuid>
 
 ## 📦 Import/Export API
 
-Backup or restore tasks using these endpoints:
+Backup or restore plants and tasks using these endpoints:
 
-- `GET /api/export` – download tasks as JSON
+- `GET /api/export` – download a JSON payload with `{ plants, tasks }`
 - `GET /api/export?format=csv` – download tasks as CSV
-- `POST /api/import` – replace tasks with `{ "tasks": Task[] }`
+- `POST /api/import` – replace data with `{ "plants": Plant[], "tasks": Task[] }` (either field optional)
 
 ## 🤖 AI Recommendation API
 

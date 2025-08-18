@@ -3,7 +3,7 @@ import { dump } from "@/lib/mockdb";
 
 export async function GET(req: NextRequest) {
   const format = req.nextUrl.searchParams.get("format");
-  const tasks = dump();
+  const { tasks, plants } = dump();
 
   if (format === "csv") {
     const header = "id,plantId,plantName,roomId,type,dueAt,status,lastEventAt";
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json(
-    { tasks },
+    { plants, tasks },
     { headers: { "Cache-Control": "no-store" } },
   );
 }

@@ -387,12 +387,20 @@ export async function getPlants() {
 }
 
 export function dump() {
-  return TASKS.slice();
+  return {
+    plants: PLANTS.slice(),
+    tasks: TASKS.slice(),
+  };
 }
 
-export function load(tasks: TaskRec[] = []) {
-  TASKS = tasks.slice();
-  return TASKS.length;
+export function load(data: { plants?: Plant[]; tasks?: TaskRec[] } = {}) {
+  if (data.plants) {
+    PLANTS = data.plants.slice();
+  }
+  if (data.tasks) {
+    TASKS = data.tasks.slice();
+  }
+  return { plantCount: PLANTS.length, taskCount: TASKS.length };
 }
 
 export function getInsights() {
