@@ -17,4 +17,28 @@ describe('GET /api/species-search', () => {
     const json = await res.json();
     expect(json).toEqual([]);
   });
+
+  it('queries Trefle when token present', async () => {
+    const oldFetch = global.fetch;
+    const mockFetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: [{ common_name: 'Rose', scientific_name: 'Rosa rubiginosa' }],
+      }),
+    } as any);
+    (global as any).fetch = mockFetch;
+    process.env.TREFLE_API_TOKEN = 'token';
+
+    const req = new Request('http://localhost/api/species-search?q=rose');
+    const res = await GET(req as any);
+    const json = await res.json();
+
+    expect(mockFetch).toHaveBeenCalled();
+    expect(json).toEqual([
+      { name: 'Rose', species: 'Rosa rubiginosa' },
+    ]);
+
+    delete process.env.TREFLE_API_TOKEN;
+    (global as any).fetch = oldFetch;
+  });
 });
