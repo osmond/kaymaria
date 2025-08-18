@@ -1,14 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import BottomNav from "@/components/BottomNav";
 import TaskRow from "@/components/TaskRow";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
 import { motion } from "framer-motion";
-import Fab from "@/components/Fab";
-import AddPlantModal from "@/components/AddPlantModal";
 import {
   Select,
   SelectContent,
@@ -26,7 +22,7 @@ import {
 } from "lucide-react";
 
 const DEFAULT_TASK_WINDOW_DAYS = Number(
-  process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7"
+  process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7",
 );
 const URGENT_WINDOW_DAYS = 2;
 
@@ -37,6 +33,7 @@ function isSameDay(a: Date, b: Date) {
     a.getDate() === b.getDate()
   );
 }
+
 function dueLabel(dueAt: Date, today: Date) {
   const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const d0 = new Date(dueAt.getFullYear(), dueAt.getMonth(), dueAt.getDate());
@@ -45,6 +42,7 @@ function dueLabel(dueAt: Date, today: Date) {
   if (diff === 1) return "Tomorrow";
   return `In ${diff}d`;
 }
+
 function timeAgo(d: Date) {
   const diff = Math.max(0, Date.now() - d.getTime());
   const days = Math.floor(diff / 86400000);
@@ -54,6 +52,7 @@ function timeAgo(d: Date) {
   const m = Math.floor(diff / 60000);
   return m + "m ago";
 }
+
 function labelForType(t: "water" | "fertilize" | "repot") {
   return t === "water" ? "Water" : t === "fertilize" ? "Fertilize" : "Repot";
 }
@@ -66,7 +65,6 @@ function pastTenseLabel(t: "water" | "fertilize" | "repot") {
     : "Repotted";
 }
 
-// Client-only date to avoid hydration drift
 function ClientDate() {
   const [text, setText] = useState("");
   useEffect(() => {
@@ -75,7 +73,7 @@ function ClientDate() {
         weekday: "short",
         month: "short",
         day: "numeric",
-      }).format(new Date())
+      }).format(new Date()),
     );
   }, []);
   return (
@@ -100,15 +98,16 @@ function CompleteFlash() {
   );
 }
 
-type PlantListItem = { id: string; name: string; roomId?: string };
-type EventDTO = { id: string; plantId: string; plantName: string; type: "water" | "fertilize" | "repot"; at: string };
+type EventDTO = {
+  id: string;
+  plantId: string;
+  plantName: string;
+  type: "water" | "fertilize" | "repot";
+  at: string;
+};
 
-export default function AppShell({ initialView }:{ initialView?: "today"|"timeline"|"plants"|"insights"|"settings" }) {
-  type View = "today" | "timeline" | "plants" | "insights" | "settings";
-  const [view, setView] = useState<View>(initialView ?? "today");
+export function TodayView() {
   const taskWindow = DEFAULT_TASK_WINDOW_DAYS;
-
-  // modals
 
   // ui
   const [confetti, setConfetti] = useState<number[]>([]);
@@ -125,32 +124,23 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   const [err, setErr] = useState<string | null>(null);
   const notifiedRef = useRef<Set<string>>(new Set());
 
-  // events list for Timeline tab
-  const [events, setEvents] = useState<EventDTO[]>([]);
-  const [eventsErr, setEventsErr] = useState<string | null>(null);
-  const [eventsLoading, setEventsLoading] = useState(false);
-  const [eventTypeFilter, setEventTypeFilter] = useState("");
-
-  // plants list for Plants tab
-  const [plants, setPlants] = useState<PlantListItem[]>([]);
-  const [plantsErr, setPlantsErr] = useState<string | null>(null);
-  const [plantsLoading, setPlantsLoading] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
-
-  // room, type & status filters
+  // filters
   const [roomFilter, setRoomFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+
   const rooms = useMemo(() => {
     const set = new Set<string>();
     tasks.forEach((t) => set.add(t.roomId));
     return Array.from(set);
   }, [tasks]);
+
   const types = useMemo(() => {
     const set = new Set<string>();
     tasks.forEach((t) => set.add(t.type));
     return Array.from(set);
   }, [tasks]);
+
   const filteredTasks = useMemo(() => {
     const now = Date.now();
     const urgentMax = now + URGENT_WINDOW_DAYS * 864e5;
@@ -170,12 +160,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     });
   }, [tasks, roomFilter, typeFilter, statusFilter]);
 
-  const filteredEvents = useMemo(() => {
-    return eventTypeFilter
-      ? events.filter((e) => e.type === eventTypeFilter)
-      : events;
-  }, [events, eventTypeFilter]);
-
   async function refresh(window = taskWindow) {
     setLoading(true);
     setErr(null);
@@ -191,23 +175,18 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       setLoading(false);
     }
   }
+
   useEffect(() => {
     refresh(taskWindow);
   }, []);
 
   useEffect(() => {
     if (
-      typeof window !== "undefined" &&
-      "Notification" in window &&
-      Notification.permission === "default"
-    ) {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !("Notification" in window)) return;
-    if (Notification.permission !== "granted") return;
+      typeof window === "undefined" ||
+      !("Notification" in window) ||
+      Notification.permission !== "granted"
+    )
+      return;
     const now = Date.now();
     tasks.forEach((t) => {
       const due = new Date(t.dueAt).getTime();
@@ -218,67 +197,25 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     });
   }, [tasks]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setEventsLoading(true);
-        setEventsErr(null);
-        const r = await fetch(`/api/events?window=30d`, { cache: "no-store" });
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        setEvents(await r.json());
-      } catch (e: any) {
-        setEventsErr(e?.message || "Failed to load");
-      } finally {
-        setEventsLoading(false);
-      }
-    })();
-  }, []);
-
-  async function loadPlants() {
-    try {
-      setPlantsLoading(true);
-      setPlantsErr(null);
-      const r = await fetch("/api/plants", { cache: "no-store" });
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      const data = await r.json();
-      setPlants(
-        (data as any[]).map((p) => ({ id: p.id, name: p.name, roomId: p.roomId }))
-      );
-    } catch (e: any) {
-      setPlantsErr(e?.message || "Failed to load plants");
-    } finally {
-      setPlantsLoading(false);
-    }
-  }
-
-  // Load plants list once we first visit the Plants tab
-  useEffect(() => {
-    if (view !== "plants" || plants.length || plantsLoading) return;
-    loadPlants();
-  }, [view, plants.length, plantsLoading]);
-
   const trigger = () => {
     const id = Math.floor(Math.random() * 1e9);
     setConfetti((p) => [...p, id]);
-    window.setTimeout(
-      () => setConfetti((p) => p.filter((n) => n !== id)),
-      1200
-    );
+    window.setTimeout(() => setConfetti((p) => p.filter((n) => n !== id)), 1200);
   };
+
   const toast = (
     m: string,
-    action?: { label: string; onClick: () => void }
+    action?: { label: string; onClick: () => void },
   ) => {
     if (timer.current) window.clearTimeout(timer.current);
     setSnackbar({ visible: true, message: m, action });
     // @ts-ignore
     timer.current = window.setTimeout(
       () => setSnackbar({ visible: false, message: "" }),
-      5000
+      5000,
     );
   };
 
-  // Composite id so the API matches "plantId:type"
   const complete = async (t: TaskDTO) => {
     try {
       setTasks((prev) => prev.filter((x) => x.id !== t.id));
@@ -322,20 +259,17 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     }
   };
 
-  
-
   const today = new Date();
   const tasksToday = useMemo(() => {
     const tomorrow = new Date(
       today.getFullYear(),
       today.getMonth(),
-      today.getDate() + 1
+      today.getDate() + 1,
     );
     return filteredTasks
       .filter((t) => new Date(t.dueAt) < tomorrow)
       .sort(
-        (a, b) =>
-          new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
+        (a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime(),
       );
   }, [filteredTasks]);
   const tasksTodayGrouped = useMemo(() => {
@@ -348,13 +282,12 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     const groups = Array.from(m.entries()).map(([plant, items]) => [
       plant,
       items.sort(
-        (a, b) =>
-          new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
+        (a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime(),
       ),
     ]) as [string, TaskDTO[]][];
     groups.sort(
       (a, b) =>
-        new Date(a[1][0].dueAt).getTime() - new Date(b[1][0].dueAt).getTime()
+        new Date(a[1][0].dueAt).getTime() - new Date(b[1][0].dueAt).getTime(),
     );
     return groups;
   }, [tasksToday]);
@@ -362,12 +295,12 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     const tomorrow = new Date(
       today.getFullYear(),
       today.getMonth(),
-      today.getDate() + 1
+      today.getDate() + 1,
     );
     const windowEnd = new Date(
       today.getFullYear(),
       today.getMonth(),
-      today.getDate() + taskWindow
+      today.getDate() + taskWindow,
     );
     const m = new Map<string, TaskDTO[]>();
     filteredTasks
@@ -393,323 +326,157 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 1.5rem)" }}
       >
         <div className="flex items-baseline justify-between w-full">
-          <h1 className="text-xl font-display font-semibold">
-            {view === "today" ? "Today" : view[0].toUpperCase() + view.slice(1)}
-          </h1>
+          <h1 className="text-xl font-display font-semibold">Today</h1>
           <ClientDate />
         </div>
-        {view === "today" && (
-          <>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <Select
-                value={roomFilter || undefined}
-                onValueChange={(v) => setRoomFilter(v)}
-              >
-                <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
-                  <Home className="h-4 w-4 text-neutral-500" />
-                  <SelectValue placeholder="Room" />
-                </SelectTrigger>
-                <SelectContent searchable>
-                  <SelectItem value="">All rooms</SelectItem>
-                  {rooms.map((r) => (
-                    <SelectItem key={r} value={r}>
-                      {r}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={typeFilter || undefined}
-                onValueChange={(v) => setTypeFilter(v)}
-              >
-                <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
-                  <Droplet className="h-4 w-4 text-neutral-500" />
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent searchable>
-                  <SelectItem value="">All task types</SelectItem>
-                  {types.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {labelForType(t as any)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={statusFilter || undefined}
-                onValueChange={(v) => setStatusFilter(v)}
-              >
-                <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
-                  <AlertCircle className="h-4 w-4 text-neutral-500" />
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All statuses</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
-                  <SelectItem value="urgent">Due soon</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {(roomFilter || typeFilter || statusFilter) && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {roomFilter && (
-                  <span className="flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
-                    {roomFilter}
-                    <button
-                      type="button"
-                      className="rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-                      onClick={() => setRoomFilter("")}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                )}
-                {typeFilter && (
-                  <span className="flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
-                    {labelForType(typeFilter as any)}
-                    <button
-                      type="button"
-                      className="rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-                      onClick={() => setTypeFilter("")}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                )}
-                {statusFilter && (
-                  <span className="flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
-                    {statusFilter === "overdue" ? "Overdue" : "Due soon"}
-                    <button
-                      type="button"
-                      className="rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-                      onClick={() => setStatusFilter("")}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                )}
-              </div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          <Select
+            value={roomFilter || undefined}
+            onValueChange={(v) => setRoomFilter(v)}
+          >
+            <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
+              <Home className="h-4 w-4 text-neutral-500" />
+              <SelectValue placeholder="Room" />
+            </SelectTrigger>
+            <SelectContent searchable>
+              <SelectItem value="">All rooms</SelectItem>
+              {rooms.map((r) => (
+                <SelectItem key={r} value={r}>
+                  {r}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={typeFilter || undefined}
+            onValueChange={(v) => setTypeFilter(v)}
+          >
+            <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
+              <Droplet className="h-4 w-4 text-neutral-500" />
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent searchable>
+              <SelectItem value="">All task types</SelectItem>
+              {types.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {labelForType(t as any)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={statusFilter || undefined}
+            onValueChange={(v) => setStatusFilter(v)}
+          >
+            <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
+              <AlertCircle className="h-4 w-4 text-neutral-500" />
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All statuses</SelectItem>
+              <SelectItem value="overdue">Overdue</SelectItem>
+              <SelectItem value="urgent">Due soon</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {(roomFilter || typeFilter || statusFilter) && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {roomFilter && (
+              <span className="flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
+                {roomFilter}
+                <button
+                  type="button"
+                  className="rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  onClick={() => setRoomFilter("")}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
             )}
-          </>
+            {typeFilter && (
+              <span className="flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
+                {labelForType(typeFilter as any)}
+                <button
+                  type="button"
+                  className="rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  onClick={() => setTypeFilter("")}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {statusFilter && (
+              <span className="flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
+                {statusFilter === "overdue" ? "Overdue" : "Due soon"}
+                <button
+                  type="button"
+                  className="rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  onClick={() => setStatusFilter("")}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+          </div>
         )}
       </header>
 
       <main className="flex-1 px-4 pb-28">
-        {view === "today" && (
-          <section className="space-y-3 mt-4">
-            {loading && (
-              <div className="space-y-3">
-                {[...Array(2)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl border bg-white shadow-sm h-16 animate-pulse"
-                  />
-                ))}
-              </div>
-            )}
-            {!loading && err && (
-              <div className="rounded-xl border bg-white shadow-sm p-4 text-sm text-red-600">
-                {err}
-              </div>
-            )}
-            {!loading &&
-              !err &&
-              tasksTodayGrouped.map(([plantName, items]) => (
-                <div key={plantName} className="space-y-2">
-                  <div className="text-xs font-medium text-neutral-600 uppercase tracking-wide">
-                    {plantName}
-                  </div>
-                  <div className="space-y-3">
-                    {items.map((t) => (
-                      <TaskRow
-                        key={t.id}
-                        plant={t.plantName}
-                        action={labelForType(t.type) as any}
-                        last={t.lastEventAt ? timeAgo(new Date(t.lastEventAt)) : "—"}
-                        due={dueLabel(new Date(t.dueAt), today)}
-                        onOpen={() => {}}
-                        onComplete={() => complete(t)}
-                        onDefer={() => deferTask(t)}
-                        showPlant={false}
-                      />
-                    ))}
-                  </div>
-                </div>
+        <section className="space-y-3 mt-4">
+          {loading && (
+            <div className="space-y-3">
+              {[...Array(2)].map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border bg-white shadow-sm h-16 animate-pulse"
+                />
               ))}
-            {!loading && !err && tasksToday.length === 0 && (
-              <div className="rounded-xl border bg-white shadow-sm p-6 text-center text-sm text-neutral-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
-                No tasks today — your plants are happy! 🌿
-                {upcoming.length > 0 && (
-                  <div className="mt-2 text-neutral-600 dark:text-neutral-300">
-                    Next up: {upcoming[0][1][0].plantName} {labelForType(upcoming[0][1][0].type)} {dueLabel(new Date(upcoming[0][1][0].dueAt), today)}
-                  </div>
-                )}
+            </div>
+          )}
+          {!loading && err && (
+            <div className="rounded-xl border bg-white shadow-sm p-4 text-sm text-red-600">
+              {err}
+            </div>
+          )}
+          {!loading &&
+            !err &&
+            tasksTodayGrouped.map(([plantName, items]) => (
+              <div key={plantName} className="space-y-2">
+                <div className="text-xs font-medium text-neutral-600 uppercase tracking-wide">
+                  {plantName}
+                </div>
+                <div className="rounded-xl border bg-white shadow-sm divide-y">
+                  {items.map((t) => (
+                    <TaskRow
+                      key={t.id}
+                      overdue={new Date(t.dueAt).getTime() < Date.now()}
+                      label={labelForType(t.type as any)}
+                      status={
+                        isSameDay(today, new Date(t.dueAt)) ? "due" : "upcoming"
+                      }
+                      due={new Date(t.dueAt).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                      onComplete={() => complete(t)}
+                      onDefer={() => deferTask(t)}
+                    />
+                  ))}
+                </div>
               </div>
-            )}
-          </section>
-        )}
-
-        {/* Removed upcoming view */}
-
-        {view === "timeline" && (
-          <section className="mt-4 rounded-xl border bg-white shadow-sm">
-            <div className="px-4 py-3 border-b">
-              <div className="text-base font-medium">Timeline</div>
-              <div className="text-xs text-neutral-500">Recent care events</div>
-            </div>
-            <div className="px-4 py-2 border-b">
-              <Select
-                value={eventTypeFilter || undefined}
-                onValueChange={(v) => setEventTypeFilter(v)}
-              >
-                <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
-                  <FilterIcon className="h-4 w-4 text-neutral-500" />
-                  <SelectValue placeholder="Event type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All event types</SelectItem>
-                  <SelectItem value="water">Water</SelectItem>
-                  <SelectItem value="fertilize">Fertilize</SelectItem>
-                  <SelectItem value="repot">Repot</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <ul className="text-sm px-4 py-2">
-              {eventsErr && <li className="py-3 text-red-600">{eventsErr}</li>}
-              {!eventsErr && eventsLoading && (
-                <li className="py-3 text-neutral-500">Loading…</li>
-              )}
-              {!eventsErr && !eventsLoading && filteredEvents.length === 0 && (
-                <li className="py-3 text-neutral-500">No events</li>
-              )}
-              {!eventsErr &&
-                filteredEvents.map((e) => (
-                  <li key={e.id} className="py-3 border-b last:border-b-0">
-                    <span className="font-medium">{e.plantName}</span> — {pastTenseLabel(e.type)}
-                    <span className="text-neutral-500"> {timeAgo(new Date(e.at))}</span>
-                  </li>
-                ))}
-            </ul>
-          </section>
-        )}
-
-        {view === "plants" && (
-          <section className="mt-4 space-y-6">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-display font-medium text-neutral-600">My Plants</h2>
-              {plantsLoading && (
-                <span className="text-xs text-neutral-500">Loading…</span>
+            ))}
+          {!loading && !err && tasksTodayGrouped.length === 0 && (
+            <div className="rounded-xl border bg-white shadow-sm p-6 text-center text-sm text-neutral-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
+              No tasks today — your plants are happy! 🌿
+              {upcoming.length > 0 && (
+                <div className="mt-2 text-neutral-600 dark:text-neutral-300">
+                  Next up: {upcoming[0][1][0].plantName} {labelForType(upcoming[0][1][0].type)} {dueLabel(new Date(upcoming[0][1][0].dueAt), today)}
+                </div>
               )}
             </div>
-
-            {plantsErr && (
-              <div className="rounded-xl border bg-white shadow-sm p-4 text-sm text-red-600">
-                {plantsErr}
-              </div>
-            )}
-
-            {!plantsErr && (
-              <div className="grid grid-cols-2 gap-3">
-                {plants.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/app/plants/${encodeURIComponent(p.id)}`}
-                    className="text-left block rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-300"
-                  >
-                    <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
-                      <div className="h-24 bg-neutral-100" />
-                      <div className="p-2">
-                        <div className="text-sm font-medium truncate">{p.name}</div>
-                        <div className="text-xs text-neutral-500">
-                          Last watered: —
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-                {!plantsLoading && plants.length === 0 && (
-                  <div className="col-span-2 text-sm text-neutral-500 border rounded-xl bg-white shadow-sm p-6 text-center">
-                    No plants yet. Use the + button to add one.
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
-        )}
-
-        {view === "insights" && (
-          <section className="mt-4 grid gap-3">
-            <div className="rounded-xl border bg-white shadow-sm p-4">
-              <div className="text-base font-medium">Longest Streak</div>
-              <div className="text-sm text-neutral-600">
-                Monstera • 12 waterings
-              </div>
-              <div className="mt-2 h-24 rounded-xl border border-dashed grid place-items-center text-sm text-neutral-500">
-                sparkline placeholder
-              </div>
-            </div>
-            <div className="rounded-xl border bg-white shadow-sm p-4">
-              <div className="text-base font-medium">Most Neglected</div>
-              <div className="text-sm text-neutral-600">Orchid • last 35d</div>
-              <div className="mt-2 h-24 rounded-xl border border-dashed grid place-items-center text-sm text-neutral-500">
-                list placeholder
-              </div>
-            </div>
-            <div className="rounded-xl border bg-white shadow-sm p-4">
-              <div className="text-base font-medium">Seasonality</div>
-              <div className="text-sm text-neutral-600">
-                Care events per month
-              </div>
-              <div className="mt-2 h-32 rounded-xl border border-dashed grid place-items-center text-sm text-neutral-500">
-                chart placeholder
-              </div>
-            </div>
-          </section>
-        )}
-
-        {view === "settings" && (
-          <section className="mt-4 grid gap-3">
-            <div className="rounded-xl border bg-white shadow-sm p-4 dark:bg-neutral-800 dark:border-neutral-700">
-              <div className="text-base font-medium">Export / Import</div>
-              <div className="text-sm text-neutral-600 dark:text-neutral-300">
-                Backup JSON / CSV; restore from file
-              </div>
-              <div className="mt-2 flex gap-2">
-                <button className="border rounded px-3 py-2 text-sm">
-                  Export JSON
-                </button>
-                <button className="border rounded px-3 py-2 text-sm">
-                  Export CSV
-                </button>
-                <button className="bg-neutral-900 text-white rounded px-3 py-2 text-sm dark:bg-neutral-100 dark:text-neutral-900">
-                  Import
-                </button>
-              </div>
-            </div>
-            <div className="rounded-xl border bg-white shadow-sm p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
-              <div className="text-base font-medium">Theme</div>
-              <ThemeToggle />
-            </div>
-          </section>
-        )}
+          )}
+        </section>
       </main>
-
-      <BottomNav value={view} onChange={(v) => setView(v as any)} />
-
-      {view === "plants" && (
-        <>
-          <Fab onClick={() => setAddOpen(true)} />
-          <AddPlantModal
-            open={addOpen}
-            onOpenChange={setAddOpen}
-            defaultRoomId="room-1"
-            onCreate={() => {
-              setAddOpen(false);
-              loadPlants();
-            }}
-          />
-        </>
-      )}
 
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {confetti.map((id) => (
@@ -727,7 +494,134 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
           )}
         </div>
       )}
-
     </div>
   );
 }
+
+export function TimelineView() {
+  const [events, setEvents] = useState<EventDTO[]>([]);
+  const [eventsErr, setEventsErr] = useState<string | null>(null);
+  const [eventsLoading, setEventsLoading] = useState(false);
+  const [eventTypeFilter, setEventTypeFilter] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setEventsLoading(true);
+        setEventsErr(null);
+        const r = await fetch(`/api/events?window=30d`, { cache: "no-store" });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        setEvents(await r.json());
+      } catch (e: any) {
+        setEventsErr(e?.message || "Failed to load");
+      } finally {
+        setEventsLoading(false);
+      }
+    })();
+  }, []);
+
+  const filteredEvents = useMemo(
+    () =>
+      eventTypeFilter
+        ? events.filter((e) => e.type === eventTypeFilter)
+        : events,
+    [events, eventTypeFilter],
+  );
+
+  return (
+    <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
+      <header
+        className="px-4 pb-2 sticky top-0 z-20 bg-gradient-to-b from-white/90 to-neutral-50/60 backdrop-blur border-b"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 1.5rem)" }}
+      >
+        <div className="flex items-baseline justify-between w-full">
+          <h1 className="text-xl font-display font-semibold">Timeline</h1>
+          <ClientDate />
+        </div>
+      </header>
+      <main className="flex-1 px-4 pb-28">
+        <section className="mt-4 rounded-xl border bg-white shadow-sm">
+          <div className="px-4 py-3 border-b">
+            <div className="text-base font-medium">Timeline</div>
+            <div className="text-xs text-neutral-500">Recent care events</div>
+          </div>
+          <div className="px-4 py-2 border-b">
+            <Select
+              value={eventTypeFilter || undefined}
+              onValueChange={(v) => setEventTypeFilter(v)}
+            >
+              <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
+                <FilterIcon className="h-4 w-4 text-neutral-500" />
+                <SelectValue placeholder="Event type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All event types</SelectItem>
+                <SelectItem value="water">Water</SelectItem>
+                <SelectItem value="fertilize">Fertilize</SelectItem>
+                <SelectItem value="repot">Repot</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <ul className="text-sm px-4 py-2">
+            {eventsErr && <li className="py-3 text-red-600">{eventsErr}</li>}
+            {!eventsErr && eventsLoading && (
+              <li className="py-3 text-neutral-500">Loading…</li>
+            )}
+            {!eventsErr && !eventsLoading && filteredEvents.length === 0 && (
+              <li className="py-3 text-neutral-500">No events</li>
+            )}
+            {!eventsErr &&
+              filteredEvents.map((e) => (
+                <li key={e.id} className="py-3 border-b last:border-b-0">
+                  <span className="font-medium">{e.plantName}</span> — {pastTenseLabel(e.type)}
+                  <span className="text-neutral-500"> {timeAgo(new Date(e.at))}</span>
+                </li>
+              ))}
+          </ul>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+export function SettingsView() {
+  return (
+    <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
+      <header
+        className="px-4 pb-2 sticky top-0 z-20 bg-gradient-to-b from-white/90 to-neutral-50/60 backdrop-blur border-b"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 1.5rem)" }}
+      >
+        <div className="flex items-baseline justify-between w-full">
+          <h1 className="text-xl font-display font-semibold">Settings</h1>
+          <ClientDate />
+        </div>
+      </header>
+      <main className="flex-1 px-4 pb-28">
+        <section className="mt-4 grid gap-3">
+          <div className="rounded-xl border bg-white shadow-sm p-4 dark:bg-neutral-800 dark:border-neutral-700">
+            <div className="text-base font-medium">Export / Import</div>
+            <div className="text-sm text-neutral-600 dark:text-neutral-300">
+              Backup JSON / CSV; restore from file
+            </div>
+            <div className="mt-2 flex gap-2">
+              <button className="border rounded px-3 py-2 text-sm">
+                Export JSON
+              </button>
+              <button className="border rounded px-3 py-2 text-sm">
+                Export CSV
+              </button>
+              <button className="bg-neutral-900 text-white rounded px-3 py-2 text-sm dark:bg-neutral-100 dark:text-neutral-900">
+                Import
+              </button>
+            </div>
+          </div>
+          <div className="rounded-xl border bg-white shadow-sm p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
+            <div className="text-base font-medium">Theme</div>
+            <ThemeToggle />
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
