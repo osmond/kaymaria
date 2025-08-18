@@ -87,6 +87,40 @@ export interface Database {
           }
         ];
       };
+      plant_photos: {
+        Row: {
+          id: string;
+          user_id: string;
+          plant_id: string;
+          url: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          plant_id: string;
+          url: string;
+          created_at?: string | null;
+        };
+        Update: {
+          url?: string;
+          created_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "plant_photos_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "plant_photos_plant_id_fkey";
+            columns: ["plant_id"];
+            referencedRelation: "plants";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
