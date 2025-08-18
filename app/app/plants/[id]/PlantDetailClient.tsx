@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
-import EditCarePlanModal from '@/components/EditCarePlanModal';
 import BottomNav from '@/components/BottomNav';
 
 type CareType = "water" | "fertilize" | "repot";
@@ -64,7 +63,6 @@ export default function PlantDetailClient({ plant }: { plant: {
     const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
   const [editOpen, setEditOpen] = useState(false);
-  const [careOpen, setCareOpen] = useState(false);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
   const careTips = useMemo(() => {
     const tips: string[] = [];
@@ -310,12 +308,6 @@ export default function PlantDetailClient({ plant }: { plant: {
               />
               <Stat label="Soil" value={plantState.soilType || "—"} />
             </div>
-            <button
-              className="mt-4 w-full border rounded-lg px-3 py-2"
-              onClick={() => setCareOpen(true)}
-            >
-              Edit Care Plan
-            </button>
           </div>
         )}
 
@@ -418,12 +410,6 @@ export default function PlantDetailClient({ plant }: { plant: {
           setName(p.name);
           setSpecies(p.species || "");
         }}
-      />
-      <EditCarePlanModal
-        open={careOpen}
-        onOpenChange={setCareOpen}
-        plant={plantState}
-        onUpdated={(p) => setPlantState(p)}
       />
     </div>
   );
