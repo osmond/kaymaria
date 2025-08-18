@@ -1,12 +1,18 @@
 import { PATCH, DELETE } from './route';
-import { load, getPlant } from '@/lib/mockdb';
+import { updatePlant, deletePlant } from '@/lib/prisma/plants';
+
+jest.mock('@/lib/prisma/plants', () => ({
+  updatePlant: jest.fn(),
+  deletePlant: jest.fn(),
+}));
 
 describe('PATCH/DELETE /api/plants/[id]', () => {
   beforeEach(() => {
-    load({ plants: [{ id: 'p1', name: 'Aloe', roomId: 'r1', rules: [] }] });
+    jest.resetAllMocks();
   });
 
   it('updates existing plant', async () => {
+    (updatePlant as jest.Mock).mockResolvedValue({ id: 'p1', name: 'Updated' });
     const req = new Request('http://localhost/api/plants/p1', {
       method: 'PATCH',
       body: JSON.stringify({ name: 'Updated' }),
@@ -15,15 +21,16 @@ describe('PATCH/DELETE /api/plants/[id]', () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.name).toBe('Updated');
-    expect(getPlant('p1')?.name).toBe('Updated');
+    expect(updatePlant).toHaveBeenCalledWith('p1', { name: 'Updated' });
   });
 
   it('deletes plant', async () => {
+    (deletePlant as jest.Mock).mockResolvedValue(true);
     const req = new Request('http://localhost/api/plants/p1', { method: 'DELETE' });
     const res = await DELETE(req, { params: { id: 'p1' } });
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toEqual({ ok: true });
-    expect(getPlant('p1')).toBeUndefined();
+    expect(deletePlant).toHaveBeenCalledWith('p1');
   });
 });
