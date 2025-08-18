@@ -144,7 +144,7 @@ All items are **unchecked** to indicate upcoming work.
 
 - [x] Add `README.md` with usage instructions
 
-- [ ] Deploy to Vercel
+- [x] Deploy to Vercel
 - [x] Manual test cases (mobile + desktop) ([docs/manual-test-cases.md](./docs/manual-test-cases.md))
 - [x] 404, 500 error handling and loading states
 - [ ] Regression test for mock → live transition
