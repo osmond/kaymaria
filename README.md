@@ -106,6 +106,8 @@ Kay Maria is built with a focus on calm, clarity, and emotional connection. Our 
 The style guide's core colors are exposed in Tailwind as utility classes like `bg-primary`, `text-foreground`, and `text-muted`.
 Use these to keep components visually consistent.
 
+The light and dark themes are powered by `next-themes` and Shadcn-style CSS variables defined in `app/globals.css`.
+
 To view a live preview of the design tokens and color palette in the app, visit:
 
 🔗 [`/style-guide`](http://localhost:3000/style-guide) (dev only)

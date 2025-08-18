@@ -1,4 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body{@apply bg-background text-foreground dark:bg-neutral-900 dark:text-neutral-50;}
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 221 39% 11%;
+    --primary: 166 27% 43%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 164 42% 88%;
+    --secondary-foreground: 221 39% 11%;
+    --muted: 218 11% 65%;
+  }
+  .dark {
+    --background: 221 39% 11%;
+    --foreground: 0 0% 98%;
+    --primary: 166 27% 43%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 164 42% 20%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 218 11% 65%;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
