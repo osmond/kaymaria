@@ -238,6 +238,16 @@ export default function PlantDetailClient({ plant }: { plant: {
     } catch {}
   };
 
+  const deletePlant = async () => {
+    if (!confirm("Delete this plant?")) return;
+    try {
+      const r = await fetch(`/api/plants/${id}`, { method: "DELETE" });
+      if (!r.ok) throw new Error();
+      router.push("/app/plants");
+      router.refresh();
+    } catch {}
+  };
+
   return (
     <div className="min-h-[100dvh] bg-neutral-50 text-neutral-900 flex flex-col">
       {/* Header */}
@@ -465,6 +475,12 @@ export default function PlantDetailClient({ plant }: { plant: {
           </section>
         )}
 
+        <button
+          onClick={deletePlant}
+          className="mt-4 w-full rounded-lg border border-red-200 bg-red-50 py-2 text-sm text-red-700"
+        >
+          Delete plant
+        </button>
         <div className="h-16" />
       </main>
 
