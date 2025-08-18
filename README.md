@@ -35,6 +35,11 @@ Once the development server is running:
 4. Swipe a task to complete it, edit the details, or delete it.
 5. Use the room and task-type filters to focus on what's relevant.
 
+
+## 🧪 Testing
+
+Manual test cases for desktop and mobile are documented in [docs/manual-test-cases.md](./docs/manual-test-cases.md).
+
 # 🌱 Kay Maria
 
 **Tend to what matters.**  
