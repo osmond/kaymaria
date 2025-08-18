@@ -146,7 +146,7 @@ All items are **unchecked** to indicate upcoming work.
 
 - [ ] Deploy to Vercel
 - [ ] Manual test cases (mobile + desktop)
-- [ ] 404, 500 error handling and loading states
+- [x] 404, 500 error handling and loading states
 - [ ] Regression test for mock → live transition
 
 ---
