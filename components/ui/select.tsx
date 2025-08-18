@@ -8,6 +8,8 @@ type Ctx = {
   setOpen: (v: boolean) => void;
   selectedLabel?: string;
   setSelectedLabel: (s?: string) => void;
+  search: string;
+  setSearch: (s: string) => void;
 };
 const SelectCtx = React.createContext<Ctx | null>(null);
 
@@ -28,6 +30,10 @@ export function Select({
 
   const [open, setOpen] = React.useState(false);
   const [selectedLabel, setSelectedLabel] = React.useState<string | undefined>(undefined);
+  const [search, setSearch] = React.useState("");
+  React.useEffect(() => {
+    if (!open) setSearch("");
+  }, [open]);
 
   const change = (v: string, label?: string) => {
     if (!isControlled) setInternal(v);
@@ -46,6 +52,8 @@ export function Select({
           setOpen,
           selectedLabel,
           setSelectedLabel,
+          search,
+          setSearch,
         }}
       >
         {children}
@@ -92,14 +100,28 @@ export function SelectValue({
 export function SelectContent({
   className = "",
   children,
+  searchable = false,
 }: {
   className?: string;
   children: React.ReactNode;
+  searchable?: boolean;
 }) {
   const ctx = React.useContext(SelectCtx);
   if (!ctx || !ctx.open) return null;
   return (
     <div className={`absolute z-50 mt-1 w-full rounded-lg border bg-white shadow-md ${className}`}>
+      {searchable && (
+        <div className="p-1">
+          <input
+            type="text"
+            value={ctx.search}
+            onChange={(e) => ctx.setSearch(e.target.value)}
+            className="h-8 w-full rounded border px-2 text-sm"
+            placeholder="Search..."
+            autoFocus
+          />
+        </div>
+      )}
       {children}
     </div>
   );
@@ -120,6 +142,12 @@ export function SelectItem({
     typeof children === "string"
       ? children
       : (Array.isArray(children) ? children.find((c) => typeof c === "string") : null) || undefined;
+  const matches =
+    !ctx.search ||
+    (label ?? value)
+      .toLowerCase()
+      .includes(ctx.search.toLowerCase());
+  if (!matches) return null;
 
   return (
     <button

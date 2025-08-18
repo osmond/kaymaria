@@ -555,7 +555,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                   <Home className="h-4 w-4 text-neutral-500" />
                   <SelectValue placeholder="Room" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent searchable>
                   <SelectItem value="">All rooms</SelectItem>
                   {rooms.map((r) => (
                     <SelectItem key={r} value={r}>
@@ -572,7 +572,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                   <Droplet className="h-4 w-4 text-neutral-500" />
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent searchable>
                   <SelectItem value="">All task types</SelectItem>
                   {types.map((t) => (
                     <SelectItem key={t} value={t}>
