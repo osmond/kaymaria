@@ -4,7 +4,7 @@ import {
   getComputedWaterInfo,
   updatePlant,
   deletePlant,
-} from "@/lib/mockdb";
+} from "@/lib/prisma/plants";
 
 // In Next 15, params may be a Promise — await it.
 export async function GET(
@@ -13,10 +13,10 @@ export async function GET(
 ) {
   try {
     const params = await (ctx as any).params;
-    const p = getPlant(params.id);
-    if (!p) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    const water = getComputedWaterInfo(p.id);
-    return NextResponse.json({ ...p, water });
+    const plant = await getPlant(params.id);
+    if (!plant) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const water = getComputedWaterInfo(plant);
+    return NextResponse.json({ ...plant, water });
   } catch (e: any) {
     console.error("GET /api/plants/[id] failed:", e);
     return NextResponse.json({ error: "server" }, { status: 500 });
@@ -30,7 +30,7 @@ export async function PATCH(
   try {
     const params = await (ctx as any).params;
     const body = await req.json().catch(() => ({}));
-    const updated = updatePlant(params.id, body);
+    const updated = await updatePlant(params.id, body);
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(updated);
   } catch (e: any) {
@@ -45,7 +45,7 @@ export async function DELETE(
 ) {
   try {
     const params = await (ctx as any).params;
-    const ok = deletePlant(params.id);
+    const ok = await deletePlant(params.id);
     if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ ok: true });
   } catch (e: any) {
@@ -53,3 +53,4 @@ export async function DELETE(
     return NextResponse.json({ error: "server" }, { status: 500 });
   }
 }
+
