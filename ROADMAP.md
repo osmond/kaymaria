@@ -134,7 +134,7 @@ All items are **unchecked** to indicate upcoming work.
 ## Phase 5 – Data Import/Export
 
 - [x] Export plant data to JSON or `.csv`
-- [ ] Import plant data from previous backups
+- [x] Import plant data from previous backups
 - [ ] Sync across devices via Supabase Auth
 
 ---
