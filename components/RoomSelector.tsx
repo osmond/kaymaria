@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, useSelectCtx } from './ui/select';
 
 type Room = { id: string; name?: string };
 
@@ -13,6 +12,8 @@ export default function RoomSelector({
   onChange: (id: string) => void;
 }) {
   const [rooms, setRooms] = React.useState<Room[]>([]);
+  const [newRoom, setNewRoom] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     async function load() {
@@ -29,14 +30,10 @@ export default function RoomSelector({
     load();
   }, []);
 
-
-  async function handleAdd(ctx: ReturnType<typeof useSelectCtx>) {
-    if (!ctx) return;
-    const name = prompt('New room name');
-    if (!name) {
-      ctx.setOpen(false);
-      return;
-    }
+  async function handleAdd(e: React.FormEvent) {
+    e.preventDefault();
+    const name = newRoom.trim();
+    if (!name) return;
     try {
       const res = await fetch('/api/rooms', {
         method: 'POST',
@@ -47,42 +44,46 @@ export default function RoomSelector({
         const json: Room = await res.json();
         setRooms((r) => [...r, json]);
         onChange(json.id);
-        ctx.setSelectedLabel(json.name || json.id);
+        setNewRoom('');
+        requestAnimationFrame(() => {
+          inputRef.current?.focus();
+        });
       }
     } catch (e) {
       console.error('Failed to add room', e);
-    } finally {
-      ctx.setOpen(false);
     }
   }
 
-  function AddRoomItem() {
-    const ctx = useSelectCtx();
-    if (!ctx) return null;
-    return (
-      <button
-        type="button"
-        className="block w-full px-3 py-2 text-left text-sm hover:bg-neutral-100"
-        onClick={() => handleAdd(ctx)}
-      >
-        Add room
-      </button>
-    );
-  }
-
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger>
-        <SelectValue placeholder="Select room" />
-      </SelectTrigger>
-      <SelectContent>
+    <div>
+      <div className="flex flex-wrap gap-2">
         {rooms.map((r) => (
-          <SelectItem key={r.id} value={r.id}>
+          <button
+            key={r.id}
+            type="button"
+            className={`px-3 py-1 rounded-full border text-sm ${
+              value === r.id
+                ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
+                : 'bg-white dark:bg-neutral-800'
+            }`}
+            onClick={() => onChange(r.id)}
+          >
             {r.name || r.id}
-          </SelectItem>
+          </button>
         ))}
-        <AddRoomItem />
-      </SelectContent>
-    </Select>
+      </div>
+      <form onSubmit={handleAdd} className="mt-2 flex gap-2">
+        <input
+          ref={inputRef}
+          className="input flex-1"
+          placeholder="Add room"
+          value={newRoom}
+          onChange={(e) => setNewRoom(e.target.value)}
+        />
+        <button type="submit" className="border rounded px-3 py-2 text-sm">
+          Save
+        </button>
+      </form>
+    </div>
   );
 }
