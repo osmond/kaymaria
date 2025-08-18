@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { fetchCareRules, CareSuggest } from '@/lib/careRules';
+import type { AiCareSuggestion } from '@/lib/aiCare';
 import RoomSelector from './RoomSelector';
 
 export type PlantFormValues = {
@@ -49,7 +49,13 @@ export default function PlantForm({
   onCancel: () => void;
 }) {
   const [state, setState] = useState<PlantFormValues>(initial);
-  const [suggest, setSuggest] = useState<CareSuggest | null>(null);
+  const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
+  const [prevManual, setPrevManual] = useState<{
+    waterEvery: string;
+    waterAmount: string;
+    fertEvery: string;
+    fertFormula: string;
+  } | null>(null);
   const [loadingSuggest, setLoadingSuggest] = useState(false);
   const [suggestError, setSuggestError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -59,32 +65,60 @@ export default function PlantForm({
     setState(initial);
   }, [initial]);
 
-  async function requestSuggest() {
-    setSuggestError(null);
-    setLoadingSuggest(true);
-    try {
-      const json = await fetchCareRules(
-        state.species,
-        Number(state.lat),
-        Number(state.lon)
-      );
-      setSuggest(json);
-    } catch (e: any) {
-      setSuggestError(e?.message || 'Could not get suggestions.');
-    } finally {
-      setLoadingSuggest(false);
+  useEffect(() => {
+    async function fetchSuggest() {
+      if (!state.species && !state.pot && !state.potMaterial) return;
+      setSuggestError(null);
+      setLoadingSuggest(true);
+      try {
+        const res = await fetch('/api/ai-care', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: state.name,
+            species: state.species,
+            potSize: state.pot,
+            potMaterial: state.potMaterial,
+            lat: Number(state.lat),
+            lon: Number(state.lon),
+          }),
+        });
+        if (!res.ok) throw new Error('Failed to get suggestion');
+        const json: AiCareSuggestion = await res.json();
+        setPrevManual({
+          waterEvery: state.waterEvery,
+          waterAmount: state.waterAmount,
+          fertEvery: state.fertEvery,
+          fertFormula: state.fertFormula,
+        });
+        setState((s) => ({
+          ...s,
+          waterEvery: json.waterEvery ? String(json.waterEvery) : s.waterEvery,
+          waterAmount: json.waterAmount ? String(json.waterAmount) : s.waterAmount,
+          fertEvery: json.fertEvery ? String(json.fertEvery) : s.fertEvery,
+          fertFormula: json.fertFormula ?? s.fertFormula,
+        }));
+        setSuggest(json);
+      } catch (e: any) {
+        setSuggestError(e?.message || 'Could not get suggestions.');
+      } finally {
+        setLoadingSuggest(false);
+      }
     }
+    fetchSuggest();
+  }, [state.species, state.pot, state.potMaterial]);
+
+  function acceptSuggest() {
+    setSuggest(null);
+    setPrevManual(null);
   }
 
-  function applySuggest() {
-    if (!suggest) return;
-    setState((s) => ({
-      ...s,
-      waterEvery: suggest.water.intervalDays ? String(suggest.water.intervalDays) : s.waterEvery,
-      waterAmount: suggest.water.amountMl ? String(suggest.water.amountMl) : s.waterAmount,
-      fertEvery: suggest.fertilize.intervalDays ? String(suggest.fertilize.intervalDays) : s.fertEvery,
-      fertFormula: suggest.fertilize.formula ? String(suggest.fertilize.formula) : s.fertFormula,
-    }));
+  function overrideSuggest() {
+    if (prevManual) {
+      setState((s) => ({ ...s, ...prevManual }));
+    }
+    setSuggest(null);
+    setPrevManual(null);
   }
 
   async function handleSubmit() {
@@ -262,40 +296,39 @@ export default function PlantForm({
         </Field>
 
         <div className="rounded-xl border p-3 bg-neutral-50">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm font-medium">USDA-Based Care Suggestions</div>
-            <button className="btn" onClick={requestSuggest} disabled={loadingSuggest}>
-              {loadingSuggest ? 'Getting…' : 'Get suggestions'}
-            </button>
-          </div>
-          {suggestError && <div className="text-xs text-red-600 mb-2">{suggestError}</div>}
-          {!suggest && !loadingSuggest && (
-            <div className="text-xs text-neutral-600">Based on USDA dataset and your local weather.</div>
+          <div className="text-sm font-medium mb-2">Suggested plan</div>
+          {loadingSuggest && (
+            <div className="text-xs text-neutral-600">Getting suggestions…</div>
           )}
-          {suggest && (
+          {suggestError && (
+            <div className="text-xs text-red-600 mb-2">{suggestError}</div>
+          )}
+          {!suggest && !loadingSuggest && (
+            <div className="text-xs text-neutral-600">
+              Select species and pot info to get AI recommendations.
+            </div>
+          )}
+          {suggest && !loadingSuggest && (
             <div className="grid gap-2 text-sm">
               <div className="grid grid-cols-2 gap-2">
                 <div className="rounded-lg border bg-white p-2">
                   <div className="text-xs text-neutral-500">Water</div>
                   <div className="font-medium">
-                    every {suggest.water.intervalDays} d · {suggest.water.amountMl ?? '~'} ml
+                    every {suggest.waterEvery} d · {suggest.waterAmount} ml
                   </div>
                 </div>
                 <div className="rounded-lg border bg-white p-2">
                   <div className="text-xs text-neutral-500">Fertilize</div>
-                  <div className="font-medium">every {suggest.fertilize.intervalDays} d</div>
-                  <div className="text-xs text-neutral-500">{suggest.fertilize.formula}</div>
+                  <div className="font-medium">every {suggest.fertEvery} d</div>
+                  {suggest.fertFormula && (
+                    <div className="text-xs text-neutral-500">{suggest.fertFormula}</div>
+                  )}
                 </div>
               </div>
-              {suggest.assumptions && (
-                <div className="text-xs text-neutral-500">Assumptions: {suggest.assumptions.join(', ')}</div>
-              )}
-              {suggest.warnings && (
-                <div className="text-xs text-amber-700">Warnings: {suggest.warnings.join('; ')}</div>
-              )}
-              <div>
-                <button className="btn-secondary" onClick={applySuggest}>
-                  Apply to fields
+              <div className="flex gap-2">
+                <button className="btn" onClick={acceptSuggest}>Use suggestions</button>
+                <button className="btn-secondary" onClick={overrideSuggest}>
+                  Override manually
                 </button>
               </div>
             </div>
