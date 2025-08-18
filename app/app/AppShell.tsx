@@ -13,7 +13,7 @@ import { TaskDTO } from "@/lib/types";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
-const TASK_WINDOW_DAYS = Number(
+const DEFAULT_TASK_WINDOW_DAYS = Number(
   process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7"
 );
 const URGENT_WINDOW_DAYS = 2;
@@ -95,6 +95,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   type View = "today" | "timeline" | "plants" | "insights" | "settings";
   const [view, setView] = useState<View>(initialView ?? "today");
   const [homeTab, setHomeTab] = useState<"today" | "upcoming">("today");
+  const [taskWindow, setTaskWindow] = useState(DEFAULT_TASK_WINDOW_DAYS);
 
   // modals
   const [addOpen, setAddOpen] = useState(false);
@@ -166,11 +167,11 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       : events;
   }, [events, eventTypeFilter]);
 
-  async function refresh() {
+  async function refresh(window = taskWindow) {
     setLoading(true);
     setErr(null);
     try {
-      const r = await fetch(`/api/tasks?window=${TASK_WINDOW_DAYS}d`, {
+      const r = await fetch(`/api/tasks?window=${window}d`, {
         cache: "no-store",
       });
       if (!r.ok) throw new Error("HTTP " + r.status);
@@ -182,8 +183,8 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     }
   }
   useEffect(() => {
-    refresh();
-  }, []);
+    refresh(taskWindow);
+  }, [taskWindow]);
 
   useEffect(() => {
     (async () => {
@@ -422,7 +423,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     const windowEnd = new Date(
       today.getFullYear(),
       today.getMonth(),
-      today.getDate() + TASK_WINDOW_DAYS
+      today.getDate() + taskWindow
     );
     const m = new Map<string, TaskDTO[]>();
     filteredTasks
@@ -439,7 +440,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
         m.set(label, [...(m.get(label) || []), t]);
       });
     return Array.from(m.entries());
-  }, [filteredTasks]);
+  }, [filteredTasks, taskWindow]);
 
   return (
     <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
@@ -481,6 +482,32 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                 Upcoming
               </button>
             </div>
+            {homeTab === "upcoming" && (
+              <div className="mt-3 flex justify-end">
+                <div className="inline-flex rounded border overflow-hidden text-xs">
+                  <button
+                    className={
+                      taskWindow === 7
+                        ? "bg-neutral-900 text-white px-3 py-1"
+                        : "px-3 py-1"
+                    }
+                    onClick={() => setTaskWindow(7)}
+                  >
+                    Next 7 days
+                  </button>
+                  <button
+                    className={
+                      taskWindow === 30
+                        ? "bg-neutral-900 text-white px-3 py-1"
+                        : "px-3 py-1"
+                    }
+                    onClick={() => setTaskWindow(30)}
+                  >
+                    Next 30 days
+                  </button>
+                </div>
+              </div>
+            )}
             <div className="mt-3 space-y-2">
               <select
                 value={roomFilter}
@@ -566,8 +593,13 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                 </div>
               ))}
             {!loading && !err && tasksToday.length === 0 && (
-              <div className="rounded-xl border bg-white shadow-sm p-6 text-center text-sm text-neutral-500">
-                All done for today 🌿
+              <div className="rounded-xl border bg-white shadow-sm p-6 text-center text-sm text-neutral-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
+                No tasks today — your plants are happy! 🌿
+                {upcoming.length > 0 && (
+                  <div className="mt-2 text-neutral-600 dark:text-neutral-300">
+                    Next up: {upcoming[0][1][0].plantName} {labelForType(upcoming[0][1][0].type)} {dueLabel(new Date(upcoming[0][1][0].dueAt), today)}
+                  </div>
+                )}
               </div>
             )}
           </section>

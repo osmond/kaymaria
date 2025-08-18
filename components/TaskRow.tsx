@@ -84,71 +84,77 @@ export default function TaskRow({
         }}
         className="relative"
       >
-        <div className="rounded-xl border bg-white shadow-sm">
+        <div className="rounded-xl border bg-white shadow-sm dark:bg-neutral-800 dark:border-neutral-700">
           <div className="p-3 flex items-center gap-3">
             <button
               onClick={onOpen}
-              className="h-10 w-10 rounded-xl bg-neutral-100 grid place-items-center"
+              className="h-10 w-10 rounded-xl bg-neutral-100 grid place-items-center dark:bg-neutral-700"
             >
               <Leaf className="h-5 w-5" />
             </button>
             <div className="flex-1" onClick={onOpen}>
               {showPlant ? (
                 <div className="flex items-center justify-between">
-                  <div className="font-medium">{plant}</div>
-                  <span className="text-xs text-neutral-500 flex items-center gap-1">
+                  <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    {plant}
+                  </div>
+                  <span className="text-xs text-neutral-600 dark:text-neutral-300 flex items-center gap-1">
                     {iconFor(action)}
                     {action}
                   </span>
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
-                  <div className="font-medium flex items-center gap-1">
+                  <div className="text-sm font-semibold flex items-center gap-1 text-neutral-900 dark:text-neutral-100">
                     {iconFor(action)}
                     {action}
                   </div>
                 </div>
               )}
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-neutral-500 dark:text-neutral-400">
                 Last: {last} • Due: {due}
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <button
-                aria-label="Done"
-                onClick={onComplete}
-                className="p-2 rounded hover:bg-neutral-100"
-              >
-                <Check className="h-4 w-4" />
-              </button>
-              <button
-                aria-label="Defer"
-                onClick={onDefer}
-                className="p-2 rounded hover:bg-neutral-100"
-              >
-                <Clock className="h-4 w-4" />
-              </button>
-              <button
-                aria-label="Edit"
-                onClick={onEdit}
-                className="p-2 rounded hover:bg-neutral-100"
-              >
-                <Edit2 className="h-4 w-4" />
-              </button>
-              <button
-                aria-label="Add note"
-                onClick={() => setNoteOpen((v) => !v)}
-                className="p-2 rounded hover:bg-neutral-100"
-              >
-                <StickyNote className="h-4 w-4" />
-              </button>
-              <button
-                aria-label="Delete"
-                onClick={onDelete}
-                className="p-2 rounded hover:bg-neutral-100"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  aria-label="Done"
+                  onClick={onComplete}
+                  className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                >
+                  <Check className="h-4 w-4" />
+                </button>
+                <button
+                  aria-label="Edit"
+                  onClick={onEdit}
+                  className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                >
+                  <Edit2 className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex items-center gap-1 ml-2 pl-2 border-l border-neutral-200 dark:border-neutral-600">
+                <button
+                  aria-label="Defer"
+                  onClick={onDefer}
+                  className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                >
+                  <Clock className="h-4 w-4" />
+                </button>
+                <button
+                  aria-label="Add note"
+                  onClick={() => setNoteOpen((v) => !v)}
+                  className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                >
+                  <StickyNote className="h-4 w-4" />
+                </button>
+                <button
+                  aria-label="Delete"
+                  onClick={onDelete}
+                  className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
