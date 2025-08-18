@@ -91,6 +91,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🔔 **Condition Alerts** – Notifies you when weather suggests watering or fertilizing soon
 - ⏰ **Overdue Task Notifications** – Browser alerts when care tasks are past due
 - 🤖 **AI Care Recommendations** – Generates plant-specific watering, fertilizer, light, and repotting guidance
+- 🔁 **AI Fine-Tuning** – Create custom models using your care logs
 - ⚠️ **Graceful Error States** – Custom 404 and 500 pages with a friendly loading experience
 
 ---
@@ -225,4 +226,16 @@ curl -X POST http://localhost:3000/api/ai/care-recommend \\
 ```
 
 The feedback is included in the AI prompt so new suggestions are adjusted accordingly.
+
+## 🔁 AI Fine-Tuning
+
+You can experiment with fine-tuning the AI using completed care logs from the mock data.
+
+Generate a training file and submit a fine-tune job to OpenAI:
+
+```bash
+npm run ai:fine-tune
+```
+
+The script writes `fine-tune-data.jsonl` to the project root and, if `OPENAI_API_KEY` is set, uploads it to OpenAI and starts a fine-tune job.
 

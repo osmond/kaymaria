@@ -103,7 +103,7 @@ All items are **unchecked** to indicate upcoming work.
 - [x] Learn from user input:
   - [x] Feedback (e.g. “too much water”)
   - [x] Adjust future care suggestions
-- [ ] Long-term idea: fine-tune a model using user care logs
+ - [x] Long-term idea: fine-tune a model using user care logs
 
 ---
 
