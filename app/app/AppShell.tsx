@@ -9,6 +9,7 @@ import QuickAddModal from "@/components/QuickAddModal";
 import AddPlantModal from "@/components/AddPlantModal";
 import EditTaskModal from "@/components/EditTaskModal";
 import ThemeToggle from "@/components/ThemeToggle";
+import FiltersModal from "@/components/FiltersModal";
 import { TaskDTO } from "@/lib/types";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
@@ -98,6 +99,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   const [taskWindow, setTaskWindow] = useState(DEFAULT_TASK_WINDOW_DAYS);
 
   // modals
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [addPlantOpen, setAddPlantOpen] = useState(false);
   const [prefillPlantName, setPrefillPlantName] = useState("");
@@ -508,40 +510,13 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                 </div>
               </div>
             )}
-            <div className="mt-3 space-y-2">
-              <select
-                value={roomFilter}
-                onChange={(e) => setRoomFilter(e.target.value)}
+            <div className="mt-3">
+              <button
                 className="border rounded px-3 py-2 w-full"
+                onClick={() => setFiltersOpen(true)}
               >
-                <option value="">All rooms</option>
-                {rooms.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="border rounded px-3 py-2 w-full"
-              >
-                <option value="">All task types</option>
-                {types.map((t) => (
-                  <option key={t} value={t}>
-                    {labelForType(t as any)}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="border rounded px-3 py-2 w-full"
-              >
-                <option value="">All statuses</option>
-                <option value="overdue">Overdue</option>
-                <option value="urgent">Due soon</option>
-              </select>
+                Filters
+              </button>
             </div>
           </>
         )}
@@ -665,16 +640,12 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
               <div className="text-xs text-neutral-500">Recent care events</div>
             </div>
             <div className="px-4 py-2 border-b">
-              <select
-                value={eventTypeFilter}
-                onChange={(e) => setEventTypeFilter(e.target.value)}
+              <button
                 className="border rounded px-3 py-2 w-full"
+                onClick={() => setFiltersOpen(true)}
               >
-                <option value="">All event types</option>
-                <option value="water">Water</option>
-                <option value="fertilize">Fertilize</option>
-                <option value="repot">Repot</option>
-              </select>
+                Filters
+              </button>
             </div>
             <ul className="text-sm px-4 py-2">
               {eventsErr && <li className="py-3 text-red-600">{eventsErr}</li>}
@@ -815,6 +786,21 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
           )}
         </div>
       )}
+
+      <FiltersModal
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        rooms={rooms}
+        roomFilter={roomFilter}
+        setRoomFilter={setRoomFilter}
+        types={types}
+        typeFilter={typeFilter}
+        setTypeFilter={setTypeFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        eventTypeFilter={eventTypeFilter}
+        setEventTypeFilter={setEventTypeFilter}
+      />
 
       <EditTaskModal
         open={!!editTask}
