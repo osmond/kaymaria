@@ -10,6 +10,13 @@ export default function PlantsPage() {
   const [items, setItems] = useState<Plant[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const sortedItems =
+    items?.slice().sort((a, b) => {
+      const roomA = a.room || "";
+      const roomB = b.room || "";
+      if (roomA !== roomB) return roomA.localeCompare(roomB);
+      return a.name.localeCompare(b.name);
+    }) ?? null;
   async function load() {
     try {
       setErr(null);
@@ -44,9 +51,9 @@ export default function PlantsPage() {
 
           {!items && !err && <div className="text-sm text-neutral-500">Loading…</div>}
 
-          {items && (
+          {sortedItems && (
             <div className="grid grid-cols-2 gap-3">
-              {items.map((p) => (
+              {sortedItems.map((p) => (
                 <Link key={p.id} href={`/app/plants/${p.id}`} className="text-left">
                   <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
                     <div className="h-24 bg-neutral-100" />
