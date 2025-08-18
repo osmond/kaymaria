@@ -3,9 +3,10 @@ import type { Tab } from '@/components/BottomNav';
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Droplet, FlaskConical, Sprout } from "lucide-react";
+import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
+import EditPlantModal from '@/components/EditPlantModal';
 import BottomNav from '@/components/BottomNav';
 
 type CareType = "water" | "fertilize" | "repot";
@@ -24,7 +25,8 @@ type Note = { id: string; text: string; at: string };
 export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string; nextWater?: string; waterIntervalDays?: number; nextFertilize?: string; fertilizeIntervalDays?: number; light?: string; humidity?: string; potSize?: string; potMaterial?: string; soilType?: string; latitude?: number; longitude?: number } }) {
   const id = plant.id;
   const router = useRouter();
-    const [name] = useState(plant.name);
+    const [name, setName] = useState(plant.name);
+    const [species, setSpecies] = useState(plant.species || "");
     const [photos, setPhotos] = useState<string[]>(plant.photos ?? []);
     const heroPhoto = photos[0] || "https://placehold.co/600x400?text=Plant";
     const acquired = plant.acquiredAt ? new Date(plant.acquiredAt) : null;
@@ -33,9 +35,24 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
     const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
     const [err, setErr] = useState<string | null>(null);
     const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">("stats");
-    const [notes, setNotes] = useState<Note[]>([]);
-    const [noteText, setNoteText] = useState("");
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
+  const [snackbar, setSnackbar] = useState<{ visible: boolean; message: string }>({
+    visible: false,
+    message: "",
+  });
+  const timer = useRef<NodeJS.Timeout | null>(null);
+  const toast = (m: string) => {
+    if (timer.current) window.clearTimeout(timer.current);
+    setSnackbar({ visible: true, message: m });
+    // @ts-ignore
+    timer.current = window.setTimeout(
+      () => setSnackbar({ visible: false, message: "" }),
+      5000
+    );
+  };
+  const [editOpen, setEditOpen] = useState(false);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
   const careTips = useMemo(() => {
     const tips: string[] = [];
@@ -127,7 +144,11 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       if (!r.ok) throw new Error();
       const r2 = await fetch(`/api/tasks?window=365d`, { cache: "no-store" });
       if (r2.ok) setAllTasks(await r2.json());
-    } catch { /* keep UX smooth in mock */ }
+      toast("Watered!");
+    } catch {
+      toast("Failed to mark watered");
+      /* keep UX smooth in mock */
+    }
   };
 
 
@@ -156,8 +177,10 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       const rec: Note = await r.json();
       setNotes((n) => [rec, ...n]);
       setNoteText("");
-    } catch {}
-
+      toast("Note added");
+    } catch {
+      toast("Failed to add note");
+    }
   };
 
   const addPhoto = async () => {
@@ -172,7 +195,10 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       if (!r.ok) throw new Error();
       const rec: { src: string } = await r.json();
       setPhotos((p) => [...p, rec.src]);
-    } catch {}
+      toast("Photo added");
+    } catch {
+      toast("Failed to add photo");
+    }
   };
 
   const markTimelineDone = async (task: TaskDTO) => {
@@ -214,9 +240,18 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
           </Link>
           <div className="flex items-baseline justify-between w-full">
             <h1 className="text-xl font-display font-semibold tracking-tight">{name}</h1>
-            <span className="text-sm text-neutral-500">
-              {new Intl.DateTimeFormat(undefined, { weekday:"short", month:"short", day:"numeric" }).format(new Date())}
-            </span>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-neutral-500">
+                {new Intl.DateTimeFormat(undefined, { weekday:"short", month:"short", day:"numeric" }).format(new Date())}
+              </span>
+              <button
+                aria-label="Edit plant"
+                onClick={() => setEditOpen(true)}
+                className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
+              >
+                <Pencil className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -229,7 +264,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
           <div className="p-4">
             <h2 className="text-lg font-display font-semibold">{name}</h2>
             <div className="text-sm text-neutral-500">
-              {plant.species || "—"}
+              {species || "—"}
               {acquired && ` • Acquired ${new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(acquired)}`}
             </div>
           </div>
@@ -356,7 +391,11 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
               </div>
             </form>
             <ul className="mt-4 space-y-3">
-              {notes.length === 0 && <li className="text-neutral-500">No notes yet</li>}
+              {notes.length === 0 && (
+                <li className="text-neutral-500">
+                  No notes yet. Add a note above to keep track of progress.
+                </li>
+              )}
               {notes.map((n) => (
                 <li key={n.id} className="border-t pt-2 first:border-t-0 first:pt-0">
                   <div>{n.text}</div>
@@ -383,7 +422,9 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
                 ))}
               </div>
             ) : (
-              <div className="text-sm text-neutral-500 text-center">No photos yet</div>
+              <div className="text-sm text-neutral-500 text-center">
+                No photos yet. Tap Add Photo to upload one.
+              </div>
             )}
           </section>
         )}
@@ -401,6 +442,21 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
 
       {/* Bottom nav */}
       <BottomNav value="plants" onChange={(t: Tab) => router.push(`/app?tab=${t}`)} />
+      {snackbar.visible && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-sm px-4 py-2 rounded-full shadow-lg">
+          {snackbar.message}
+        </div>
+      )}
+      <EditPlantModal
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        plant={{ id, name, species }}
+        onUpdated={(p) => {
+          setName(p.name);
+          setSpecies(p.species || "");
+          toast("Plant updated");
+        }}
+      />
     </div>
   );
 }
