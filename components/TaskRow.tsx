@@ -39,13 +39,20 @@ export default function TaskRow({
             Complete
           </div>
         </div>
+        <div className="absolute inset-y-0 right-0 w-20 grid place-items-center bg-amber-100 text-amber-700">
+          <div className="flex items-center gap-2 text-xs font-medium">
+            <Clock className="h-4 w-4" />
+            Snooze
+          </div>
+        </div>
       </div>
       <motion.div
         drag="x"
-        dragConstraints={{ left: 0, right: 80 }}
+        dragConstraints={{ left: -80, right: 80 }}
         dragElastic={0.2}
         onDragEnd={(_, i) => {
           if (i.offset.x > 60) onComplete();
+          else if (i.offset.x < -60) onDefer();
         }}
         className="relative"
       >
