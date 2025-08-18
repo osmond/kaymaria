@@ -22,16 +22,40 @@ type TaskDTO = {
 
 type Note = { id: string; text: string; at: string };
 
-export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string; nextWater?: string; waterIntervalDays?: number; nextFertilize?: string; fertilizeIntervalDays?: number; light?: string; humidity?: string; potSize?: string; potMaterial?: string; soilType?: string; latitude?: number; longitude?: number } }) {
-  const id = plant.id;
+export default function PlantDetailClient({ plant }: { plant: {
+  id: string;
+  name: string;
+  species?: string;
+  roomId?: string;
+  photos?: string[];
+  acquiredAt?: string;
+  nextWater?: string;
+  waterIntervalDays?: number;
+  waterAmountMl?: number;
+  nextFertilize?: string;
+  fertilizeIntervalDays?: number;
+  fertilizeFormula?: string;
+  light?: string;
+  lightLevel?: string;
+  humidity?: string;
+  potSize?: string;
+  potMaterial?: string;
+  soilType?: string;
+  drainage?: 'poor' | 'ok' | 'great';
+  indoor?: boolean;
+  latitude?: number;
+  longitude?: number;
+} }) {
+  const [plantState, setPlantState] = useState(plant);
+  const id = plantState.id;
   const router = useRouter();
-    const [name, setName] = useState(plant.name);
-    const [species, setSpecies] = useState(plant.species || "");
-    const [photos, setPhotos] = useState<string[]>(plant.photos ?? []);
-    const heroPhoto = photos[0] || "https://placehold.co/600x400?text=Plant";
-    const acquired = plant.acquiredAt ? new Date(plant.acquiredAt) : null;
-  const nextWater = plant.nextWater ? new Date(plant.nextWater) : null;
-  const nextFertilize = plant.nextFertilize ? new Date(plant.nextFertilize) : null;
+  const [name, setName] = useState(plant.name);
+  const [species, setSpecies] = useState(plant.species || "");
+  const [photos, setPhotos] = useState<string[]>(plant.photos ?? []);
+  const heroPhoto = photos[0] || "https://placehold.co/600x400?text=Plant";
+  const acquired = plantState.acquiredAt ? new Date(plantState.acquiredAt) : null;
+  const nextWater = plantState.nextWater ? new Date(plantState.nextWater) : null;
+  const nextFertilize = plantState.nextFertilize ? new Date(plantState.nextFertilize) : null;
     const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
     const [err, setErr] = useState<string | null>(null);
     const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">("stats");
@@ -103,7 +127,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
 
   useEffect(() => {
     let alive = true;
-    if (plant.latitude === undefined || plant.longitude === undefined) return;
+    if (plantState.latitude === undefined || plantState.longitude === undefined) return;
     (async () => {
       try {
         const r = await fetch(`/api/plants/${id}/weather`, { cache: "no-store" });
@@ -113,7 +137,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       } catch {}
     })();
     return () => { alive = false; };
-  }, [id, plant.latitude, plant.longitude]);
+  }, [id, plantState.latitude, plantState.longitude]);
 
 
 
@@ -287,31 +311,31 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
             <Stat
               label="Water"
               value={
-                plant.waterIntervalDays
-                  ? `Every ${plant.waterIntervalDays}d${nextWater ? ` • next ${fmt(nextWater)}` : ""}`
+                plantState.waterIntervalDays
+                  ? `Every ${plantState.waterIntervalDays}d${nextWater ? ` • next ${fmt(nextWater)}` : ""}`
                   : "—"
               }
             />
             <Stat
               label="Fertilize"
               value={
-                plant.fertilizeIntervalDays
-                  ? `Every ${plant.fertilizeIntervalDays}d${nextFertilize ? ` • next ${fmt(nextFertilize)}` : ""}`
+                plantState.fertilizeIntervalDays
+                  ? `Every ${plantState.fertilizeIntervalDays}d${nextFertilize ? ` • next ${fmt(nextFertilize)}` : ""}`
                   : "—"
               }
             />
-            <Stat label="Light" value={plant.light || "—"} />
-            <Stat label="Humidity" value={plant.humidity || "—"} />
+            <Stat label="Light" value={plantState.light || plantState.lightLevel || "—"} />
+            <Stat label="Humidity" value={plantState.humidity || "—"} />
             <Stat label="Weather" value={weather ? `${Math.round(weather.temperature)}°C` : "—"} />
             <Stat
               label="Pot"
               value={
-                plant.potSize
-                  ? `${plant.potSize}${plant.potMaterial ? ` ${plant.potMaterial}` : ""}`
+                plantState.potSize
+                  ? `${plantState.potSize}${plantState.potMaterial ? ` ${plantState.potMaterial}` : ""}`
                   : "—"
               }
             />
-            <Stat label="Soil" value={plant.soilType || "—"} />
+            <Stat label="Soil" value={plantState.soilType || "—"} />
           </div>
         )}
 
@@ -389,7 +413,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
                   <img
                     key={i}
                     src={src}
-                    alt={`${plant.name} photo ${i + 1}`}
+                    alt={`${plantState.name} photo ${i + 1}`}
                     className="w-full h-24 object-cover rounded"
                   />
                 ))}
@@ -416,8 +440,9 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
       <EditPlantModal
         open={editOpen}
         onOpenChange={setEditOpen}
-        plant={{ id, name, species }}
+        plant={plantState}
         onUpdated={(p) => {
+          setPlantState(p);
           setName(p.name);
           setSpecies(p.species || "");
         }}
