@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
+import EditCarePlanModal from '@/components/EditCarePlanModal';
 import BottomNav from '@/components/BottomNav';
 
 type CareType = "water" | "fertilize" | "repot";
@@ -63,6 +64,7 @@ export default function PlantDetailClient({ plant }: { plant: {
     const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [careOpen, setCareOpen] = useState(false);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
   const careTips = useMemo(() => {
     const tips: string[] = [];
@@ -307,35 +309,43 @@ export default function PlantDetailClient({ plant }: { plant: {
         </div>
 
         {tab === "stats" && (
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            <Stat
-              label="Water"
-              value={
-                plantState.waterIntervalDays
-                  ? `Every ${plantState.waterIntervalDays}d${nextWater ? ` • next ${fmt(nextWater)}` : ""}`
-                  : "—"
-              }
-            />
-            <Stat
-              label="Fertilize"
-              value={
-                plantState.fertilizeIntervalDays
-                  ? `Every ${plantState.fertilizeIntervalDays}d${nextFertilize ? ` • next ${fmt(nextFertilize)}` : ""}`
-                  : "—"
-              }
-            />
-            <Stat label="Light" value={plantState.light || plantState.lightLevel || "—"} />
-            <Stat label="Humidity" value={plantState.humidity || "—"} />
-            <Stat label="Weather" value={weather ? `${Math.round(weather.temperature)}°C` : "—"} />
-            <Stat
-              label="Pot"
-              value={
-                plantState.potSize
-                  ? `${plantState.potSize}${plantState.potMaterial ? ` ${plantState.potMaterial}` : ""}`
-                  : "—"
-              }
-            />
-            <Stat label="Soil" value={plantState.soilType || "—"} />
+          <div className="mt-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Stat
+                label="Water"
+                value={
+                  plantState.waterIntervalDays
+                    ? `Every ${plantState.waterIntervalDays}d${nextWater ? ` • next ${fmt(nextWater)}` : ""}`
+                    : "—"
+                }
+              />
+              <Stat
+                label="Fertilize"
+                value={
+                  plantState.fertilizeIntervalDays
+                    ? `Every ${plantState.fertilizeIntervalDays}d${nextFertilize ? ` • next ${fmt(nextFertilize)}` : ""}`
+                    : "—"
+                }
+              />
+              <Stat label="Light" value={plantState.light || plantState.lightLevel || "—"} />
+              <Stat label="Humidity" value={plantState.humidity || "—"} />
+              <Stat label="Weather" value={weather ? `${Math.round(weather.temperature)}°C` : "—"} />
+              <Stat
+                label="Pot"
+                value={
+                  plantState.potSize
+                    ? `${plantState.potSize}${plantState.potMaterial ? ` ${plantState.potMaterial}` : ""}`
+                    : "—"
+                }
+              />
+              <Stat label="Soil" value={plantState.soilType || "—"} />
+            </div>
+            <button
+              className="mt-4 w-full border rounded-lg px-3 py-2"
+              onClick={() => setCareOpen(true)}
+            >
+              Edit Care Plan
+            </button>
           </div>
         )}
 
@@ -446,6 +456,12 @@ export default function PlantDetailClient({ plant }: { plant: {
           setName(p.name);
           setSpecies(p.species || "");
         }}
+      />
+      <EditCarePlanModal
+        open={careOpen}
+        onOpenChange={setCareOpen}
+        plant={plantState}
+        onUpdated={(p) => setPlantState(p)}
       />
     </div>
   );
