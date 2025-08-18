@@ -5,18 +5,20 @@
 
 1. Copy `.env.local.example` to `.env.local` and fill in your values.
    - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` come from your Supabase project.
+   - `SUPABASE_SERVICE_ROLE_KEY` is used on the server to persist user data for cross-device sync.
    - `NEXT_PUBLIC_BASE_URL` should point to the URL where the app runs.
    - `DATABASE_URL` is used by Prisma; the example file defaults to a local SQLite database.
    - `NEXT_PUBLIC_TASK_WINDOW_DAYS` controls how many days ahead the Upcoming view looks (default `7`)
    - `OPENAI_API_KEY` enables AI-powered care recommendations
-2. Install dependencies, seed the database, and start the development server:
+2. In Supabase, create a `plant_sync` table with columns `user_id uuid` (primary key, references `auth.users`) and `data jsonb`. Enable RLS with policies that allow users to read and upsert their own row.
+3. Install dependencies, seed the database, and start the development server:
 
 ```bash
 npm install
 npm run db:migrate
 npm run db:seed
 npm run dev
-# open http://localhost:3000/app
+# open http://localhost:3000/login to sign in, then /app
 ```
 
 To create a production build run:
@@ -29,12 +31,13 @@ npm run build
 
 Once the development server is running:
 
-1. Visit [`/app`](http://localhost:3000/app) to see the task dashboard for today.
-2. Use the **+** button to add a new plant with care defaults.
-3. Tap a plant card to view its quick stats, timeline, notes, or photo gallery.
-4. Swipe a task to complete it, edit the details, or delete it.
-5. Use the room and task-type filters to focus on what's relevant.
-6. Allow browser notifications to get alerts for overdue tasks.
+1. Sign up or log in at [`/login`](http://localhost:3000/login) to enable sync across devices.
+2. Visit [`/app`](http://localhost:3000/app) to see the task dashboard for today.
+3. Use the **+** button to add a new plant with care defaults.
+4. Tap a plant card to view its quick stats, timeline, notes, or photo gallery.
+5. Swipe a task to complete it, edit the details, or delete it.
+6. Use the room and task-type filters to focus on what's relevant.
+7. Allow browser notifications to get alerts for overdue tasks.
 
 
 ## 🧪 Testing
@@ -84,6 +87,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 💧 **ET₀‑Aware Watering** – Adjusts suggested watering intervals using local evapotranspiration data
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
 - 📦 **Import/Export Tools** – Backup your plant journal anytime
+- ☁️ **Cross-Device Sync** – Your plants and tasks persist via Supabase Auth
 - 📱 **Mobile-First Layout** – Bottom navigation, floating action button, and swipeable task cards optimized for one-handed use
 - 🛡️ **Safe Area Awareness** – Layout adapts to device notches and home indicators
 - 🌗 **Light/Dark Mode** – Toggle the interface theme from Settings

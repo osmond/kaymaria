@@ -10,6 +10,7 @@ import AddPlantModal from "@/components/AddPlantModal";
 import EditTaskModal from "@/components/EditTaskModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import {
   Select,
@@ -110,6 +111,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   const [view, setView] = useState<View>(initialView ?? "today");
   const [homeTab, setHomeTab] = useState<"today" | "upcoming">("today");
   const [taskWindow, setTaskWindow] = useState(DEFAULT_TASK_WINDOW_DAYS);
+  const [ready, setReady] = useState(false);
 
   // modals
   const [addOpen, setAddOpen] = useState(false);
@@ -195,11 +197,25 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       setErr(e?.message || "Failed to load");
     } finally {
       setLoading(false);
+      sync();
     }
   }
   useEffect(() => {
-    refresh(taskWindow);
-  }, [taskWindow]);
+    if (ready) refresh(taskWindow);
+  }, [taskWindow, ready]);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) {
+        window.location.href = "/login";
+      } else {
+        await fetch("/api/sync", {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        setReady(true);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (
@@ -282,6 +298,16 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       5000
     );
   };
+
+  async function sync() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      await fetch("/api/sync", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+    }
+  }
 
   // Composite id so the API matches "plantId:type"
   const complete = async (t: TaskDTO) => {
@@ -377,6 +403,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       });
       if (!r.ok) throw new Error();
       toast("Note added");
+      sync();
     } catch {
       toast("Failed to add note");
     }
@@ -413,6 +440,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       setTasks((prev) => [created, ...prev]);
       trigger();
       toast(`${payload.action} • ${payload.plant} added`);
+      sync();
     } catch (e: any) {
       toast("Failed to add task");
     }
@@ -889,6 +917,18 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
             <div className="rounded-xl border bg-white shadow-sm p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
               <div className="text-base font-medium">Theme</div>
               <ThemeToggle />
+            </div>
+            <div className="rounded-xl border bg-white shadow-sm p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
+              <div className="text-base font-medium">Account</div>
+              <button
+                className="text-sm underline"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.href = "/login";
+                }}
+              >
+                Sign out
+              </button>
             </div>
           </section>
         )}

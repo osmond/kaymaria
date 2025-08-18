@@ -135,7 +135,7 @@ All items are **unchecked** to indicate upcoming work.
 
 - [x] Export plant data to JSON or `.csv`
 - [x] Import plant data from previous backups
-- [ ] Sync across devices via Supabase Auth
+- [x] Sync across devices via Supabase Auth
 
 ---
 
