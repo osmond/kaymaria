@@ -17,6 +17,8 @@ model Plant {
   potSize     String?  @map("pot_size")
   potMaterial String?  @map("pot_material")
   soilType    String?  @map("soil_type")
+  latitude    Float?
+  longitude   Float?
   createdAt   DateTime @default(now()) @map("created_at")
 
   tasks  Task[]

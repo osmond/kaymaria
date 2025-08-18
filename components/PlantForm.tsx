@@ -20,8 +20,8 @@ export type PlantFormValues = {
   indoor: 'Indoor' | 'Outdoor';
   drainage: 'poor' | 'ok' | 'great';
   soil: string;
-  lat: string;
-  lon: string;
+  lat?: string;
+  lon?: string;
   waterEvery: string;
   waterAmount: string;
   fertEvery: string;
@@ -38,13 +38,13 @@ export type PlantFormSubmit = {
   indoor: boolean;
   soilType?: string;
   drainage: 'poor' | 'ok' | 'great';
-  lat: number;
-  lon: number;
+  lat?: number;
+  lon?: number;
   rules: { type: 'water' | 'fertilize'; intervalDays: number; amountMl?: number; formula?: string }[];
 };
 
 export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
-  return {
+  const base: PlantFormSubmit = {
     name: s.name.trim(),
     roomId: s.roomId,
     species: s.species || undefined,
@@ -54,8 +54,6 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
     indoor: s.indoor === 'Indoor',
     soilType: s.soil || undefined,
     drainage: s.drainage,
-    lat: Number(s.lat),
-    lon: Number(s.lon),
     rules: [
       {
         type: 'water',
@@ -69,6 +67,11 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
       },
     ],
   };
+  if (s.lat && s.lon) {
+    base.lat = Number(s.lat);
+    base.lon = Number(s.lon);
+  }
+  return base;
 }
 
 type SectionProps = {
@@ -153,6 +156,38 @@ export function BasicsFields({ state, setState }: SectionProps) {
 
 export function EnvironmentFields({ state, setState }: SectionProps) {
   const [showMore, setShowMore] = useState(false);
+  const [address, setAddress] = useState('');
+
+  function useCurrentLocation() {
+    if (!('geolocation' in navigator)) return;
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setState({
+        ...state,
+        lat: pos.coords.latitude.toFixed(6),
+        lon: pos.coords.longitude.toFixed(6),
+      });
+    });
+  }
+
+  async function lookupAddress() {
+    if (!address.trim()) return;
+    try {
+      const r = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          address.trim()
+        )}`
+      );
+      const data = await r.json();
+      if (data[0]) {
+        setState({
+          ...state,
+          lat: data[0].lat,
+          lon: data[0].lon,
+        });
+      }
+    } catch {}
+  }
+
   return (
     <div className="p-5 space-y-4">
       <Field label="Environment">
@@ -189,25 +224,41 @@ export function EnvironmentFields({ state, setState }: SectionProps) {
         )}
       </Field>
 
-      {showMore && (
-        <Field label="Location (for weather)">
-          <div className="grid grid-cols-2 gap-3">
+      <Field label="Location (for weather)">
+        <div className="grid gap-2">
+          <button type="button" className="btn-secondary" onClick={useCurrentLocation}>
+            Use current location
+          </button>
+          <div className="flex gap-2">
             <input
-              className="input"
-              value={state.lat}
-              onChange={(e) => setState({ ...state, lat: e.target.value })}
-              placeholder="Latitude"
+              className="input flex-1"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Search address"
             />
-            <input
-              className="input"
-              value={state.lon}
-              onChange={(e) => setState({ ...state, lon: e.target.value })}
-              placeholder="Longitude"
-            />
+            <button type="button" className="btn-secondary" onClick={lookupAddress}>
+              Search
+            </button>
           </div>
-          <p className="hint">Used to tailor intervals based on local conditions.</p>
-        </Field>
-      )}
+          {showMore && (
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                className="input"
+                value={state.lat ?? ''}
+                onChange={(e) => setState({ ...state, lat: e.target.value })}
+                placeholder="Latitude"
+              />
+              <input
+                className="input"
+                value={state.lon ?? ''}
+                onChange={(e) => setState({ ...state, lon: e.target.value })}
+                placeholder="Longitude"
+              />
+            </div>
+          )}
+        </div>
+        <p className="hint">Used to tailor intervals based on local conditions.</p>
+      </Field>
 
       <button
         type="button"
@@ -273,17 +324,20 @@ export function CarePlanFields({
       setSuggestError(null);
       setLoadingSuggest(true);
       try {
+        const body: any = {
+          name: state.name,
+          species: state.species,
+          potSize: state.pot,
+          potMaterial: state.potMaterial,
+        };
+        if (state.lat && state.lon) {
+          body.lat = Number(state.lat);
+          body.lon = Number(state.lon);
+        }
         const res = await fetch('/api/ai-care', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: state.name,
-            species: state.species,
-            potSize: state.pot,
-            potMaterial: state.potMaterial,
-            lat: Number(state.lat),
-            lon: Number(state.lon),
-          }),
+          body: JSON.stringify(body),
         });
         if (!res.ok) throw new Error('Failed to get suggestion');
         const json: AiCareSuggestion = await res.json();
