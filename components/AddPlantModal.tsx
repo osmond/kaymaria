@@ -3,7 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { useRouter } from 'next/navigation';
-import PlantForm, { PlantFormSubmit, PlantFormValues } from './PlantForm';
+import PlantForm, {
+  PlantFormSubmit,
+  PlantFormValues,
+} from './PlantForm';
+import type { AiCareSuggestion } from '@/lib/aiCare';
 
 export default function AddPlantModal({
   open,
@@ -23,6 +27,10 @@ export default function AddPlantModal({
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [initialSuggest, setInitialSuggest] = useState<AiCareSuggestion | null>(
+    null,
+  );
+  const [planSource, setPlanSource] = useState<'preset' | 'ai' | null>(null);
 
   function close() {
     onOpenChange(false);
@@ -52,14 +60,40 @@ export default function AddPlantModal({
         fertFormula: '10-10-10 @ 1/2 strength',
       };
       try {
-        const r = await fetch(`/api/species-care?species=${encodeURIComponent(prefillName || '')}`);
+        const r = await fetch(
+          `/api/species-care?species=${encodeURIComponent(prefillName || '')}`,
+        );
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const json = await r.json();
         if (json.presets) {
           setInitial({ ...base, ...json.presets });
+          setPlanSource('preset');
         } else {
-          setNotice('No presets found—please adjust manually or request AI suggestions');
           setInitial(base);
+          setNotice('No presets found—generating AI suggestion');
+          try {
+            const ai = await fetch('/api/ai-care', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: base.name,
+                species: base.species,
+                potSize: base.pot,
+                potMaterial: base.potMaterial,
+                lat: Number(base.lat),
+                lon: Number(base.lon),
+              }),
+            });
+            if (ai.ok) {
+              const sug: AiCareSuggestion = await ai.json();
+              setInitialSuggest(sug);
+              setPlanSource('ai');
+            } else {
+              setNotice('No presets found and AI suggestion failed');
+            }
+          } catch (e) {
+            setNotice('No presets found and AI suggestion failed');
+          }
         }
       } catch (e) {
         setLoadError('Failed to load species defaults.');
@@ -71,12 +105,15 @@ export default function AddPlantModal({
     loadDefaults();
   }, [open, prefillName, defaultRoomId]);
 
-  async function handleSubmit(data: PlantFormSubmit, source: 'ai' | 'manual' = 'manual') {
-    console.log('Creating plant via', source);
+  async function handleSubmit(
+    data: PlantFormSubmit,
+    source: 'ai' | 'manual' = 'manual',
+  ) {
+    console.log('Creating plant via', source, 'plan source', planSource);
     const r = await fetch('/api/plants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, planSource }),
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const created = await r.json();
@@ -110,6 +147,7 @@ export default function AddPlantModal({
                 onSubmit={handleSubmit}
                 onCancel={close}
                 enableAiSubmit
+                initialSuggest={initialSuggest}
               />
             </>
           )}

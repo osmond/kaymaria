@@ -50,12 +50,14 @@ export default function PlantForm({
   onSubmit,
   onCancel,
   enableAiSubmit,
+  initialSuggest,
 }: {
   initial: PlantFormValues;
   submitLabel: string;
   onSubmit: (data: PlantFormSubmit, source?: 'ai' | 'manual') => Promise<void>;
   onCancel: () => void;
   enableAiSubmit?: boolean;
+  initialSuggest?: AiCareSuggestion | null;
 }) {
   const [state, setState] = useState<PlantFormValues>(initial);
   const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
@@ -73,6 +75,30 @@ export default function PlantForm({
   useEffect(() => {
     setState(initial);
   }, [initial]);
+
+  useEffect(() => {
+    if (!initialSuggest) return;
+    setPrevManual({
+      waterEvery: initial.waterEvery,
+      waterAmount: initial.waterAmount,
+      fertEvery: initial.fertEvery,
+      fertFormula: initial.fertFormula,
+    });
+    setState((s) => ({
+      ...s,
+      waterEvery: initialSuggest.waterEvery
+        ? String(initialSuggest.waterEvery)
+        : s.waterEvery,
+      waterAmount: initialSuggest.waterAmount
+        ? String(initialSuggest.waterAmount)
+        : s.waterAmount,
+      fertEvery: initialSuggest.fertEvery
+        ? String(initialSuggest.fertEvery)
+        : s.fertEvery,
+      fertFormula: initialSuggest.fertFormula ?? s.fertFormula,
+    }));
+    setSuggest(initialSuggest);
+  }, [initialSuggest, initial]);
 
   useEffect(() => {
     async function fetchSuggest() {
