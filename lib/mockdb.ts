@@ -83,7 +83,7 @@ let NOTES: Note[] = [];
 
 // ----- Query helpers -----
 export function listPlants(): Plant[] {
-  return PLANTS.slice();
+  return PLANTS.slice().sort((a,b)=>(a.roomId ?? '').localeCompare(b.roomId ?? '') || a.name.localeCompare(b.name));
 }
 
 export function getPlant(id: string): Plant | undefined {
