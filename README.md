@@ -13,6 +13,7 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
    - `NEXT_PUBLIC_BASE_URL`
    - `DATABASE_URL`
    - `OPENAI_API_KEY` *(optional)*
+   - `TREFLE_API_TOKEN` *(optional, enables [Trefle](https://trefle.io) species search)*
    - `NEXT_PUBLIC_TASK_WINDOW_DAYS` *(defaults to `7`)*
    - `SINGLE_USER_MODE` and `SINGLE_USER_ID` for skipping Supabase auth
 3. Prepare the database and start the app
@@ -44,6 +45,12 @@ prisma/       Prisma schema and seeds
 public/       static assets
 supabase/     database schema
 ```
+
+## Species Search
+
+The app can query the [Trefle API](https://trefle.io) for plant names when a
+`TREFLE_API_TOKEN` is provided in your environment. Without a token, species
+lookups fall back to a small built-in list.
 
 ## Single-User Mode
 Useful when running locally without authentication.
