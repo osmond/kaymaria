@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import PushManager from "@/components/PushManager";
 
 export const metadata: Metadata = {
   title: "Kay Maria",
@@ -31,6 +32,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-background text-foreground">
         <ThemeProvider>{children}</ThemeProvider>
+        <PushManager />
       </body>
     </html>
   );
