@@ -1,9 +1,14 @@
 import { GET, POST } from './route';
 import { listPlants, createPlant } from '@/lib/prisma/plants';
+import { createRouteHandlerClient } from '@/lib/supabase';
 
 jest.mock('@/lib/prisma/plants', () => ({
   listPlants: jest.fn(),
   createPlant: jest.fn(),
+}));
+
+jest.mock('@/lib/supabase', () => ({
+  createRouteHandlerClient: jest.fn(),
 }));
 
 describe('GET/POST /api/plants', () => {
@@ -26,6 +31,10 @@ describe('GET/POST /api/plants', () => {
     const newPlant = { id: 'p_new', name: 'New Plant' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
+    const mockSupabase = { auth: { getUser: jest.fn() } };
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
       body: JSON.stringify({ name: 'New Plant' }),
@@ -35,6 +44,7 @@ describe('GET/POST /api/plants', () => {
     expect(res.status).toBe(201);
     const json = await res.json();
     expect(json).toEqual(newPlant);
-    expect(createPlant).toHaveBeenCalledWith({ name: 'New Plant' });
+    expect(createPlant).toHaveBeenCalledWith('user-1', { name: 'New Plant' });
+    expect(createRouteHandlerClient).toHaveBeenCalled();
   });
 });
