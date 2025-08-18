@@ -49,11 +49,13 @@ export default function PlantForm({
   submitLabel,
   onSubmit,
   onCancel,
+  enableAiSubmit,
 }: {
   initial: PlantFormValues;
   submitLabel: string;
-  onSubmit: (data: PlantFormSubmit) => Promise<void>;
+  onSubmit: (data: PlantFormSubmit, source?: 'ai' | 'manual') => Promise<void>;
   onCancel: () => void;
+  enableAiSubmit?: boolean;
 }) {
   const [state, setState] = useState<PlantFormValues>(initial);
   const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
@@ -128,36 +130,41 @@ export default function PlantForm({
     setPrevManual(null);
   }
 
-  async function handleSubmit() {
-    if (!state.name.trim()) return;
+  function toSubmit(s: PlantFormValues): PlantFormSubmit {
+    return {
+      name: s.name.trim(),
+      roomId: s.roomId,
+      species: s.species || undefined,
+      potSize: s.pot,
+      potMaterial: s.potMaterial,
+      lightLevel: s.light,
+      indoor: s.indoor === 'Indoor',
+      soilType: s.soil || undefined,
+      drainage: s.drainage,
+      lat: Number(s.lat),
+      lon: Number(s.lon),
+      rules: [
+        {
+          type: 'water',
+          intervalDays: Number(s.waterEvery || 7),
+          amountMl: Number(s.waterAmount || 500),
+        },
+        {
+          type: 'fertilize',
+          intervalDays: Number(s.fertEvery || 30),
+          formula: s.fertFormula || undefined,
+        },
+      ],
+    };
+  }
+
+  async function handleSubmit(source: 'ai' | 'manual' = 'manual', override?: PlantFormValues) {
+    const current = override ?? state;
+    if (!current.name.trim()) return;
     setSaving(true);
     setSaveError(null);
     try {
-      await onSubmit({
-        name: state.name.trim(),
-        roomId: state.roomId,
-        species: state.species || undefined,
-        potSize: state.pot,
-        potMaterial: state.potMaterial,
-        lightLevel: state.light,
-        indoor: state.indoor === 'Indoor',
-        soilType: state.soil || undefined,
-        drainage: state.drainage,
-        lat: Number(state.lat),
-        lon: Number(state.lon),
-        rules: [
-          {
-            type: 'water',
-            intervalDays: Number(state.waterEvery || 7),
-            amountMl: Number(state.waterAmount || 500),
-          },
-          {
-            type: 'fertilize',
-            intervalDays: Number(state.fertEvery || 30),
-            formula: state.fertFormula || undefined,
-          },
-        ],
-      });
+      await onSubmit(toSubmit(current), source);
     } catch (e: any) {
       console.error('Error saving plant', e);
       let message = 'Failed to save plant.';
@@ -190,6 +197,18 @@ export default function PlantForm({
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleSubmitAi() {
+    if (!suggest) return;
+    const s: PlantFormValues = {
+      ...state,
+      waterEvery: String(suggest.waterEvery ?? Number(state.waterEvery)),
+      waterAmount: String(suggest.waterAmount ?? Number(state.waterAmount)),
+      fertEvery: String(suggest.fertEvery ?? Number(state.fertEvery)),
+      fertFormula: suggest.fertFormula ?? state.fertFormula,
+    };
+    await handleSubmit('ai', s);
   }
 
   return (
@@ -381,7 +400,12 @@ export default function PlantForm({
         <button className="btn-secondary" onClick={onCancel}>
           Cancel
         </button>
-        <button className="btn" onClick={handleSubmit} disabled={saving || !state.name.trim()}>
+        {enableAiSubmit && suggest && (
+          <button className="btn" onClick={handleSubmitAi} disabled={saving || !state.name.trim()}>
+            {saving ? 'Saving…' : 'Create with AI Plan'}
+          </button>
+        )}
+        <button className="btn" onClick={() => handleSubmit('manual')} disabled={saving || !state.name.trim()}>
           {saving ? 'Saving…' : submitLabel}
         </button>
       </div>
