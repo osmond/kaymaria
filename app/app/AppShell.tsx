@@ -105,8 +105,7 @@ type EventDTO = { id: string; plantId: string; plantName: string; type: "water" 
 export default function AppShell({ initialView }:{ initialView?: "today"|"timeline"|"plants"|"insights"|"settings" }) {
   type View = "today" | "timeline" | "plants" | "insights" | "settings";
   const [view, setView] = useState<View>(initialView ?? "today");
-  const [homeTab, setHomeTab] = useState<"today" | "upcoming">("today");
-  const [taskWindow, setTaskWindow] = useState(DEFAULT_TASK_WINDOW_DAYS);
+  const taskWindow = DEFAULT_TASK_WINDOW_DAYS;
 
   // modals
   const [editTask, setEditTask] = useState<TaskDTO | null>(null);
@@ -193,7 +192,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   }
   useEffect(() => {
     refresh(taskWindow);
-  }, [taskWindow]);
+  }, []);
 
   useEffect(() => {
     if (
@@ -446,64 +445,12 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       >
         <div className="flex items-baseline justify-between w-full">
           <h1 className="text-xl font-display font-semibold">
-            {view === "today"
-              ? homeTab === "today"
-                ? "Today"
-                : "Upcoming"
-              : view[0].toUpperCase() + view.slice(1)}
+            {view === "today" ? "Today" : view[0].toUpperCase() + view.slice(1)}
           </h1>
           <ClientDate />
         </div>
         {view === "today" && (
           <>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <button
-                className={
-                  homeTab === "today"
-                    ? "bg-neutral-900 text-white rounded px-3 py-2"
-                    : "border rounded px-3 py-2"
-                }
-                onClick={() => setHomeTab("today")}
-              >
-                Today
-              </button>
-              <button
-                className={
-                  homeTab === "upcoming"
-                    ? "bg-neutral-900 text-white rounded px-3 py-2"
-                    : "border rounded px-3 py-2"
-                }
-                onClick={() => setHomeTab("upcoming")}
-              >
-                Upcoming
-              </button>
-            </div>
-            {homeTab === "upcoming" && (
-              <div className="mt-3 flex justify-end">
-                <div className="inline-flex rounded border overflow-hidden text-xs">
-                  <button
-                    className={
-                      taskWindow === 7
-                        ? "bg-neutral-900 text-white px-3 py-1"
-                        : "px-3 py-1"
-                    }
-                    onClick={() => setTaskWindow(7)}
-                  >
-                    Next 7 days
-                  </button>
-                  <button
-                    className={
-                      taskWindow === 30
-                        ? "bg-neutral-900 text-white px-3 py-1"
-                        : "px-3 py-1"
-                    }
-                    onClick={() => setTaskWindow(30)}
-                  >
-                    Next 30 days
-                  </button>
-                </div>
-              </div>
-            )}
             <div className="mt-3 grid grid-cols-3 gap-2">
               <Select
                 value={roomFilter || undefined}
@@ -599,7 +546,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       </header>
 
       <main className="flex-1 px-4 pb-28">
-        {view === "today" && homeTab === "today" && (
+        {view === "today" && (
           <section className="space-y-3 mt-4">
             {loading && (
               <div className="space-y-3">
@@ -656,58 +603,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
           </section>
         )}
 
-        {view === "today" && homeTab === "upcoming" && (
-          <section className="space-y-5 mt-4">
-            {loading && (
-              <div className="space-y-3">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl border bg-white shadow-sm h-16 animate-pulse"
-                  />
-                ))}
-              </div>
-            )}
-            {!loading && err && (
-              <div className="rounded-xl border bg-white shadow-sm p-4 text-sm text-red-600">
-                {err}
-              </div>
-            )}
-            {!loading &&
-              !err &&
-              upcoming.map(([label, items]) => (
-                <div key={label} className="space-y-2">
-                  <div className="text-xs font-medium text-neutral-600 uppercase tracking-wide">
-                    {label}
-                  </div>
-                  <div className="space-y-3">
-                    {items.map((t) => (
-                      <TaskRow
-                        key={t.id}
-                        plant={t.plantName}
-                        action={labelForType(t.type) as any}
-                        last={
-                          t.lastEventAt ? timeAgo(new Date(t.lastEventAt)) : "—"
-                        }
-                        due={dueLabel(new Date(t.dueAt), today)}
-                        onOpen={() => {}}
-                        onComplete={() => complete(t)}
-                        onAddNote={(note) => addNote(t.plantId, note)}
-                        onDelete={() => remove(t)}
-                        onDefer={() => deferTask(t)}
-                        onEdit={() => setEditTask(t)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            {!loading && !err && upcoming.length === 0 && (
-              <div className="rounded-xl border bg-white shadow-sm p-6 text-center text-sm text-neutral-500">
-                No upcoming tasks
-              </div>
-            )}
-          </section>
-        )}
+        {/* Removed upcoming view */}
 
         {view === "timeline" && (
           <section className="mt-4 rounded-xl border bg-white shadow-sm">
