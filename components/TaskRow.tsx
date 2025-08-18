@@ -3,9 +3,7 @@
 import { motion } from 'framer-motion';
 import {
   Check,
-  Trash2,
   Clock,
-  Edit2,
   StickyNote,
   Droplet,
   FlaskConical,
@@ -22,9 +20,7 @@ export default function TaskRow({
   onOpen,
   onComplete,
   onAddNote,
-  onDelete,
   onDefer,
-  onEdit,
   showPlant = true,
 }: {
   plant: string;
@@ -34,9 +30,7 @@ export default function TaskRow({
   onOpen: () => void;
   onComplete: () => void;
   onAddNote: (note: string) => void;
-  onDelete: () => void;
   onDefer: () => void;
-  onEdit: () => void;
   showPlant?: boolean;
 }) {
   function iconFor(action: 'Water' | 'Fertilize' | 'Repot') {
@@ -58,29 +52,13 @@ export default function TaskRow({
             Complete
           </div>
         </div>
-        <div className="absolute inset-y-0 right-0 flex">
-          <div className="w-20 grid place-items-center bg-blue-100 text-blue-600">
-            <div className="flex items-center gap-2 text-xs font-medium">
-              <Edit2 className="h-4 w-4" />
-              Edit
-            </div>
-          </div>
-          <div className="w-20 grid place-items-center bg-red-100 text-red-600">
-            <div className="flex items-center gap-2 text-xs font-medium">
-              <Trash2 className="h-4 w-4" />
-              Delete
-            </div>
-          </div>
-        </div>
       </div>
       <motion.div
         drag="x"
-        dragConstraints={{ left: -160, right: 80 }}
+        dragConstraints={{ left: 0, right: 80 }}
         dragElastic={0.2}
         onDragEnd={(_, i) => {
           if (i.offset.x > 60) onComplete();
-          else if (i.offset.x < -120) onDelete();
-          else if (i.offset.x < -60) onEdit();
         }}
         className="relative"
       >
@@ -116,22 +94,13 @@ export default function TaskRow({
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <div className="flex items-center gap-1">
-                <button
-                  aria-label="Done"
-                  onClick={onComplete}
-                  className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                >
-                  <Check className="h-4 w-4" />
-                </button>
-                <button
-                  aria-label="Edit"
-                  onClick={onEdit}
-                  className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                >
-                  <Edit2 className="h-4 w-4" />
-                </button>
-              </div>
+              <button
+                aria-label="Done"
+                onClick={onComplete}
+                className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
+              >
+                <Check className="h-4 w-4" />
+              </button>
               <div className="flex items-center gap-1 ml-2 pl-2 border-l border-neutral-200 dark:border-neutral-600">
                 <button
                   aria-label="Defer"
@@ -146,13 +115,6 @@ export default function TaskRow({
                   className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
                 >
                   <StickyNote className="h-4 w-4" />
-                </button>
-                <button
-                  aria-label="Delete"
-                  onClick={onDelete}
-                  className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                >
-                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             </div>
