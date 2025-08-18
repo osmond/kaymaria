@@ -18,7 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, AlertCircle, Droplet, Home, Filter as FilterIcon } from "lucide-react";
+import {
+  Check,
+  AlertCircle,
+  Droplet,
+  Home,
+  X,
+  Filter as FilterIcon,
+} from "lucide-react";
 
 const DEFAULT_TASK_WINDOW_DAYS = Number(
   process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7"
@@ -565,6 +572,46 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                 </SelectContent>
               </Select>
             </div>
+            {(roomFilter || typeFilter || statusFilter) && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {roomFilter && (
+                  <span className="flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
+                    {roomFilter}
+                    <button
+                      type="button"
+                      className="rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                      onClick={() => setRoomFilter("")}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+                {typeFilter && (
+                  <span className="flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
+                    {labelForType(typeFilter as any)}
+                    <button
+                      type="button"
+                      className="rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                      onClick={() => setTypeFilter("")}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+                {statusFilter && (
+                  <span className="flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
+                    {statusFilter === "overdue" ? "Overdue" : "Due soon"}
+                    <button
+                      type="button"
+                      className="rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                      onClick={() => setStatusFilter("")}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+              </div>
+            )}
           </>
         )}
       </header>
