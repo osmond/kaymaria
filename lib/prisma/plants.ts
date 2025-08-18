@@ -2,7 +2,14 @@ import { PrismaClient, Plant, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-type PlantData = Partial<Omit<Plant, "id" | "tasks">>;
+type PlantData = {
+  name?: string;
+  roomId?: string | null;
+  species?: string | null;
+  potSize?: string | null;
+  potMaterial?: string | null;
+  soilType?: string | null;
+};
 
 export async function listPlants(): Promise<Plant[]> {
   return prisma.plant.findMany({ orderBy: { name: "asc" } });
@@ -12,19 +19,16 @@ export async function getPlant(id: string): Promise<Plant | null> {
   return prisma.plant.findUnique({ where: { id } });
 }
 
-export async function createPlant(data: PlantData): Promise<Plant> {
+export async function createPlant(userId: string, data: PlantData): Promise<Plant> {
   return prisma.plant.create({
     data: {
+      userId,
       name: data.name ?? "New Plant",
+      roomId: data.roomId,
       species: data.species,
-      lastWatered: data.lastWatered ? new Date(data.lastWatered) : undefined,
-      nextWater: data.nextWater ? new Date(data.nextWater) : undefined,
-      lastFertilized: data.lastFertilized ? new Date(data.lastFertilized) : undefined,
-      nextFertilize: data.nextFertilize ? new Date(data.nextFertilize) : undefined,
-      waterIntervalDays: data.waterIntervalDays,
-      fertilizeIntervalDays: data.fertilizeIntervalDays,
-      latitude: data.latitude,
-      longitude: data.longitude,
+      potSize: data.potSize,
+      potMaterial: data.potMaterial,
+      soilType: data.soilType,
     },
   });
 }
@@ -35,15 +39,11 @@ export async function updatePlant(id: string, data: PlantData): Promise<Plant | 
       where: { id },
       data: {
         name: data.name,
+        roomId: data.roomId,
         species: data.species,
-        lastWatered: data.lastWatered ? new Date(data.lastWatered) : undefined,
-        nextWater: data.nextWater ? new Date(data.nextWater) : undefined,
-        lastFertilized: data.lastFertilized ? new Date(data.lastFertilized) : undefined,
-        nextFertilize: data.nextFertilize ? new Date(data.nextFertilize) : undefined,
-        waterIntervalDays: data.waterIntervalDays,
-        fertilizeIntervalDays: data.fertilizeIntervalDays,
-        latitude: data.latitude,
-        longitude: data.longitude,
+        potSize: data.potSize,
+        potMaterial: data.potMaterial,
+        soilType: data.soilType,
       },
     });
   } catch (e: any) {
@@ -66,15 +66,7 @@ export async function deletePlant(id: string): Promise<boolean> {
   }
 }
 
-export function getComputedWaterInfo(plant: Plant): {
-  lastWateredAt?: string;
-  nextWaterAt?: string;
-  intervalDays?: number;
-} {
-  return {
-    lastWateredAt: plant.lastWatered?.toISOString(),
-    nextWaterAt: plant.nextWater?.toISOString(),
-    intervalDays: plant.waterIntervalDays ?? undefined,
-  };
+export function getComputedWaterInfo(_plant: Plant): Record<string, never> {
+  return {};
 }
 
