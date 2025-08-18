@@ -7,6 +7,8 @@ import TaskRow from "@/components/TaskRow";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
 import { motion } from "framer-motion";
+import Fab from "@/components/Fab";
+import AddPlantModal from "@/components/AddPlantModal";
 import {
   Select,
   SelectContent,
@@ -133,6 +135,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   const [plants, setPlants] = useState<PlantListItem[]>([]);
   const [plantsErr, setPlantsErr] = useState<string | null>(null);
   const [plantsLoading, setPlantsLoading] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
 
   // room, type & status filters
   const [roomFilter, setRoomFilter] = useState("");
@@ -231,26 +234,27 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     })();
   }, []);
 
+  async function loadPlants() {
+    try {
+      setPlantsLoading(true);
+      setPlantsErr(null);
+      const r = await fetch("/api/plants", { cache: "no-store" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const data = await r.json();
+      setPlants(
+        (data as any[]).map((p) => ({ id: p.id, name: p.name, roomId: p.roomId }))
+      );
+    } catch (e: any) {
+      setPlantsErr(e?.message || "Failed to load plants");
+    } finally {
+      setPlantsLoading(false);
+    }
+  }
+
   // Load plants list once we first visit the Plants tab
   useEffect(() => {
     if (view !== "plants" || plants.length || plantsLoading) return;
-    (async () => {
-      try {
-        setPlantsLoading(true);
-        setPlantsErr(null);
-        const r = await fetch("/api/plants", { cache: "no-store" });
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        const data = await r.json();
-        // Map to the minimal fields we need
-        setPlants(
-          (data as any[]).map((p) => ({ id: p.id, name: p.name, roomId: p.roomId }))
-        );
-      } catch (e: any) {
-        setPlantsErr(e?.message || "Failed to load plants");
-      } finally {
-        setPlantsLoading(false);
-      }
-    })();
+    loadPlants();
   }, [view, plants.length, plantsLoading]);
 
   const trigger = () => {
@@ -706,6 +710,21 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
       </main>
 
       <BottomNav value={view} onChange={(v) => setView(v as any)} />
+
+      {view === "plants" && (
+        <>
+          <Fab onClick={() => setAddOpen(true)} />
+          <AddPlantModal
+            open={addOpen}
+            onOpenChange={setAddOpen}
+            defaultRoomId="room-1"
+            onCreate={() => {
+              setAddOpen(false);
+              loadPlants();
+            }}
+          />
+        </>
+      )}
 
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {confetti.map((id) => (
