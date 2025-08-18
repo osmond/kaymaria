@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { fetchCareRules, CareSuggest } from '@/lib/careRules';
+import RoomSelector from './RoomSelector';
 
 export type PlantFormValues = {
   name: string;
@@ -162,11 +163,10 @@ export default function PlantForm({
           />
         </Field>
 
-        <Field label="Room ID (internal)">
-          <input
-            className="input"
+        <Field label="Room">
+          <RoomSelector
             value={state.roomId}
-            onChange={(e) => setState({ ...state, roomId: e.target.value })}
+            onChange={(id) => setState({ ...state, roomId: id })}
           />
           <p className="hint">Stored locally in Settings → Defaults.</p>
         </Field>
