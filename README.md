@@ -72,6 +72,8 @@ Once the development server is running:
 
 Manual test cases for desktop and mobile are documented in [docs/manual-test-cases.md](./docs/manual-test-cases.md).
 
+Run unit tests with `npm test`.
+
 ## ✨ Features
 
 - 🌼 **Today View** – See exactly which plants need attention today, including overdue tasks
@@ -98,7 +100,6 @@ Manual test cases for desktop and mobile are documented in [docs/manual-test-cas
 - 📍 **Smart Care Suggestions** – Based on location, light, humidity, pot size, species, weather, and season
 - 💧 **ET₀‑Aware Watering** – Adjusts suggested watering intervals using local evapotranspiration data
 - 📊 **Visual Insights** – See patterns like ET₀ vs care frequency
-- 📦 **Import/Export Tools** – Backup your plant journal anytime
 - 📱 **Mobile-First Layout** – Bottom navigation, floating action button, and swipeable task cards optimized for one-handed use
 - 🛡️ **Safe Area Awareness** – Layout adapts to device notches and home indicators
 - 🌗 **Light/Dark Mode** – Toggle the interface theme from Settings
@@ -106,7 +107,6 @@ Manual test cases for desktop and mobile are documented in [docs/manual-test-cas
 - 🔔 **Condition Alerts** – Notifies you when weather suggests watering or fertilizing soon
 - ⏰ **Overdue Task Notifications** – Browser alerts when care tasks are past due
 - 🤖 **AI Care Recommendations** – Generates plant-specific watering, fertilizer, light, and repotting guidance
-- 🔁 **AI Fine-Tuning** – Create custom models using your care logs
 - ⚠️ **Graceful Error States** – Custom 404 and 500 pages with a friendly loading experience
 
 ## 🚧 Current Status
@@ -159,14 +159,6 @@ Deploy to [Vercel](https://vercel.com):
 
 The included [`vercel.json`](./vercel.json) ensures Vercel picks up the required environment variables.
 
-## 🔌 Test API
-
-A simple endpoint is available for experimenting with mock data:
-
-```bash
-curl http://localhost:3000/api/test
-```
-
 ## 🌿 Plant API
 
 Basic CRUD endpoints exist for working with mock plant data. When creating a plant you can include default care rules, and initial tasks will be scheduled automatically.
@@ -179,10 +171,9 @@ To enable local weather in the app, include `latitude` and `longitude` when crea
 - `GET /api/plants/:id` – fetch a plant
 - `PATCH /api/plants/:id` – update fields on a plant
 - `DELETE /api/plants/:id` – remove a plant and its tasks
-- `GET /api/plants/:id/notes` – list notes for a plant
-- `POST /api/plants/:id/notes` – add a note
 - `GET /api/plants/:id/photos` – list photos for a plant
-- `POST /api/plants/:id/photos` – add a photo by URL
+- `POST /api/plants/:id/photos` – upload a photo for a plant
+- `DELETE /api/plants/:id/photos` – remove a photo
 - `GET /api/plants/:id/weather` – current weather for a plant
 
 Example:
@@ -198,20 +189,6 @@ Tasks represent upcoming care actions for your plants. Completed tasks automatic
 
 - `GET /api/tasks` – list tasks due in the next 7 days (`?window=14d` for a different range)
 - `POST /api/tasks` – create a new task
-- `PATCH /api/tasks/:id` – mark a task complete and record the event
-
-Example:
-```bash
-curl -X PATCH http://localhost:3000/api/tasks/t_<uuid>
-```
-
-## 📦 Import/Export API
-
-Backup or restore plants and tasks using these endpoints:
-
-- `GET /api/export` – download a JSON payload with `{ plants, tasks }`
-- `GET /api/export?format=csv` – download tasks as CSV
-- `POST /api/import` – replace data with `{ "plants": Plant[], "tasks": Task[] }` (either field optional)
 
 ## 🤖 AI Recommendation API
 
@@ -239,13 +216,3 @@ curl -X POST http://localhost:3000/api/ai/care-recommend \
 
 The feedback is included in the AI prompt so new suggestions are adjusted accordingly.
 
-## 🔁 AI Fine-Tuning
-
-You can experiment with fine-tuning the AI using completed care logs from the mock data.
-
-Generate a training file and submit a fine-tune job to OpenAI:
-```bash
-npm run ai:fine-tune
-```
-
-The script writes `fine-tune-data.jsonl` to the project root and, if `OPENAI_API_KEY` is set, uploads it to OpenAI and starts a fine-tune job.
