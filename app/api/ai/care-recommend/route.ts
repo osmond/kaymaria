@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 function getSeason(date: Date = new Date()): string {
   const month = date.getMonth() + 1;
   if (month >= 3 && month <= 5) return "spring";
@@ -12,12 +10,15 @@ function getSeason(date: Date = new Date()): string {
 }
 
 export async function POST(req: NextRequest) {
-  if (!process.env.OPENAI_API_KEY) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
     return NextResponse.json(
       { error: "OPENAI_API_KEY not set" },
       { status: 500 }
     );
   }
+
+  const client = new OpenAI({ apiKey });
 
   const body = await req.json().catch(() => ({}));
   const species = body.species ?? "Unknown plant";
