@@ -122,7 +122,8 @@ All items are **unchecked** to indicate upcoming work.
  - [x] Swipeable task actions (mark done, edit, delete)
 
 - [x] Light/dark mode toggle in settings
-- [ ] Mobile UX refinements
+ - [x] Mobile UX refinements
+   - [x] Respect device safe areas for notched screens
 
 - [ ] Align design with [Style Guide](./style-guide/page.tsx)
 
