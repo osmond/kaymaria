@@ -64,7 +64,8 @@ export default function AddPlantModal({
     loadDefaults();
   }, [open, prefillName, defaultRoomId]);
 
-  async function handleSubmit(data: PlantFormSubmit) {
+  async function handleSubmit(data: PlantFormSubmit, source: 'ai' | 'manual' = 'manual') {
+    console.log('Creating plant via', source);
     const r = await fetch('/api/plants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -98,6 +99,7 @@ export default function AddPlantModal({
                 submitLabel="Create Plant"
                 onSubmit={handleSubmit}
                 onCancel={close}
+                enableAiSubmit
               />
             </>
           )}
