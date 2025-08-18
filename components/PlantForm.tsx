@@ -67,7 +67,7 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
       },
     ],
   };
-  if (s.lat && s.lon) {
+  if (s.lat && s.lon && !isNaN(Number(s.lat)) && !isNaN(Number(s.lon))) {
     base.lat = Number(s.lat);
     base.lon = Number(s.lon);
   }
@@ -77,6 +77,15 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
 type SectionProps = {
   state: PlantFormValues;
   setState: React.Dispatch<React.SetStateAction<PlantFormValues>>;
+};
+
+type FieldName = 'name' | 'lat' | 'lon';
+
+type Validation = {
+  errors: Partial<Record<FieldName, string>>;
+  touched: Partial<Record<FieldName, boolean>>;
+  validate: (field: FieldName, value: string | undefined) => void;
+  markTouched: (field: FieldName) => void;
 };
 
 function ChipSelect({
@@ -108,14 +117,41 @@ function ChipSelect({
   );
 }
 
-export function BasicsFields({ state, setState }: SectionProps) {
+export function BasicsFields({
+  state,
+  setState,
+  validation,
+}: SectionProps & { validation: Validation }) {
+  const { errors, touched, validate, markTouched } = validation;
   return (
     <div className="p-5 space-y-4">
-      <Field label="Name">
+      <Field
+        label="Name"
+        message={
+          touched.name
+            ? errors.name
+              ? errors.name
+              : 'Looks good!'
+            : undefined
+        }
+        status={touched.name ? (errors.name ? 'error' : 'success') : undefined}
+      >
         <SpeciesAutosuggest
           value={state.name}
-          onChange={(v) => setState({ ...state, name: v })}
-          onSelect={(s) => setState({ ...state, name: s.name, species: s.species })}
+          onChange={(v) => {
+            setState({ ...state, name: v });
+            markTouched('name');
+            validate('name', v);
+          }}
+          onSelect={(s) => {
+            setState({ ...state, name: s.name, species: s.species });
+            markTouched('name');
+            validate('name', s.name);
+          }}
+          onBlur={() => {
+            markTouched('name');
+            validate('name', state.name);
+          }}
         />
       </Field>
 
@@ -154,18 +190,25 @@ export function BasicsFields({ state, setState }: SectionProps) {
   );
 }
 
-export function EnvironmentFields({ state, setState }: SectionProps) {
+export function EnvironmentFields({
+  state,
+  setState,
+  validation,
+}: SectionProps & { validation: Validation }) {
+  const { errors, touched, validate, markTouched } = validation;
   const [showMore, setShowMore] = useState(false);
   const [address, setAddress] = useState('');
 
   function useCurrentLocation() {
     if (!('geolocation' in navigator)) return;
     navigator.geolocation.getCurrentPosition((pos) => {
-      setState({
-        ...state,
-        lat: pos.coords.latitude.toFixed(6),
-        lon: pos.coords.longitude.toFixed(6),
-      });
+      const lat = pos.coords.latitude.toFixed(6);
+      const lon = pos.coords.longitude.toFixed(6);
+      setState({ ...state, lat, lon });
+      markTouched('lat');
+      markTouched('lon');
+      validate('lat', lat);
+      validate('lon', lon);
     });
   }
 
@@ -179,11 +222,13 @@ export function EnvironmentFields({ state, setState }: SectionProps) {
       );
       const data = await r.json();
       if (data[0]) {
-        setState({
-          ...state,
-          lat: data[0].lat,
-          lon: data[0].lon,
-        });
+        const lat = data[0].lat;
+        const lon = data[0].lon;
+        setState({ ...state, lat, lon });
+        markTouched('lat');
+        markTouched('lon');
+        validate('lat', lat);
+        validate('lon', lon);
       }
     } catch {}
   }
@@ -242,18 +287,54 @@ export function EnvironmentFields({ state, setState }: SectionProps) {
           </div>
           {showMore && (
             <div className="grid grid-cols-2 gap-3">
-              <input
-                className="input"
-                value={state.lat ?? ''}
-                onChange={(e) => setState({ ...state, lat: e.target.value })}
-                placeholder="Latitude"
-              />
-              <input
-                className="input"
-                value={state.lon ?? ''}
-                onChange={(e) => setState({ ...state, lon: e.target.value })}
-                placeholder="Longitude"
-              />
+              <div className="grid gap-1">
+                <input
+                  className="input"
+                  value={state.lat ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setState({ ...state, lat: v });
+                    markTouched('lat');
+                    validate('lat', v);
+                  }}
+                  onBlur={() => {
+                    markTouched('lat');
+                    validate('lat', state.lat);
+                  }}
+                  placeholder="Latitude"
+                />
+                {touched.lat && (
+                  errors.lat ? (
+                    <span className="text-xs text-red-600">{errors.lat}</span>
+                  ) : state.lat ? (
+                    <span className="text-xs text-green-600">Looks good!</span>
+                  ) : null
+                )}
+              </div>
+              <div className="grid gap-1">
+                <input
+                  className="input"
+                  value={state.lon ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setState({ ...state, lon: v });
+                    markTouched('lon');
+                    validate('lon', v);
+                  }}
+                  onBlur={() => {
+                    markTouched('lon');
+                    validate('lon', state.lon);
+                  }}
+                  placeholder="Longitude"
+                />
+                {touched.lon && (
+                  errors.lon ? (
+                    <span className="text-xs text-red-600">{errors.lon}</span>
+                  ) : state.lon ? (
+                    <span className="text-xs text-green-600">Looks good!</span>
+                  ) : null
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -486,6 +567,22 @@ export default function PlantForm({
   initialSuggest?: AiCareSuggestion | null;
 }) {
   const [state, setState] = useState<PlantFormValues>(initial);
+  const [errors, setErrors] = useState<Validation['errors']>({});
+  const [touched, setTouched] = useState<Validation['touched']>({});
+  const validate: Validation['validate'] = (field, value) => {
+    let error: string | undefined;
+    if (field === 'name') {
+      error = value && value.trim() ? undefined : 'Name is required';
+    } else if (field === 'lat') {
+      if (value && isNaN(Number(value))) error = 'Latitude must be a number';
+    } else if (field === 'lon') {
+      if (value && isNaN(Number(value))) error = 'Longitude must be a number';
+    }
+    setErrors((e) => ({ ...e, [field]: error }));
+  };
+  const markTouched: Validation['markTouched'] = (field) => {
+    setTouched((t) => ({ ...t, [field]: true }));
+  };
   const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -493,6 +590,8 @@ export default function PlantForm({
 
   useEffect(() => {
     setState(initial);
+    setErrors({});
+    setTouched({});
   }, [initial]);
 
   function toSubmit() {
@@ -552,10 +651,14 @@ export default function PlantForm({
     await handleSubmit('ai', s);
   }
 
+  const validation = { errors, touched, validate, markTouched };
+
   return (
     <>
-      <BasicsFields state={state} setState={setState} />
-      {hasSpecies && <EnvironmentFields state={state} setState={setState} />}
+      <BasicsFields state={state} setState={setState} validation={validation} />
+      {hasSpecies && (
+        <EnvironmentFields state={state} setState={setState} validation={validation} />
+      )}
       <CarePlanFields
         state={state}
         setState={setState}
@@ -593,11 +696,24 @@ export function FormStyles() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+  message,
+  status,
+}: {
+  label: string;
+  children: React.ReactNode;
+  message?: string;
+  status?: 'error' | 'success';
+}) {
   return (
     <div className="grid gap-2">
       <label className="text-sm font-medium text-neutral-700">{label}</label>
       {children}
+      {message && (
+        <span className={`text-xs ${status === 'error' ? 'text-red-600' : 'text-green-600'}`}>{message}</span>
+      )}
     </div>
   );
 }
