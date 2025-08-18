@@ -123,6 +123,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   const [tasks, setTasks] = useState<TaskDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const notifiedRef = useRef<Set<string>>(new Set());
 
   // events list for Timeline tab
   const [events, setEvents] = useState<EventDTO[]>([]);
@@ -192,6 +193,29 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   useEffect(() => {
     refresh(taskWindow);
   }, [taskWindow]);
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      "Notification" in window &&
+      Notification.permission === "default"
+    ) {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("Notification" in window)) return;
+    if (Notification.permission !== "granted") return;
+    const now = Date.now();
+    tasks.forEach((t) => {
+      const due = new Date(t.dueAt).getTime();
+      if (due < now && !notifiedRef.current.has(t.id)) {
+        new Notification(`${t.plantName}: ${labelForType(t.type)} overdue`);
+        notifiedRef.current.add(t.id);
+      }
+    });
+  }, [tasks]);
 
   useEffect(() => {
     (async () => {

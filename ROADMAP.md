@@ -153,7 +153,7 @@ All items are **unchecked** to indicate upcoming work.
 
 ## 💡 Backlog & Ideas
 
-- [ ] Notifications for overdue care
+- [x] Notifications for overdue care
 - [ ] Shareable plant profiles (public link)
 - [ ] Visual analytics dashboard
 - [ ] Native app support (PWA or React Native)
