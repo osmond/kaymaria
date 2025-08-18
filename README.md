@@ -84,6 +84,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🌤️ **Weather Awareness** – Current local weather for each plant using Open‑Meteo
 - 🔔 **Condition Alerts** – Notifies you when weather suggests watering or fertilizing soon
 - 🤖 **AI Care Recommendations** – Generates plant-specific watering, fertilizer, light, and repotting guidance
+- ⚠️ **Graceful Error States** – Custom 404 and 500 pages with a friendly loading experience
 
 ---
 
