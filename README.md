@@ -34,6 +34,7 @@ Once the development server is running:
 3. Tap a plant card to view its quick stats, timeline, notes, or photo gallery.
 4. Swipe a task to complete it, edit the details, or delete it.
 5. Use the room and task-type filters to focus on what's relevant.
+6. Allow browser notifications to get alerts for overdue tasks.
 
 
 ## 🧪 Testing
@@ -88,6 +89,7 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🌗 **Light/Dark Mode** – Toggle the interface theme from Settings
 - 🌤️ **Weather Awareness** – Current local weather for each plant using Open‑Meteo
 - 🔔 **Condition Alerts** – Notifies you when weather suggests watering or fertilizing soon
+- ⏰ **Overdue Task Notifications** – Browser alerts when care tasks are past due
 - 🤖 **AI Care Recommendations** – Generates plant-specific watering, fertilizer, light, and repotting guidance
 - ⚠️ **Graceful Error States** – Custom 404 and 500 pages with a friendly loading experience
 
