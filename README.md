@@ -25,6 +25,16 @@ To create a production build run:
 npm run build
 ```
 
+## 🚀 Usage
+
+Once the development server is running:
+
+1. Visit [`/app`](http://localhost:3000/app) to see the task dashboard for today.
+2. Use the **+** button to add a new plant with care defaults.
+3. Tap a plant card to view its quick stats, timeline, notes, or photo gallery.
+4. Swipe a task to complete it, edit the details, or delete it.
+5. Use the room and task-type filters to focus on what's relevant.
+
 # 🌱 Kay Maria
 
 **Tend to what matters.**  

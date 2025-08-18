@@ -143,7 +143,7 @@ All items are **unchecked** to indicate upcoming work.
 
 - [ ] Review accessibility
 - [ ] Lighthouse performance pass
-- [ ] Add `README.md` with usage instructions
+- [x] Add `README.md` with usage instructions
 - [ ] Create short demo video or gif
 - [ ] Deploy to Vercel and connect to custom domain
 - [ ] Manual test cases (mobile + desktop)
