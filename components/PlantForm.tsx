@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 
 import type { AiCareSuggestion } from '@/lib/aiCare';
 
-import { fetchCareRules, CareSuggest } from '@/lib/careRules';
 
 import SpeciesAutosuggest from './SpeciesAutosuggest';
 
@@ -44,22 +43,164 @@ export type PlantFormSubmit = {
   rules: { type: 'water' | 'fertilize'; intervalDays: number; amountMl?: number; formula?: string }[];
 };
 
-export default function PlantForm({
-  initial,
-  submitLabel,
-  onSubmit,
-  onCancel,
-  enableAiSubmit,
-  initialSuggest,
-}: {
-  initial: PlantFormValues;
-  submitLabel: string;
-  onSubmit: (data: PlantFormSubmit, source?: 'ai' | 'manual') => Promise<void>;
-  onCancel: () => void;
-  enableAiSubmit?: boolean;
+export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
+  return {
+    name: s.name.trim(),
+    roomId: s.roomId,
+    species: s.species || undefined,
+    potSize: s.pot,
+    potMaterial: s.potMaterial,
+    lightLevel: s.light,
+    indoor: s.indoor === 'Indoor',
+    soilType: s.soil || undefined,
+    drainage: s.drainage,
+    lat: Number(s.lat),
+    lon: Number(s.lon),
+    rules: [
+      {
+        type: 'water',
+        intervalDays: Number(s.waterEvery || 7),
+        amountMl: Number(s.waterAmount || 500),
+      },
+      {
+        type: 'fertilize',
+        intervalDays: Number(s.fertEvery || 30),
+        formula: s.fertFormula || undefined,
+      },
+    ],
+  };
+}
+
+type SectionProps = {
+  state: PlantFormValues;
+  setState: React.Dispatch<React.SetStateAction<PlantFormValues>>;
+};
+
+export function BasicsFields({ state, setState }: SectionProps) {
+  return (
+    <div className="p-5 space-y-4">
+      <Field label="Name">
+        <SpeciesAutosuggest
+          value={state.name}
+          onChange={(v) => setState({ ...state, name: v })}
+          onSelect={(s) => setState({ ...state, name: s.name, species: s.species })}
+        />
+      </Field>
+
+      <Field label="Room">
+        <RoomSelector
+          value={state.roomId}
+          onChange={(id) => setState({ ...state, roomId: id })}
+        />
+        <p className="hint">Stored locally in Settings → Defaults.</p>
+      </Field>
+
+      <div className="grid grid-cols-3 gap-3">
+        <Field label="Pot size">
+          <select
+            className="input"
+            value={state.pot}
+            onChange={(e) => setState({ ...state, pot: e.target.value })}
+          >
+            <option>4 in</option>
+            <option>6 in</option>
+            <option>8 in</option>
+          </select>
+        </Field>
+        <Field label="Pot material">
+          <select
+            className="input"
+            value={state.potMaterial}
+            onChange={(e) => setState({ ...state, potMaterial: e.target.value })}
+          >
+            <option>Plastic</option>
+            <option>Terracotta</option>
+            <option>Ceramic</option>
+          </select>
+        </Field>
+        <Field label="Light">
+          <select
+            className="input"
+            value={state.light}
+            onChange={(e) => setState({ ...state, light: e.target.value })}
+          >
+            <option>Low</option>
+            <option>Medium</option>
+            <option>Bright</option>
+          </select>
+        </Field>
+      </div>
+    </div>
+  );
+}
+
+export function EnvironmentFields({ state, setState }: SectionProps) {
+  return (
+    <div className="p-5 space-y-4">
+      <Field label="Environment">
+        <div className="grid grid-cols-2 gap-3">
+          <select
+            className="input"
+            value={state.indoor}
+            onChange={(e) =>
+              setState({ ...state, indoor: e.target.value as 'Indoor' | 'Outdoor' })
+            }
+          >
+            <option>Indoor</option>
+            <option>Outdoor</option>
+          </select>
+          <select
+            className="input"
+            value={state.drainage}
+            onChange={(e) =>
+              setState({ ...state, drainage: e.target.value as 'poor' | 'ok' | 'great' })
+            }
+          >
+            <option value="poor">Poor drainage</option>
+            <option value="ok">OK drainage</option>
+            <option value="great">Great drainage</option>
+          </select>
+        </div>
+        <input
+          className="input mt-2"
+          value={state.soil}
+          onChange={(e) => setState({ ...state, soil: e.target.value })}
+          placeholder="Soil type (e.g., Aroid mix)"
+        />
+      </Field>
+
+      <Field label="Location (for weather)">
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            className="input"
+            value={state.lat}
+            onChange={(e) => setState({ ...state, lat: e.target.value })}
+            placeholder="Latitude"
+          />
+          <input
+            className="input"
+            value={state.lon}
+            onChange={(e) => setState({ ...state, lon: e.target.value })}
+            placeholder="Longitude"
+          />
+        </div>
+        <p className="hint">Used to tailor intervals based on local conditions.</p>
+      </Field>
+    </div>
+  );
+}
+
+type CarePlanProps = SectionProps & {
   initialSuggest?: AiCareSuggestion | null;
-}) {
-  const [state, setState] = useState<PlantFormValues>(initial);
+  onSuggestChange?: (s: AiCareSuggestion | null) => void;
+};
+
+export function CarePlanFields({
+  state,
+  setState,
+  initialSuggest,
+  onSuggestChange,
+}: CarePlanProps) {
   const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
   const [prevManual, setPrevManual] = useState<{
     waterEvery: string;
@@ -69,20 +210,14 @@ export default function PlantForm({
   } | null>(null);
   const [loadingSuggest, setLoadingSuggest] = useState(false);
   const [suggestError, setSuggestError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setState(initial);
-  }, [initial]);
 
   useEffect(() => {
     if (!initialSuggest) return;
     setPrevManual({
-      waterEvery: initial.waterEvery,
-      waterAmount: initial.waterAmount,
-      fertEvery: initial.fertEvery,
-      fertFormula: initial.fertFormula,
+      waterEvery: state.waterEvery,
+      waterAmount: state.waterAmount,
+      fertEvery: state.fertEvery,
+      fertFormula: state.fertFormula,
     });
     setState((s) => ({
       ...s,
@@ -98,7 +233,7 @@ export default function PlantForm({
       fertFormula: initialSuggest.fertFormula ?? s.fertFormula,
     }));
     setSuggest(initialSuggest);
-  }, [initialSuggest, initial]);
+  }, [initialSuggest, setState]);
 
   useEffect(() => {
     async function fetchSuggest() {
@@ -141,7 +276,11 @@ export default function PlantForm({
       }
     }
     fetchSuggest();
-  }, [state.species, state.pot, state.potMaterial]);
+  }, [state.species, state.pot, state.potMaterial, state.lat, state.lon, setState]);
+
+  useEffect(() => {
+    onSuggestChange?.(suggest);
+  }, [suggest, onSuggestChange]);
 
   function acceptSuggest() {
     setSuggest(null);
@@ -156,32 +295,119 @@ export default function PlantForm({
     setPrevManual(null);
   }
 
-  function toSubmit(s: PlantFormValues): PlantFormSubmit {
-    return {
-      name: s.name.trim(),
-      roomId: s.roomId,
-      species: s.species || undefined,
-      potSize: s.pot,
-      potMaterial: s.potMaterial,
-      lightLevel: s.light,
-      indoor: s.indoor === 'Indoor',
-      soilType: s.soil || undefined,
-      drainage: s.drainage,
-      lat: Number(s.lat),
-      lon: Number(s.lon),
-      rules: [
-        {
-          type: 'water',
-          intervalDays: Number(s.waterEvery || 7),
-          amountMl: Number(s.waterAmount || 500),
-        },
-        {
-          type: 'fertilize',
-          intervalDays: Number(s.fertEvery || 30),
-          formula: s.fertFormula || undefined,
-        },
-      ],
-    };
+  return (
+    <div className="p-5 space-y-4">
+      <div className="rounded-xl border p-3 bg-neutral-50">
+        <div className="text-sm font-medium mb-2">Suggested plan</div>
+        {loadingSuggest && (
+          <div className="text-xs text-neutral-600">Getting suggestions…</div>
+        )}
+        {suggestError && (
+          <div className="text-xs text-red-600 mb-2">{suggestError}</div>
+        )}
+        {!suggest && !loadingSuggest && (
+          <div className="text-xs text-neutral-600">
+            Select species and pot info to get AI recommendations.
+          </div>
+        )}
+        {suggest && !loadingSuggest && (
+          <div className="grid gap-2 text-sm">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-lg border bg-white p-2">
+                <div className="text-xs text-neutral-500">Water</div>
+                <div className="font-medium">
+                  every {suggest.waterEvery} d · {suggest.waterAmount} ml
+                </div>
+              </div>
+              <div className="rounded-lg border bg-white p-2">
+                <div className="text-xs text-neutral-500">Fertilize</div>
+                <div className="font-medium">every {suggest.fertEvery} d</div>
+                {suggest.fertFormula && (
+                  <div className="text-xs text-neutral-500">{suggest.fertFormula}</div>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button className="btn" onClick={acceptSuggest}>Use suggestions</button>
+              <button className="btn-secondary" onClick={overrideSuggest}>
+                Override manually
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Water every (days)">
+          <input
+            className="input"
+            type="number"
+            min={1}
+            value={state.waterEvery}
+            onChange={(e) => setState({ ...state, waterEvery: e.target.value })}
+          />
+        </Field>
+        <Field label="Water amount (ml)">
+          <input
+            className="input"
+            type="number"
+            min={50}
+            step={10}
+            value={state.waterAmount}
+            onChange={(e) => setState({ ...state, waterAmount: e.target.value })}
+          />
+        </Field>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Fertilize every (days)">
+          <input
+            className="input"
+            type="number"
+            min={7}
+            value={state.fertEvery}
+            onChange={(e) => setState({ ...state, fertEvery: e.target.value })}
+          />
+        </Field>
+        <Field label="Formula">
+          <input
+            className="input"
+            value={state.fertFormula}
+            onChange={(e) => setState({ ...state, fertFormula: e.target.value })}
+            placeholder="e.g., 10-10-10 @ 1/2 strength"
+          />
+        </Field>
+      </div>
+    </div>
+  );
+}
+
+export default function PlantForm({
+  initial,
+  submitLabel,
+  onSubmit,
+  onCancel,
+  enableAiSubmit,
+  initialSuggest,
+}: {
+  initial: PlantFormValues;
+  submitLabel: string;
+  onSubmit: (data: PlantFormSubmit, source?: 'ai' | 'manual') => Promise<void>;
+  onCancel: () => void;
+  enableAiSubmit?: boolean;
+  initialSuggest?: AiCareSuggestion | null;
+}) {
+  const [state, setState] = useState<PlantFormValues>(initial);
+  const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setState(initial);
+  }, [initial]);
+
+  function toSubmit() {
+    return plantValuesToSubmit(state);
   }
 
   async function handleSubmit(source: 'ai' | 'manual' = 'manual', override?: PlantFormValues) {
@@ -190,7 +416,7 @@ export default function PlantForm({
     setSaving(true);
     setSaveError(null);
     try {
-      await onSubmit(toSubmit(current), source);
+      await onSubmit(plantValuesToSubmit(current), source);
     } catch (e: any) {
       console.error('Error saving plant', e);
       let message = 'Failed to save plant.';
@@ -239,189 +465,15 @@ export default function PlantForm({
 
   return (
     <>
-      <div className="p-5 space-y-4">
-        <Field label="Name">
-          <SpeciesAutosuggest
-            value={state.name}
-            onChange={(v) => setState({ ...state, name: v })}
-            onSelect={(s) => setState({ ...state, name: s.name, species: s.species })}
-          />
-        </Field>
-
-        <Field label="Room">
-          <RoomSelector
-            value={state.roomId}
-            onChange={(id) => setState({ ...state, roomId: id })}
-          />
-          <p className="hint">Stored locally in Settings → Defaults.</p>
-        </Field>
-
-        <div className="grid grid-cols-3 gap-3">
-          <Field label="Pot size">
-            <select
-              className="input"
-              value={state.pot}
-              onChange={(e) => setState({ ...state, pot: e.target.value })}
-            >
-              <option>4 in</option>
-              <option>6 in</option>
-              <option>8 in</option>
-            </select>
-          </Field>
-          <Field label="Pot material">
-            <select
-              className="input"
-              value={state.potMaterial}
-              onChange={(e) => setState({ ...state, potMaterial: e.target.value })}
-            >
-              <option>Plastic</option>
-              <option>Terracotta</option>
-              <option>Ceramic</option>
-            </select>
-          </Field>
-          <Field label="Light">
-            <select
-              className="input"
-              value={state.light}
-              onChange={(e) => setState({ ...state, light: e.target.value })}
-            >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>Bright</option>
-            </select>
-          </Field>
-        </div>
-
-        <Field label="Environment">
-          <div className="grid grid-cols-2 gap-3">
-            <select
-              className="input"
-              value={state.indoor}
-              onChange={(e) => setState({ ...state, indoor: e.target.value as 'Indoor' | 'Outdoor' })}
-            >
-              <option>Indoor</option>
-              <option>Outdoor</option>
-            </select>
-            <select
-              className="input"
-              value={state.drainage}
-              onChange={(e) => setState({ ...state, drainage: e.target.value as 'poor' | 'ok' | 'great' })}
-            >
-              <option value="poor">Poor drainage</option>
-              <option value="ok">OK drainage</option>
-              <option value="great">Great drainage</option>
-            </select>
-          </div>
-          <input
-            className="input mt-2"
-            value={state.soil}
-            onChange={(e) => setState({ ...state, soil: e.target.value })}
-            placeholder="Soil type (e.g., Aroid mix)"
-          />
-        </Field>
-
-        <Field label="Location (for weather)">
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              className="input"
-              value={state.lat}
-              onChange={(e) => setState({ ...state, lat: e.target.value })}
-              placeholder="Latitude"
-            />
-            <input
-              className="input"
-              value={state.lon}
-              onChange={(e) => setState({ ...state, lon: e.target.value })}
-              placeholder="Longitude"
-            />
-          </div>
-          <p className="hint">Used to tailor intervals based on local conditions.</p>
-        </Field>
-
-        <div className="rounded-xl border p-3 bg-neutral-50">
-          <div className="text-sm font-medium mb-2">Suggested plan</div>
-          {loadingSuggest && (
-            <div className="text-xs text-neutral-600">Getting suggestions…</div>
-          )}
-          {suggestError && (
-            <div className="text-xs text-red-600 mb-2">{suggestError}</div>
-          )}
-          {!suggest && !loadingSuggest && (
-            <div className="text-xs text-neutral-600">
-              Select species and pot info to get AI recommendations.
-            </div>
-          )}
-          {suggest && !loadingSuggest && (
-            <div className="grid gap-2 text-sm">
-              <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-lg border bg-white p-2">
-                  <div className="text-xs text-neutral-500">Water</div>
-                  <div className="font-medium">
-                    every {suggest.waterEvery} d · {suggest.waterAmount} ml
-                  </div>
-                </div>
-                <div className="rounded-lg border bg-white p-2">
-                  <div className="text-xs text-neutral-500">Fertilize</div>
-                  <div className="font-medium">every {suggest.fertEvery} d</div>
-                  {suggest.fertFormula && (
-                    <div className="text-xs text-neutral-500">{suggest.fertFormula}</div>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button className="btn" onClick={acceptSuggest}>Use suggestions</button>
-                <button className="btn-secondary" onClick={overrideSuggest}>
-                  Override manually
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Water every (days)">
-            <input
-              className="input"
-              type="number"
-              min={1}
-              value={state.waterEvery}
-              onChange={(e) => setState({ ...state, waterEvery: e.target.value })}
-            />
-          </Field>
-          <Field label="Water amount (ml)">
-            <input
-              className="input"
-              type="number"
-              min={50}
-              step={10}
-              value={state.waterAmount}
-              onChange={(e) => setState({ ...state, waterAmount: e.target.value })}
-            />
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Fertilize every (days)">
-            <input
-              className="input"
-              type="number"
-              min={7}
-              value={state.fertEvery}
-              onChange={(e) => setState({ ...state, fertEvery: e.target.value })}
-            />
-          </Field>
-          <Field label="Formula">
-            <input
-              className="input"
-              value={state.fertFormula}
-              onChange={(e) => setState({ ...state, fertFormula: e.target.value })}
-              placeholder="e.g., 10-10-10 @ 1/2 strength"
-            />
-          </Field>
-        </div>
-
-        {saveError && <div className="text-xs text-red-600">{saveError}</div>}
-      </div>
+      <BasicsFields state={state} setState={setState} />
+      <EnvironmentFields state={state} setState={setState} />
+      <CarePlanFields
+        state={state}
+        setState={setState}
+        initialSuggest={initialSuggest}
+        onSuggestChange={setSuggest}
+      />
+      {saveError && <div className="p-5 text-xs text-red-600">{saveError}</div>}
       <div className="p-5 border-t flex gap-2 justify-end">
         <button className="btn-secondary" onClick={onCancel}>
           Cancel
@@ -435,13 +487,19 @@ export default function PlantForm({
           {saving ? 'Saving…' : submitLabel}
         </button>
       </div>
-      <style jsx>{`
-        .input { @apply w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-300; }
-        .btn { @apply rounded-lg bg-neutral-900 text-white text-sm px-3 py-2 disabled:opacity-70; }
-        .btn-secondary { @apply rounded-lg border text-sm px-3 py-2 bg-white; }
-        .hint { @apply text-xs text-neutral-500 mt-1; }
-      `}</style>
+      <FormStyles />
     </>
+  );
+}
+
+export function FormStyles() {
+  return (
+    <style jsx>{`
+      .input { @apply w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-300; }
+      .btn { @apply rounded-lg bg-neutral-900 text-white text-sm px-3 py-2 disabled:opacity-70; }
+      .btn-secondary { @apply rounded-lg border text-sm px-3 py-2 bg-white; }
+      .hint { @apply text-xs text-neutral-500 mt-1; }
+    `}</style>
   );
 }
 
