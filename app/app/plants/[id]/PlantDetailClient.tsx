@@ -3,7 +3,7 @@ import type { Tab } from '@/components/BottomNav';
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
@@ -66,6 +66,9 @@ export default function PlantDetailClient({ plant }: { plant: {
   const [editOpen, setEditOpen] = useState(false);
   const [careOpen, setCareOpen] = useState(false);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+  const [photoErr, setPhotoErr] = useState<string | null>(null);
   const careTips = useMemo(() => {
     const tips: string[] = [];
     const now = Date.now();
@@ -189,19 +192,31 @@ export default function PlantDetailClient({ plant }: { plant: {
 
   };
 
-  const addPhoto = async () => {
-    const url = prompt("Photo URL");
-    if (!url) return;
+  const addPhoto = () => fileInputRef.current?.click();
+
+  const handlePhotoChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+    setUploadPreview(preview);
+    setPhotoErr(null);
     try {
+      const formData = new FormData();
+      formData.append("file", file);
       const r = await fetch(`/api/plants/${id}/photos`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ src: url }),
+        body: formData,
       });
       if (!r.ok) throw new Error();
       const rec: { src: string } = await r.json();
       setPhotos((p) => [...p, rec.src]);
-    } catch {}
+      URL.revokeObjectURL(preview);
+      setUploadPreview(null);
+    } catch {
+      setPhotoErr("Failed to upload photo");
+    } finally {
+      e.target.value = "";
+    }
   };
 
   const markTimelineDone = async (task: TaskDTO) => {
@@ -417,8 +432,18 @@ export default function PlantDetailClient({ plant }: { plant: {
 
         {tab === "photos" && (
           <section className="mt-4 rounded-xl border bg-white shadow-sm p-4">
-            {photos && photos.length > 0 ? (
+            {photoErr && (
+              <div className="mb-2 text-sm text-red-600">{photoErr}</div>
+            )}
+            {uploadPreview || photos.length > 0 ? (
               <div className="grid grid-cols-3 gap-2">
+                {uploadPreview && (
+                  <img
+                    src={uploadPreview}
+                    alt={`${plantState.name} preview`}
+                    className="w-full h-24 object-cover rounded opacity-50"
+                  />
+                )}
                 {photos.map((src, i) => (
                   <img
                     key={i}
@@ -436,6 +461,14 @@ export default function PlantDetailClient({ plant }: { plant: {
 
         <div className="h-16" />
       </main>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handlePhotoChange}
+      />
 
       {/* Sticky action bar */}
       <div className="fixed bottom-16 left-0 right-0 px-4">
