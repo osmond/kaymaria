@@ -117,7 +117,33 @@ export default function PlantForm({
         ],
       });
     } catch (e: any) {
-      setSaveError(e?.message || 'Failed to save plant.');
+      console.error('Error saving plant', e);
+      let message = 'Failed to save plant.';
+      try {
+        const status = e?.status ?? e?.response?.status;
+        let data: any = null;
+        if (e instanceof Response) {
+          data = await e.json().catch(() => null);
+        } else if (e?.response && typeof e.response.json === 'function') {
+          data = await e.response.json().catch(() => null);
+        } else if (e?.response?.data) {
+          data = e.response.data;
+        }
+        if (status === 401 || /401/.test(e?.message || '')) {
+          message = 'Please log in before adding a plant.';
+        } else if (data?.error) {
+          message = data.error;
+        } else if (data?.message) {
+          message = data.message;
+        } else if (data?.detail) {
+          message = data.detail;
+        } else if (typeof e?.message === 'string') {
+          message = e.message;
+        }
+      } catch (_) {
+        // ignore parse errors
+      }
+      setSaveError(message);
       return;
     } finally {
       setSaving(false);
