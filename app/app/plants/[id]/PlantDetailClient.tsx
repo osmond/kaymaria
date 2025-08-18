@@ -53,7 +53,7 @@ export default function PlantDetailClient({ plant }: { plant: {
   const [name, setName] = useState(plant.name);
   const [species, setSpecies] = useState(plant.species || "");
   const [photos, setPhotos] = useState<string[]>(plant.photos ?? []);
-  const [newPhoto, setNewPhoto] = useState("");
+  const [newPhotoFile, setNewPhotoFile] = useState<File | null>(null);
   const heroPhoto = photos[0] || "https://placehold.co/600x400?text=Plant";
   const acquired = plantState.acquiredAt ? new Date(plantState.acquiredAt) : null;
   const nextWater = plantState.nextWater ? new Date(plantState.nextWater) : null;
@@ -204,18 +204,26 @@ export default function PlantDetailClient({ plant }: { plant: {
     setUndoInfo(null);
   };
 
-  const addPhotoUrl = async () => {
-    const src = newPhoto.trim();
-    if (!src) return;
+  const addPhotoFile = async () => {
+    if (!newPhotoFile) return;
+    const formData = new FormData();
+    formData.append("file", newPhotoFile);
     try {
-      const r = await fetch(`/api/plants/${id}/photos`, {
+      const upload = await fetch(`/api/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!upload.ok) throw new Error();
+      const data = await upload.json().catch(() => ({}));
+      const src: string | undefined = data.src || data.url;
+      if (!src) throw new Error();
+      await fetch(`/api/plants/${id}/photos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ src }),
       });
-      if (!r.ok) throw new Error();
       setPhotos((p) => [...p, src]);
-      setNewPhoto("");
+      setNewPhotoFile(null);
     } catch {}
   };
 
@@ -411,20 +419,22 @@ export default function PlantDetailClient({ plant }: { plant: {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                addPhotoUrl();
+                addPhotoFile();
+                e.currentTarget.reset();
               }}
               className="flex gap-2 mb-4"
             >
               <input
-                type="url"
-                value={newPhoto}
-                onChange={(e) => setNewPhoto(e.target.value)}
-                placeholder="Image URL"
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={(e) => setNewPhotoFile(e.target.files?.[0] || null)}
                 className="flex-1 border rounded p-2 text-sm"
               />
               <button
                 type="submit"
                 className="px-3 py-2 rounded bg-neutral-900 text-white text-sm"
+                disabled={!newPhotoFile}
               >
                 Add
               </button>
