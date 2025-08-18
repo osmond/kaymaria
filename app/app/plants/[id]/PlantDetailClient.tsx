@@ -5,7 +5,8 @@ import type { Tab } from '@/components/BottomNav';
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Droplet, FlaskConical, Sprout } from "lucide-react";
+import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
+import EditPlantModal from '@/components/EditPlantModal';
 import BottomNav from '@/components/BottomNav';
 
 type CareType = "water" | "fertilize" | "repot";
@@ -24,7 +25,8 @@ type Note = { id: string; text: string; at: string };
 export default function PlantDetailClient({ plant }: { plant: { id: string; name: string; species?: string; photos?: string[]; acquiredAt?: string; nextWater?: string; waterIntervalDays?: number; nextFertilize?: string; fertilizeIntervalDays?: number; light?: string; humidity?: string; potSize?: string; potMaterial?: string; soilType?: string; latitude?: number; longitude?: number } }) {
   const id = plant.id;
   const router = useRouter();
-    const [name] = useState(plant.name);
+    const [name, setName] = useState(plant.name);
+    const [species, setSpecies] = useState(plant.species || "");
     const [photos, setPhotos] = useState<string[]>(plant.photos ?? []);
     const heroPhoto = photos[0] || "https://placehold.co/600x400?text=Plant";
     const acquired = plant.acquiredAt ? new Date(plant.acquiredAt) : null;
@@ -36,6 +38,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
     const [notes, setNotes] = useState<Note[]>([]);
     const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
   const careTips = useMemo(() => {
     const tips: string[] = [];
@@ -214,9 +217,18 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
           </Link>
           <div className="flex items-baseline justify-between w-full">
             <h1 className="text-xl font-display font-semibold tracking-tight">{name}</h1>
-            <span className="text-sm text-neutral-500">
-              {new Intl.DateTimeFormat(undefined, { weekday:"short", month:"short", day:"numeric" }).format(new Date())}
-            </span>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-neutral-500">
+                {new Intl.DateTimeFormat(undefined, { weekday:"short", month:"short", day:"numeric" }).format(new Date())}
+              </span>
+              <button
+                aria-label="Edit plant"
+                onClick={() => setEditOpen(true)}
+                className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
+              >
+                <Pencil className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -229,7 +241,7 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
           <div className="p-4">
             <h2 className="text-lg font-display font-semibold">{name}</h2>
             <div className="text-sm text-neutral-500">
-              {plant.species || "—"}
+              {species || "—"}
               {acquired && ` • Acquired ${new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(acquired)}`}
             </div>
           </div>
@@ -401,6 +413,15 @@ export default function PlantDetailClient({ plant }: { plant: { id: string; name
 
       {/* Bottom nav */}
       <BottomNav value="plants" onChange={(t: Tab) => router.push(`/app?tab=${t}`)} />
+      <EditPlantModal
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        plant={{ id, name, species }}
+        onUpdated={(p) => {
+          setName(p.name);
+          setSpecies(p.species || "");
+        }}
+      />
     </div>
   );
 }
