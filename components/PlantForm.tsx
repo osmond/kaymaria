@@ -76,6 +76,35 @@ type SectionProps = {
   setState: React.Dispatch<React.SetStateAction<PlantFormValues>>;
 };
 
+function ChipSelect({
+  options,
+  value,
+  onChange,
+}: {
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex gap-2">
+      {options.map((opt) => (
+        <button
+          key={opt}
+          type="button"
+          className={`px-3 py-1 rounded-full border text-sm ${
+            value === opt
+              ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
+              : 'bg-white dark:bg-neutral-800'
+          }`}
+          onClick={() => onChange(opt)}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function BasicsFields({ state, setState }: SectionProps) {
   return (
     <div className="p-5 space-y-4">
@@ -97,37 +126,25 @@ export function BasicsFields({ state, setState }: SectionProps) {
 
       <div className="grid grid-cols-3 gap-3">
         <Field label="Pot size">
-          <select
-            className="input"
+          <ChipSelect
+            options={["4 in", "6 in", "8 in"]}
             value={state.pot}
-            onChange={(e) => setState({ ...state, pot: e.target.value })}
-          >
-            <option>4 in</option>
-            <option>6 in</option>
-            <option>8 in</option>
-          </select>
+            onChange={(v) => setState({ ...state, pot: v })}
+          />
         </Field>
         <Field label="Pot material">
-          <select
-            className="input"
+          <ChipSelect
+            options={["Plastic", "Terracotta", "Ceramic"]}
             value={state.potMaterial}
-            onChange={(e) => setState({ ...state, potMaterial: e.target.value })}
-          >
-            <option>Plastic</option>
-            <option>Terracotta</option>
-            <option>Ceramic</option>
-          </select>
+            onChange={(v) => setState({ ...state, potMaterial: v })}
+          />
         </Field>
         <Field label="Light">
-          <select
-            className="input"
+          <ChipSelect
+            options={["Low", "Medium", "Bright"]}
             value={state.light}
-            onChange={(e) => setState({ ...state, light: e.target.value })}
-          >
-            <option>Low</option>
-            <option>Medium</option>
-            <option>Bright</option>
-          </select>
+            onChange={(v) => setState({ ...state, light: v })}
+          />
         </Field>
       </div>
     </div>
