@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-type PlantFormValues = {
+export type PlantFormValues = {
   name: string;
   roomId: string;
   species: string;
