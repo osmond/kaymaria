@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 import { Check, Clock, Droplet, FlaskConical, Sprout, Leaf } from 'lucide-react';
 
 export default function TaskRow({
@@ -22,6 +23,30 @@ export default function TaskRow({
   onDefer: () => void;
   showPlant?: boolean;
 }) {
+  const [announce, setAnnounce] = useState('');
+
+  useEffect(() => {
+    if (announce) {
+      const t = setTimeout(() => setAnnounce(''), 1000);
+      return () => clearTimeout(t);
+    }
+  }, [announce]);
+
+  function handleComplete() {
+    onComplete();
+    setAnnounce('Task completed');
+  }
+
+  function handleDefer() {
+    onDefer();
+    setAnnounce('Task deferred');
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    if (e.key === 'Enter' || e.key.toLowerCase() === 'o') onOpen();
+    else if (e.key.toLowerCase() === 'c') handleComplete();
+    else if (e.key.toLowerCase() === 's') handleDefer();
+  }
   function iconFor(action: 'Water' | 'Fertilize' | 'Repot') {
     const className = "h-3 w-3";
     return action === 'Water'
@@ -31,7 +56,14 @@ export default function TaskRow({
       : <Sprout className={className} />;
   }
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      aria-keyshortcuts="Enter o c s"
+      aria-label={`Task for ${plant}: ${action}. Last ${last}. Due ${due}. Press Enter or O to open, C to complete, S to snooze.`}
+    >
+      <div className="sr-only" aria-live="polite">{announce}</div>
       <div className="absolute inset-0 rounded-xl overflow-hidden">
         <div className="absolute inset-y-0 left-0 w-20 grid place-items-center bg-emerald-100 text-emerald-700">
           <div className="flex items-center gap-2 text-xs font-medium">
@@ -51,8 +83,8 @@ export default function TaskRow({
         dragConstraints={{ left: -80, right: 80 }}
         dragElastic={0.2}
         onDragEnd={(_, i) => {
-          if (i.offset.x > 60) onComplete();
-          else if (i.offset.x < -60) onDefer();
+          if (i.offset.x > 60) handleComplete();
+          else if (i.offset.x < -60) handleDefer();
         }}
         className="relative"
       >
@@ -60,6 +92,7 @@ export default function TaskRow({
           <div className="p-3 flex items-center gap-3">
             <button
               onClick={onOpen}
+              aria-keyshortcuts="o"
               className="h-10 w-10 rounded-xl bg-neutral-100 grid place-items-center dark:bg-neutral-700"
             >
               <Leaf className="h-5 w-5" />
@@ -90,7 +123,8 @@ export default function TaskRow({
             <div className="flex items-center gap-1">
               <button
                 aria-label="Done"
-                onClick={onComplete}
+                aria-keyshortcuts="c"
+                onClick={handleComplete}
                 className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
               >
                 <Check className="h-4 w-4" />
@@ -98,7 +132,8 @@ export default function TaskRow({
               <div className="flex items-center gap-1 ml-2 pl-2 border-l border-neutral-200 dark:border-neutral-600">
                 <button
                   aria-label="Defer"
-                  onClick={onDefer}
+                  aria-keyshortcuts="s"
+                  onClick={handleDefer}
                   className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
                 >
                   <Clock className="h-4 w-4" />

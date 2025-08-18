@@ -11,6 +11,7 @@
     "ai:fine-tune": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/fine-tune.ts"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.7",
     "@prisma/client": "^6.14.0",
     "@supabase/supabase-js": "^2.55.0",
     "framer-motion": "^11.0.0",
