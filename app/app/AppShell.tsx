@@ -9,10 +9,16 @@ import QuickAddModal from "@/components/QuickAddModal";
 import AddPlantModal from "@/components/AddPlantModal";
 import EditTaskModal from "@/components/EditTaskModal";
 import ThemeToggle from "@/components/ThemeToggle";
-import FiltersModal from "@/components/FiltersModal";
 import { TaskDTO } from "@/lib/types";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Check, AlertCircle, Droplet, Home, Filter as FilterIcon } from "lucide-react";
 
 const DEFAULT_TASK_WINDOW_DAYS = Number(
   process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7"
@@ -99,7 +105,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   const [taskWindow, setTaskWindow] = useState(DEFAULT_TASK_WINDOW_DAYS);
 
   // modals
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [addPlantOpen, setAddPlantOpen] = useState(false);
   const [prefillPlantName, setPrefillPlantName] = useState("");
@@ -510,13 +515,55 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                 </div>
               </div>
             )}
-            <div className="mt-3">
-              <button
-                className="border rounded px-3 py-2 w-full"
-                onClick={() => setFiltersOpen(true)}
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              <Select
+                value={roomFilter || undefined}
+                onValueChange={(v) => setRoomFilter(v)}
               >
-                Filters
-              </button>
+                <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
+                  <Home className="h-4 w-4 text-neutral-500" />
+                  <SelectValue placeholder="Room" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All rooms</SelectItem>
+                  {rooms.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {r}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={typeFilter || undefined}
+                onValueChange={(v) => setTypeFilter(v)}
+              >
+                <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
+                  <Droplet className="h-4 w-4 text-neutral-500" />
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All task types</SelectItem>
+                  {types.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {labelForType(t as any)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={statusFilter || undefined}
+                onValueChange={(v) => setStatusFilter(v)}
+              >
+                <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
+                  <AlertCircle className="h-4 w-4 text-neutral-500" />
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All statuses</SelectItem>
+                  <SelectItem value="overdue">Overdue</SelectItem>
+                  <SelectItem value="urgent">Due soon</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </>
         )}
@@ -640,12 +687,21 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
               <div className="text-xs text-neutral-500">Recent care events</div>
             </div>
             <div className="px-4 py-2 border-b">
-              <button
-                className="border rounded px-3 py-2 w-full"
-                onClick={() => setFiltersOpen(true)}
+              <Select
+                value={eventTypeFilter || undefined}
+                onValueChange={(v) => setEventTypeFilter(v)}
               >
-                Filters
-              </button>
+                <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
+                  <FilterIcon className="h-4 w-4 text-neutral-500" />
+                  <SelectValue placeholder="Event type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All event types</SelectItem>
+                  <SelectItem value="water">Water</SelectItem>
+                  <SelectItem value="fertilize">Fertilize</SelectItem>
+                  <SelectItem value="repot">Repot</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <ul className="text-sm px-4 py-2">
               {eventsErr && <li className="py-3 text-red-600">{eventsErr}</li>}
@@ -786,21 +842,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
           )}
         </div>
       )}
-
-      <FiltersModal
-        open={filtersOpen}
-        onClose={() => setFiltersOpen(false)}
-        rooms={rooms}
-        roomFilter={roomFilter}
-        setRoomFilter={setRoomFilter}
-        types={types}
-        typeFilter={typeFilter}
-        setTypeFilter={setTypeFilter}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        eventTypeFilter={eventTypeFilter}
-        setEventTypeFilter={setEventTypeFilter}
-      />
 
       <EditTaskModal
         open={!!editTask}
