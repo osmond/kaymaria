@@ -54,6 +54,10 @@ function pastTenseLabel(t: "water" | "fertilize" | "repot") {
     : "Repotted";
 }
 
+function plantImage(id: string) {
+  return `https://source.unsplash.com/64x64/?plant&sig=${id}`;
+}
+
 // Client-only date to avoid hydration drift
 function ClientDate() {
   const [text, setText] = useState("");
@@ -441,6 +445,19 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     return Array.from(m.entries());
   }, [filteredTasks]);
 
+  const upcomingSummary = useMemo(() => {
+    const all = upcoming.flatMap(([, items]) => items);
+    const counts = all.reduce<Record<string, number>>((acc, t) => {
+      const label = labelForType(t.type);
+      acc[label] = (acc[label] ?? 0) + 1;
+      return acc;
+    }, {});
+    const parts = Object.entries(counts)
+      .map(([k, v]) => `${v} ${k}`)
+      .join(", ");
+    return `${all.length} task${all.length === 1 ? "" : "s"} due this week (${parts})`;
+  }, [upcoming]);
+
   return (
     <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
       <header
@@ -546,22 +563,29 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                     {plantName}
                   </div>
                   <div className="space-y-3">
-                    {items.map((t) => (
-                      <TaskRow
-                        key={t.id}
-                        plant={t.plantName}
-                        action={labelForType(t.type) as any}
-                        last={t.lastEventAt ? timeAgo(new Date(t.lastEventAt)) : "—"}
-                        due={dueLabel(new Date(t.dueAt), today)}
-                        onOpen={() => {}}
-                        onComplete={() => complete(t)}
-                        onAddNote={(note) => addNote(t.plantId, note)}
-                        onDelete={() => remove(t)}
-                        onDefer={() => deferTask(t)}
-                        onEdit={() => setEditTask(t)}
-                        showPlant={false}
-                      />
-                    ))}
+                    {items.map((t) => {
+                      const dueDate = new Date(t.dueAt);
+                      const isOverdue =
+                        dueDate < today && !isSameDay(dueDate, today);
+                      return (
+                        <TaskRow
+                          key={t.id}
+                          plant={t.plantName}
+                          imageUrl={plantImage(t.plantId)}
+                          action={labelForType(t.type) as any}
+                          last={t.lastEventAt ? timeAgo(new Date(t.lastEventAt)) : "—"}
+                          due={dueLabel(new Date(t.dueAt), today)}
+                          status={isOverdue ? "overdue" : "today"}
+                          onOpen={() => {}}
+                          onComplete={() => complete(t)}
+                          onAddNote={(note) => addNote(t.plantId, note)}
+                          onDelete={() => remove(t)}
+                          onDefer={() => deferTask(t)}
+                          onEdit={() => setEditTask(t)}
+                          showPlant={false}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               ))}
@@ -590,6 +614,13 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                 {err}
               </div>
             )}
+            {!loading && !err && upcoming.length > 0 && (
+              <details className="rounded-xl border bg-white shadow-sm">
+                <summary className="px-3 py-2 cursor-pointer text-sm">
+                  {upcomingSummary}
+                </summary>
+              </details>
+            )}
             {!loading &&
               !err &&
               upcoming.map(([label, items]) => (
@@ -602,6 +633,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                       <TaskRow
                         key={t.id}
                         plant={t.plantName}
+                        imageUrl={plantImage(t.plantId)}
                         action={labelForType(t.type) as any}
                         last={
                           t.lastEventAt ? timeAgo(new Date(t.lastEventAt)) : "—"

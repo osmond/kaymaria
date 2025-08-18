@@ -16,9 +16,11 @@ import { useState } from 'react';
 
 export default function TaskRow({
   plant,
+  imageUrl,
   action,
   last,
   due,
+  status,
   onOpen,
   onComplete,
   onAddNote,
@@ -28,9 +30,11 @@ export default function TaskRow({
   showPlant = true,
 }: {
   plant: string;
+  imageUrl?: string;
   action: 'Water' | 'Fertilize' | 'Repot';
   last: string;
   due: string;
+  status?: 'overdue' | 'today';
   onOpen: () => void;
   onComplete: () => void;
   onAddNote: (note: string) => void;
@@ -49,6 +53,20 @@ export default function TaskRow({
   }
   const [noteOpen, setNoteOpen] = useState(false);
   const [note, setNote] = useState('');
+
+  const statusStyles =
+    status === 'overdue'
+      ? 'border-red-300 bg-red-50'
+      : status === 'today'
+      ? 'border-emerald-300 bg-emerald-50'
+      : 'border-neutral-200 bg-white';
+  const dueStyles =
+    status === 'overdue'
+      ? 'text-red-600'
+      : status === 'today'
+      ? 'text-emerald-600'
+      : 'text-neutral-500';
+
   return (
     <div className="relative">
       <div className="absolute inset-0 rounded-xl overflow-hidden">
@@ -84,13 +102,17 @@ export default function TaskRow({
         }}
         className="relative"
       >
-        <div className="rounded-xl border bg-white shadow-sm">
+        <div className={`rounded-xl border shadow-sm ${statusStyles}`}>
           <div className="p-3 flex items-center gap-3">
             <button
               onClick={onOpen}
-              className="h-10 w-10 rounded-xl bg-neutral-100 grid place-items-center"
+              className="h-10 w-10 rounded-xl overflow-hidden bg-neutral-100 grid place-items-center"
             >
-              <Leaf className="h-5 w-5" />
+              {imageUrl ? (
+                <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <Leaf className="h-5 w-5" />
+              )}
             </button>
             <div className="flex-1" onClick={onOpen}>
               {showPlant ? (
@@ -109,7 +131,7 @@ export default function TaskRow({
                   </div>
                 </div>
               )}
-              <div className="text-xs text-neutral-500">
+              <div className={`text-xs ${dueStyles}`}>
                 Last: {last} • Due: {due}
               </div>
             </div>
