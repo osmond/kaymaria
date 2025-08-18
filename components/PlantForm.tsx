@@ -135,6 +135,7 @@ export function BasicsFields({ state, setState }: SectionProps) {
 }
 
 export function EnvironmentFields({ state, setState }: SectionProps) {
+  const [showMore, setShowMore] = useState(false);
   return (
     <div className="p-5 space-y-4">
       <Field label="Environment">
@@ -161,31 +162,43 @@ export function EnvironmentFields({ state, setState }: SectionProps) {
             <option value="great">Great drainage</option>
           </select>
         </div>
-        <input
-          className="input mt-2"
-          value={state.soil}
-          onChange={(e) => setState({ ...state, soil: e.target.value })}
-          placeholder="Soil type (e.g., Aroid mix)"
-        />
+        {showMore && (
+          <input
+            className="input mt-2"
+            value={state.soil}
+            onChange={(e) => setState({ ...state, soil: e.target.value })}
+            placeholder="Soil type (e.g., Aroid mix)"
+          />
+        )}
       </Field>
 
-      <Field label="Location (for weather)">
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            className="input"
-            value={state.lat}
-            onChange={(e) => setState({ ...state, lat: e.target.value })}
-            placeholder="Latitude"
-          />
-          <input
-            className="input"
-            value={state.lon}
-            onChange={(e) => setState({ ...state, lon: e.target.value })}
-            placeholder="Longitude"
-          />
-        </div>
-        <p className="hint">Used to tailor intervals based on local conditions.</p>
-      </Field>
+      {showMore && (
+        <Field label="Location (for weather)">
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              className="input"
+              value={state.lat}
+              onChange={(e) => setState({ ...state, lat: e.target.value })}
+              placeholder="Latitude"
+            />
+            <input
+              className="input"
+              value={state.lon}
+              onChange={(e) => setState({ ...state, lon: e.target.value })}
+              placeholder="Longitude"
+            />
+          </div>
+          <p className="hint">Used to tailor intervals based on local conditions.</p>
+        </Field>
+      )}
+
+      <button
+        type="button"
+        className="text-xs underline"
+        onClick={() => setShowMore((m) => !m)}
+      >
+        {showMore ? 'Less options' : 'More options'}
+      </button>
     </div>
   );
 }
@@ -193,6 +206,7 @@ export function EnvironmentFields({ state, setState }: SectionProps) {
 type CarePlanProps = SectionProps & {
   initialSuggest?: AiCareSuggestion | null;
   onSuggestChange?: (s: AiCareSuggestion | null) => void;
+  showSuggest?: boolean;
 };
 
 export function CarePlanFields({
@@ -200,6 +214,7 @@ export function CarePlanFields({
   setState,
   initialSuggest,
   onSuggestChange,
+  showSuggest = true,
 }: CarePlanProps) {
   const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
   const [prevManual, setPrevManual] = useState<{
@@ -237,7 +252,7 @@ export function CarePlanFields({
 
   useEffect(() => {
     async function fetchSuggest() {
-      if (!state.species && !state.pot && !state.potMaterial) return;
+      if (!state.species) return;
       setSuggestError(null);
       setLoadingSuggest(true);
       try {
@@ -275,8 +290,8 @@ export function CarePlanFields({
         setLoadingSuggest(false);
       }
     }
-    fetchSuggest();
-  }, [state.species, state.pot, state.potMaterial, state.lat, state.lon, setState]);
+    if (showSuggest) fetchSuggest();
+  }, [state.species, state.pot, state.potMaterial, state.lat, state.lon, setState, showSuggest]);
 
   useEffect(() => {
     onSuggestChange?.(suggest);
@@ -297,45 +312,47 @@ export function CarePlanFields({
 
   return (
     <div className="p-5 space-y-4">
-      <div className="rounded-xl border p-3 bg-neutral-50">
-        <div className="text-sm font-medium mb-2">Suggested plan</div>
-        {loadingSuggest && (
-          <div className="text-xs text-neutral-600">Getting suggestions…</div>
-        )}
-        {suggestError && (
-          <div className="text-xs text-red-600 mb-2">{suggestError}</div>
-        )}
-        {!suggest && !loadingSuggest && (
-          <div className="text-xs text-neutral-600">
-            Select species and pot info to get AI recommendations.
-          </div>
-        )}
-        {suggest && !loadingSuggest && (
-          <div className="grid gap-2 text-sm">
-            <div className="grid grid-cols-2 gap-2">
-              <div className="rounded-lg border bg-white p-2">
-                <div className="text-xs text-neutral-500">Water</div>
-                <div className="font-medium">
-                  every {suggest.waterEvery} d · {suggest.waterAmount} ml
+      {showSuggest && (
+        <div className="rounded-xl border p-3 bg-neutral-50">
+          <div className="text-sm font-medium mb-2">Suggested plan</div>
+          {loadingSuggest && (
+            <div className="text-xs text-neutral-600">Getting suggestions…</div>
+          )}
+          {suggestError && (
+            <div className="text-xs text-red-600 mb-2">{suggestError}</div>
+          )}
+          {!suggest && !loadingSuggest && (
+            <div className="text-xs text-neutral-600">
+              Select species and pot info to get AI recommendations.
+            </div>
+          )}
+          {suggest && !loadingSuggest && (
+            <div className="grid gap-2 text-sm">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-lg border bg-white p-2">
+                  <div className="text-xs text-neutral-500">Water</div>
+                  <div className="font-medium">
+                    every {suggest.waterEvery} d · {suggest.waterAmount} ml
+                  </div>
+                </div>
+                <div className="rounded-lg border bg-white p-2">
+                  <div className="text-xs text-neutral-500">Fertilize</div>
+                  <div className="font-medium">every {suggest.fertEvery} d</div>
+                  {suggest.fertFormula && (
+                    <div className="text-xs text-neutral-500">{suggest.fertFormula}</div>
+                  )}
                 </div>
               </div>
-              <div className="rounded-lg border bg-white p-2">
-                <div className="text-xs text-neutral-500">Fertilize</div>
-                <div className="font-medium">every {suggest.fertEvery} d</div>
-                {suggest.fertFormula && (
-                  <div className="text-xs text-neutral-500">{suggest.fertFormula}</div>
-                )}
+              <div className="flex gap-2">
+                <button className="btn" onClick={acceptSuggest}>Use suggestions</button>
+                <button className="btn-secondary" onClick={overrideSuggest}>
+                  Override manually
+                </button>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button className="btn" onClick={acceptSuggest}>Use suggestions</button>
-              <button className="btn-secondary" onClick={overrideSuggest}>
-                Override manually
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="Water every (days)">
@@ -401,6 +418,7 @@ export default function PlantForm({
   const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const hasSpecies = Boolean(state.species);
 
   useEffect(() => {
     setState(initial);
@@ -466,12 +484,13 @@ export default function PlantForm({
   return (
     <>
       <BasicsFields state={state} setState={setState} />
-      <EnvironmentFields state={state} setState={setState} />
+      {hasSpecies && <EnvironmentFields state={state} setState={setState} />}
       <CarePlanFields
         state={state}
         setState={setState}
         initialSuggest={initialSuggest}
         onSuggestChange={setSuggest}
+        showSuggest={hasSpecies}
       />
       {saveError && <div className="p-5 text-xs text-red-600">{saveError}</div>}
       <div className="p-5 border-t flex gap-2 justify-end">
