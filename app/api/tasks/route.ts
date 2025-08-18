@@ -3,12 +3,23 @@ import { createRouteHandlerClient } from "@/lib/supabase";
 
 export async function GET(req: NextRequest) {
   const supabase = await createRouteHandlerClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const singleUser = process.env.SINGLE_USER_MODE === "true";
+  let userId: string | undefined;
+  if (singleUser) {
+    userId = process.env.SINGLE_USER_ID;
+    if (!userId) {
+      console.error("SINGLE_USER_MODE enabled but SINGLE_USER_ID not set");
+      return NextResponse.json({ error: "server" }, { status: 500 });
+    }
+  } else {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user)
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    userId = user.id;
+  }
 
   const url = new URL(req.url);
   const win = url.searchParams.get("window") || "7d";
@@ -19,7 +30,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabase
     .from("tasks")
     .select("id, type, due_at, plant:plants(id, name, room_id)")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .lte("due_at", maxDate.toISOString())
     .order("due_at");
   if (error) {
@@ -43,12 +54,23 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const supabase = await createRouteHandlerClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const singleUser = process.env.SINGLE_USER_MODE === "true";
+  let userId: string | undefined;
+  if (singleUser) {
+    userId = process.env.SINGLE_USER_ID;
+    if (!userId) {
+      console.error("SINGLE_USER_MODE enabled but SINGLE_USER_ID not set");
+      return NextResponse.json({ error: "server" }, { status: 500 });
+    }
+  } else {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user)
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    userId = user.id;
+  }
 
   const body = await req.json().catch(() => ({}));
   const action = String(body.action || "Water").toLowerCase();
@@ -62,7 +84,7 @@ export async function POST(req: NextRequest) {
   const { data, error } = await supabase
     .from("tasks")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       plant_id: plantId,
       type,
       due_at: dueAt,
