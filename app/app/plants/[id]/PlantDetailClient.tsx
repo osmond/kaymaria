@@ -1,5 +1,3 @@
-import type { Tab } from '@/components/BottomNav';
-
 "use client";
 
 import Link from "next/link";
@@ -485,7 +483,7 @@ export default function PlantDetailClient({ plant }: { plant: {
       </main>
 
       {/* Bottom nav */}
-      <BottomNav value="plants" onChange={(t: Tab) => router.push(`/app?tab=${t}`)} />
+      <BottomNav value="plants" />
       <EditPlantModal
         open={editOpen}
         onOpenChange={setEditOpen}
