@@ -1,7 +1,7 @@
 # 🌱 Kay Maria Roadmap
 
 This roadmap outlines the development milestones for the Kay Maria plant care app.  
-All items are **unchecked** to indicate upcoming work.
+Items are checked to indicate completed work.
 
 ---
 
