@@ -25,6 +25,8 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
    - `DATABASE_URL` is used by Prisma; the example file defaults to a local SQLite database.
    - `NEXT_PUBLIC_TASK_WINDOW_DAYS` controls how many days ahead the Upcoming view looks (default `7`).
    - `OPENAI_API_KEY` enables AI-powered care recommendations.
+   - `SINGLE_USER_MODE` set to `true` to bypass Supabase auth.
+   - `SINGLE_USER_ID` the user ID used when `SINGLE_USER_MODE` is enabled.
 3. Run migrations, seed the database, and start the development server:
    ```bash
    npm run db:migrate
@@ -32,6 +34,10 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
    npm run dev
    # open http://localhost:3000/app
    ```
+
+### Single-User Mode
+
+For testing or a single-user deployment, enable `SINGLE_USER_MODE` and set `SINGLE_USER_ID`. When enabled, API routes such as `/api/tasks` skip Supabase authentication and operate on the fixed user ID.
 
 To create a production build run:
 ```bash
