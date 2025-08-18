@@ -4,7 +4,7 @@ This project uses [Prisma](https://www.prisma.io/) with a PostgreSQL database.
 
 ## Setup
 
-1. Copy `.env.local.example` to `.env.local` and set `DATABASE_URL` to point to your local PostgreSQL instance.
+1. Copy `.env.example` to `.env` and set `DATABASE_URL` to point to your local PostgreSQL instance.
 2. Install dependencies:
    ```bash
    npm install
