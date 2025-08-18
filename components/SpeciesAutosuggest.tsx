@@ -13,10 +13,12 @@ export default function SpeciesAutosuggest({
   value,
   onChange,
   onSelect,
+  onBlur,
 }: {
   value: string;
   onChange: (v: string) => void;
   onSelect: (s: Suggestion) => void;
+  onBlur?: () => void;
 }) {
   const [query, setQuery] = useState(value);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -93,7 +95,10 @@ export default function SpeciesAutosuggest({
         value={query}
         onChange={handleChange}
         onFocus={() => { if (suggestions.length) setOpen(true); }}
-        onBlur={() => setTimeout(() => setOpen(false), 100)}
+        onBlur={() => {
+          onBlur?.();
+          setTimeout(() => setOpen(false), 100);
+        }}
         placeholder="e.g., Monstera"
       />
       {open && suggestions.length > 0 && (
