@@ -1,3 +1,5 @@
+import { mockPlants } from "@/mock/plants";
+
 export type CareType = "water" | "fertilize" | "repot";
 
 export type Rule =
@@ -52,83 +54,17 @@ function uuid() {
   });
 }
 
-let PLANTS: Plant[] = [
-  {
-    id: "p1",
-    name: "Aloe",
-    roomId: "living",
-    species: "Aloe vera",
-    potSize: "6in",
-    potMaterial: "plastic",
-    soilType: "cactus mix",
-    rules: [
-      { type: "water", intervalDays: 7 },
-      { type: "fertilize", intervalDays: 30 },
-    ],
-  },
-  {
-    id: "p2",
-    name: "Monstera",
-    roomId: "living",
-    species: "Monstera deliciosa",
-    potSize: "8in",
-    potMaterial: "terracotta",
-    soilType: "aroid mix",
-    rules: [
-      { type: "water", intervalDays: 5 },
-      { type: "fertilize", intervalDays: 28 },
-    ],
-  },
-  {
-    id: "p3",
-    name: "Orchid",
-    roomId: "bed",
-    species: "Phalaenopsis",
-    potSize: "4in",
-    potMaterial: "ceramic",
-    soilType: "orchid bark",
-    rules: [
-      { type: "water", intervalDays: 10 },
-      { type: "fertilize", intervalDays: 45 },
-    ],
-  },
-  {
-    id: "p4",
-    name: "Snake Plant",
-    roomId: "bed",
-    species: "Sansevieria",
-    potSize: "6in",
-    potMaterial: "plastic",
-    soilType: "sandy mix",
-    rules: [
-      { type: "water", intervalDays: 14 },
-    ],
-  },
-  {
-    id: "p5",
-    name: "Fern",
-    roomId: "living",
-    species: "Boston fern",
-    potSize: "6in",
-    potMaterial: "ceramic",
-    soilType: "peaty mix",
-    rules: [
-      { type: "water", intervalDays: 3 },
-    ],
-  },
-  {
-    id: "p6",
-    name: "Fiddle Fig",
-    roomId: "living",
-    species: "Ficus lyrata",
-    potSize: "10in",
-    potMaterial: "plastic",
-    soilType: "rich potting mix",
-    rules: [
-      { type: "water", intervalDays: 7 },
-    ],
-  },
-];
+// import 20 plant records from mock data
+let PLANTS: Plant[] = mockPlants.map(p => ({
+  id: p.id,
+  name: p.name,
+  roomId: p.roomId,
+  species: p.species,
+  potSize: p.potSize,
+  potMaterial: p.potMaterial,
+  soilType: p.soilType,
+  rules: [],
+}));
 
 let EVENTS: Event[] = [
   // one old event to make "365d ago" style things appear
