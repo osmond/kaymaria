@@ -3,7 +3,7 @@ import type { Tab } from '@/components/BottomNav';
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
@@ -66,9 +66,6 @@ export default function PlantDetailClient({ plant }: { plant: {
   const [editOpen, setEditOpen] = useState(false);
   const [careOpen, setCareOpen] = useState(false);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
-  const [photoErr, setPhotoErr] = useState<string | null>(null);
   const careTips = useMemo(() => {
     const tips: string[] = [];
     const now = Date.now();
@@ -148,21 +145,6 @@ export default function PlantDetailClient({ plant }: { plant: {
 
   const plantTasks = useMemo(() => (allTasks ?? []).filter(t => t.plantId === id), [allTasks, id]);
 
-  const markWatered = async () => {
-    try {
-      const taskId = `${id}:water`;
-      const r = await fetch(`/api/tasks/${encodeURIComponent(taskId)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "done" }),
-      });
-      if (!r.ok) throw new Error();
-      const r2 = await fetch(`/api/tasks?window=365d`, { cache: "no-store" });
-      if (r2.ok) setAllTasks(await r2.json());
-    } catch { /* keep UX smooth in mock */ }
-  };
-
-
   const iconFor = (type: CareType) => {
     const className = "inline h-4 w-4";
     switch (type) {
@@ -190,33 +172,6 @@ export default function PlantDetailClient({ plant }: { plant: {
       setNoteText("");
     } catch {}
 
-  };
-
-  const addPhoto = () => fileInputRef.current?.click();
-
-  const handlePhotoChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const preview = URL.createObjectURL(file);
-    setUploadPreview(preview);
-    setPhotoErr(null);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const r = await fetch(`/api/plants/${id}/photos`, {
-        method: "POST",
-        body: formData,
-      });
-      if (!r.ok) throw new Error();
-      const rec: { src: string } = await r.json();
-      setPhotos((p) => [...p, rec.src]);
-      URL.revokeObjectURL(preview);
-      setUploadPreview(null);
-    } catch {
-      setPhotoErr("Failed to upload photo");
-    } finally {
-      e.target.value = "";
-    }
   };
 
   const markTimelineDone = async (task: TaskDTO) => {
@@ -432,18 +387,8 @@ export default function PlantDetailClient({ plant }: { plant: {
 
         {tab === "photos" && (
           <section className="mt-4 rounded-xl border bg-white shadow-sm p-4">
-            {photoErr && (
-              <div className="mb-2 text-sm text-red-600">{photoErr}</div>
-            )}
-            {uploadPreview || photos.length > 0 ? (
+            {photos.length > 0 ? (
               <div className="grid grid-cols-3 gap-2">
-                {uploadPreview && (
-                  <img
-                    src={uploadPreview}
-                    alt={`${plantState.name} preview`}
-                    className="w-full h-24 object-cover rounded opacity-50"
-                  />
-                )}
                 {photos.map((src, i) => (
                   <img
                     key={i}
@@ -461,22 +406,6 @@ export default function PlantDetailClient({ plant }: { plant: {
 
         <div className="h-16" />
       </main>
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handlePhotoChange}
-      />
-
-      {/* Sticky action bar */}
-      <div className="fixed bottom-16 left-0 right-0 px-4">
-        <div className="max-w-screen-sm mx-auto flex gap-2">
-          <button onClick={markWatered} className="flex-1 h-10 rounded-lg bg-neutral-900 text-white text-sm font-medium">Mark Watered</button>
-            <button onClick={addPhoto} className="flex-1 h-10 rounded-lg bg-white border text-sm font-medium">Add Photo</button>
-        </div>
-      </div>
 
       {/* Bottom nav */}
       <BottomNav value="plants" onChange={(t: Tab) => router.push(`/app?tab=${t}`)} />
