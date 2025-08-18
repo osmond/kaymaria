@@ -129,6 +129,18 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
+## ☁️ Deployment
+
+Deploy the app to [Vercel](https://vercel.com/) with the Vercel CLI:
+
+```bash
+npm install -g vercel
+vercel
+vercel --prod
+```
+
+The included [`vercel.json`](./vercel.json) maps required environment variables to your project settings.
+
 ## 🔌 Test API
 
 A simple endpoint is available for experimenting with mock data:
