@@ -66,7 +66,6 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 - 🏠 **Room Filters** – Focus on tasks for a specific room or location
 - 🔍 **Task Type Filters** – Filter tasks by action (water, fertilize, repot)
 - ⏰ **Overdue/Urgent Filters** – Show only overdue tasks or those due soon
-- 📝 **Quick Notes** – Jot down observations directly from any task card
 - ✅ **Inline Task Actions** – Mark tasks done, defer them, or edit details without leaving the dashboard
 - 👉 **Swipe Actions** – Swipe a task to quickly complete, edit, or delete it
 - 🎉 **Completion Feedback** – Subtle check animation and timestamp confirmation when tasks are marked done
@@ -165,7 +164,7 @@ To enable local weather in the app, include `latitude` and `longitude` when crea
 - `PATCH /api/plants/:id` – update fields on a plant
 - `DELETE /api/plants/:id` – remove a plant and its tasks
 - `GET /api/plants/:id/notes` – list notes for a plant
-- `POST /api/plants/:id/notes` – add a quick note
+- `POST /api/plants/:id/notes` – add a note
 - `GET /api/plants/:id/photos` – list photos for a plant
 - `POST /api/plants/:id/photos` – add a photo by URL
 - `GET /api/plants/:id/weather` – current weather for a plant

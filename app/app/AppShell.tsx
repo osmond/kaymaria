@@ -324,20 +324,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
 
   
 
-  const addNote = async (plantId: string, text: string) => {
-    try {
-      const r = await fetch(`/api/plants/${plantId}/notes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      if (!r.ok) throw new Error();
-      toast("Note added");
-    } catch {
-      toast("Failed to add note");
-    }
-  };
-
   const today = new Date();
   const tasksToday = useMemo(() => {
     const tomorrow = new Date(
@@ -543,7 +529,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                         due={dueLabel(new Date(t.dueAt), today)}
                         onOpen={() => {}}
                         onComplete={() => complete(t)}
-                        onAddNote={(note) => addNote(t.plantId, note)}
                         onDefer={() => deferTask(t)}
                         showPlant={false}
                       />
