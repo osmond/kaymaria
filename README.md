@@ -37,7 +37,20 @@ Whether you're nurturing one plant or a hundred, Kay Maria adapts to your space,
 
 ### Single-User Mode
 
-For testing or a single-user deployment, enable `SINGLE_USER_MODE` and set `SINGLE_USER_ID`. When enabled, API routes such as `/api/tasks` skip Supabase authentication and operate on the fixed user ID.
+To run the app without signing in, configure a fixed Supabase user ID:
+
+1. **Create a Supabase user**
+   - Dashboard → **Authentication → Users → Add User**.
+   - Copy the generated UUID from the **ID** column.
+2. **Fill out the `.env` file**
+   - `SINGLE_USER_MODE=true`
+   - `SINGLE_USER_ID=<copied UUID>`
+   - ensure the other Supabase variables are populated.
+3. **Restart the dev server**
+   ```bash
+   npm run dev
+   ```
+4. Visit [http://localhost:3000/app](http://localhost:3000/app); API routes will use the fixed user ID and skip authentication.
 
 To create a production build run:
 ```bash
@@ -123,15 +136,28 @@ To view a live preview of the design tokens and color palette in the app, visit:
 
 ## ☁️ Deployment
 
-Deploy the app to [Vercel](https://vercel.com/) with the Vercel CLI:
+Deploy to [Vercel](https://vercel.com):
 
-```bash
-npm install -g vercel
-vercel
-vercel --prod
-```
+1. **Push** this repository to GitHub (or another Git provider).
+2. **Create a Vercel project** and link it to the repo.
+3. **Add environment variables** in *Project Settings → Environment Variables*:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_BASE_URL=https://kaymaria.vercel.app`
+   - `DATABASE_URL`
+   - `NEXT_PUBLIC_TASK_WINDOW_DAYS`
+   - `OPENAI_API_KEY` *(optional)*
+   - `SINGLE_USER_MODE=true`
+   - `SINGLE_USER_ID=<same UUID used locally>`
+4. **Deploy**
+   ```bash
+   npm install -g vercel
+   vercel
+   vercel --prod
+   ```
+5. Visit [https://kaymaria.vercel.app/app](https://kaymaria.vercel.app/app) to confirm everything is working.
 
-The included [`vercel.json`](./vercel.json) maps required environment variables to your project settings.
+The included [`vercel.json`](./vercel.json) ensures Vercel picks up the required environment variables.
 
 ## 🔌 Test API
 

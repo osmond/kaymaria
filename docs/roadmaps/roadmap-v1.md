@@ -7,7 +7,7 @@ All items are **unchecked** to indicate upcoming work.
 
 ## Phase 0 – Foundation
 
- - [x] Set up Supabase project and env keys (.env.local)
+ - [x] Set up Supabase project and env keys (.env)
  - [x] Run database migrations (Prisma)
  - [x] Create seed scripts for mock data (plants, tasks)
  - [x] Add test route to fetch plants and tasks
