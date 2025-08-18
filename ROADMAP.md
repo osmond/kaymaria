@@ -141,11 +141,10 @@ All items are **unchecked** to indicate upcoming work.
 
 ## Phase 6 – Launch Ready
 
-- [ ] Review accessibility
-- [ ] Lighthouse performance pass
+
 - [x] Add `README.md` with usage instructions
-- [ ] Create short demo video or gif
-- [ ] Deploy to Vercel and connect to custom domain
+
+- [ ] Deploy to Vercel
 - [ ] Manual test cases (mobile + desktop)
 - [ ] 404, 500 error handling and loading states
 - [ ] Regression test for mock → live transition
