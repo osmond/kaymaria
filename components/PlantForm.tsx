@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { fetchCareRules, CareSuggest } from '@/lib/careRules';
 
 export type PlantFormValues = {
   name: string;
@@ -61,16 +62,11 @@ export default function PlantForm({
     setSuggestError(null);
     setLoadingSuggest(true);
     try {
-      const r = await fetch('/api/ai/care-suggest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lat: Number(state.lat),
-          lon: Number(state.lon),
-        }),
-      });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const json: CareSuggest = await r.json();
+      const json = await fetchCareRules(
+        state.species,
+        Number(state.lat),
+        Number(state.lon)
+      );
       setSuggest(json);
     } catch (e: any) {
       setSuggestError(e?.message || 'Could not get suggestions.');
@@ -241,14 +237,14 @@ export default function PlantForm({
 
         <div className="rounded-xl border p-3 bg-neutral-50">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-sm font-medium">AI + Weather Suggestions</div>
+            <div className="text-sm font-medium">USDA-Based Care Suggestions</div>
             <button className="btn" onClick={requestSuggest} disabled={loadingSuggest}>
               {loadingSuggest ? 'Getting…' : 'Get suggestions'}
             </button>
           </div>
           {suggestError && <div className="text-xs text-red-600 mb-2">{suggestError}</div>}
           {!suggest && !loadingSuggest && (
-            <div className="text-xs text-neutral-600">Uses species, pot, light, environment and your local weather.</div>
+            <div className="text-xs text-neutral-600">Based on USDA dataset and your local weather.</div>
           )}
           {suggest && (
             <div className="grid gap-2 text-sm">
@@ -341,16 +337,6 @@ export default function PlantForm({
     </>
   );
 }
-
-type CareSuggest = {
-  version: string;
-  water: { intervalDays: number; amountMl?: number; notes?: string };
-  fertilize: { intervalDays: number; formula?: string; notes?: string };
-  repot?: { intervalDays?: number; notes?: string };
-  assumptions?: string[];
-  warnings?: string[];
-  confidence?: number;
-};
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
