@@ -13,6 +13,10 @@ type Ctx = {
 };
 const SelectCtx = React.createContext<Ctx | null>(null);
 
+export function useSelectCtx() {
+  return React.useContext(SelectCtx);
+}
+
 export function Select({
   value,
   onValueChange,
