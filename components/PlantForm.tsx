@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { fetchCareRules, CareSuggest } from '@/lib/careRules';
+import SpeciesAutosuggest from './SpeciesAutosuggest';
 
 export type PlantFormValues = {
   name: string;
@@ -154,11 +155,10 @@ export default function PlantForm({
     <>
       <div className="p-5 space-y-4">
         <Field label="Name">
-          <input
-            className="input"
+          <SpeciesAutosuggest
             value={state.name}
-            onChange={(e) => setState({ ...state, name: e.target.value })}
-            placeholder="e.g., Monstera Deliciosa"
+            onChange={(v) => setState({ ...state, name: v })}
+            onSelect={(s) => setState({ ...state, name: s.name, species: s.species })}
           />
         </Field>
 
@@ -169,14 +169,6 @@ export default function PlantForm({
             onChange={(e) => setState({ ...state, roomId: e.target.value })}
           />
           <p className="hint">Stored locally in Settings → Defaults.</p>
-        </Field>
-
-        <Field label="Species (optional)">
-          <input
-            className="input"
-            value={state.species}
-            onChange={(e) => setState({ ...state, species: e.target.value })}
-          />
         </Field>
 
         <div className="grid grid-cols-3 gap-3">
