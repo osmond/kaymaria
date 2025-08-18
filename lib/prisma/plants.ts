@@ -9,6 +9,8 @@ type PlantData = {
   potSize?: string | null;
   potMaterial?: string | null;
   soilType?: string | null;
+  lat?: number | null;
+  lon?: number | null;
 };
 
 export async function listPlants(): Promise<Plant[]> {
@@ -29,6 +31,8 @@ export async function createPlant(userId: string, data: PlantData): Promise<Plan
       potSize: data.potSize,
       potMaterial: data.potMaterial,
       soilType: data.soilType,
+      latitude: data.lat ?? undefined,
+      longitude: data.lon ?? undefined,
     },
   });
 }
@@ -44,6 +48,8 @@ export async function updatePlant(id: string, data: PlantData): Promise<Plant | 
         potSize: data.potSize,
         potMaterial: data.potMaterial,
         soilType: data.soilType,
+        latitude: data.lat ?? undefined,
+        longitude: data.lon ?? undefined,
       },
     });
   } catch (e: any) {

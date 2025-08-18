@@ -63,8 +63,8 @@ export default function AddPlantModal({
         indoor: 'Indoor',
         drainage: 'ok',
         soil: 'Well-draining mix',
-        lat: '44.9778',
-        lon: '-93.2650',
+        lat: '',
+        lon: '',
         waterEvery: '7',
         waterAmount: '500',
         fertEvery: '30',
@@ -86,17 +86,20 @@ export default function AddPlantModal({
           setValues(base);
           setNotice('No presets found—generating AI suggestion');
           try {
+            const aiBody: any = {
+              name: base.name,
+              species: base.species,
+              potSize: base.pot,
+              potMaterial: base.potMaterial,
+            };
+            if (base.lat && base.lon) {
+              aiBody.lat = Number(base.lat);
+              aiBody.lon = Number(base.lon);
+            }
             const ai = await fetch('/api/ai-care', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                name: base.name,
-                species: base.species,
-                potSize: base.pot,
-                potMaterial: base.potMaterial,
-                lat: Number(base.lat),
-                lon: Number(base.lon),
-              }),
+              body: JSON.stringify(aiBody),
             });
             if (ai.ok) {
               const sug: AiCareSuggestion = await ai.json();
