@@ -1,16 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {
-  Check,
-  Clock,
-  StickyNote,
-  Droplet,
-  FlaskConical,
-  Sprout,
-  Leaf,
-} from 'lucide-react';
-import { useState } from 'react';
+import { Check, Clock, Droplet, FlaskConical, Sprout, Leaf } from 'lucide-react';
 
 export default function TaskRow({
   plant,
@@ -19,7 +10,6 @@ export default function TaskRow({
   due,
   onOpen,
   onComplete,
-  onAddNote,
   onDefer,
   showPlant = true,
 }: {
@@ -29,7 +19,6 @@ export default function TaskRow({
   due: string;
   onOpen: () => void;
   onComplete: () => void;
-  onAddNote: (note: string) => void;
   onDefer: () => void;
   showPlant?: boolean;
 }) {
@@ -41,8 +30,6 @@ export default function TaskRow({
       ? <FlaskConical className={className} />
       : <Sprout className={className} />;
   }
-  const [noteOpen, setNoteOpen] = useState(false);
-  const [note, setNote] = useState('');
   return (
     <div className="relative">
       <div className="absolute inset-0 rounded-xl overflow-hidden">
@@ -109,42 +96,10 @@ export default function TaskRow({
                 >
                   <Clock className="h-4 w-4" />
                 </button>
-                <button
-                  aria-label="Add note"
-                  onClick={() => setNoteOpen((v) => !v)}
-                  className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                >
-                  <StickyNote className="h-4 w-4" />
-                </button>
               </div>
             </div>
           </div>
         </div>
-        {noteOpen && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!note.trim()) return;
-              onAddNote(note.trim());
-              setNote('');
-              setNoteOpen(false);
-            }}
-            className="flex items-center gap-2 border-t p-3"
-          >
-            <input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Quick note..."
-              className="flex-1 text-sm border rounded px-2 py-1"
-            />
-            <button
-              type="submit"
-              className="text-sm px-2 py-1 rounded bg-neutral-100"
-            >
-              Save
-            </button>
-          </form>
-        )}
       </motion.div>
     </div>
   );
