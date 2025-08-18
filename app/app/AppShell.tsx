@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import TaskRow from "@/components/TaskRow";
-import EditTaskModal from "@/components/EditTaskModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
 import { motion } from "framer-motion";
@@ -108,7 +107,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
   const taskWindow = DEFAULT_TASK_WINDOW_DAYS;
 
   // modals
-  const [editTask, setEditTask] = useState<TaskDTO | null>(null);
 
   // ui
   const [confetti, setConfetti] = useState<number[]>([]);
@@ -320,46 +318,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
     }
   };
 
-  const updateTaskDetails = async (updates: {
-    action: "Water" | "Fertilize" | "Repot";
-    due: string;
-  }) => {
-    if (!editTask) return;
-    function optionToISO(opt: string) {
-      const d = new Date();
-      if (opt === "Tomorrow") d.setDate(d.getDate() + 1);
-      else if (opt.startsWith("In "))
-        d.setDate(d.getDate() + Number(opt.replace(/[^0-9]/g, "")));
-      return d.toISOString();
-    }
-    try {
-      const r = await fetch(`/api/tasks/${encodeURIComponent(editTask.id)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: updates.action.toLowerCase(),
-          dueAt: optionToISO(updates.due),
-        }),
-      });
-      if (!r.ok) throw new Error();
-      const rec = await r.json();
-      setTasks((prev) => prev.map((t) => (t.id === rec.id ? rec : t)));
-      toast("Task updated");
-    } catch {
-      toast("Failed to update task");
-    } finally {
-      setEditTask(null);
-      refresh();
-    }
-  };
-
-  const remove = (t: TaskDTO) => {
-    setTasks((prev) => prev.filter((x) => x.id !== t.id));
-    toast(`Dismissed • ${t.plantName}`, {
-      label: "Undo",
-      onClick: () => setTasks((prev) => [t, ...prev]),
-    });
-  };
+  
 
   const addNote = async (plantId: string, text: string) => {
     try {
@@ -581,9 +540,7 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
                         onOpen={() => {}}
                         onComplete={() => complete(t)}
                         onAddNote={(note) => addNote(t.plantId, note)}
-                        onDelete={() => remove(t)}
                         onDefer={() => deferTask(t)}
-                        onEdit={() => setEditTask(t)}
                         showPlant={false}
                       />
                     ))}
@@ -767,20 +724,6 @@ export default function AppShell({ initialView }:{ initialView?: "today"|"timeli
         </div>
       )}
 
-      <EditTaskModal
-        open={!!editTask}
-        task={
-          editTask
-            ? {
-                plant: editTask.plantName,
-                action: labelForType(editTask.type) as any,
-                dueAt: editTask.dueAt,
-              }
-            : null
-        }
-        onClose={() => setEditTask(null)}
-        onSave={(u) => updateTaskDetails(u)}
-      />
     </div>
   );
 }
