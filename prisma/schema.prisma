@@ -1,6 +1,7 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["public", "auth"]
 }
 
 generator client {
@@ -8,27 +9,55 @@ generator client {
 }
 
 model Plant {
-  id             String   @id @default(cuid())
-  name           String
-  species        String?
-  lastWatered    DateTime?
-  nextWater      DateTime?
-  lastFertilized DateTime?
-  nextFertilize  DateTime?
-  waterIntervalDays     Int?
-  fertilizeIntervalDays Int?
-  latitude       Float?
-  longitude      Float?
-  tasks          Task[]
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  name        String
+  roomId      String?  @map("room_id")
+  species     String?
+  potSize     String?  @map("pot_size")
+  potMaterial String?  @map("pot_material")
+  soilType    String?  @map("soil_type")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tasks  Task[]
+  photos PlantPhoto[]
+
+  @@map("plants")
+  @@schema("public")
 }
 
 model Task {
-  id        String   @id @default(cuid())
-  title     String
-  due       DateTime
-  completed Boolean  @default(false)
-  type      String?
-  notes     String?
-  plant     Plant    @relation(fields: [plantId], references: [id])
-  plantId   String
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  plantId    String    @map("plant_id") @db.Uuid
+  type       String
+  dueDate    DateTime  @map("due_date")
+  lastDoneAt DateTime? @map("last_done_at")
+  notes      String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+  @@schema("public")
+}
+
+model PlantPhoto {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  plantId   String   @map("plant_id") @db.Uuid
+  url       String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@map("plant_photos")
+  @@schema("public")
+}
+
+model User {
+  id String @id @db.Uuid
+
+  @@map("users")
+  @@schema("auth")
 }
