@@ -42,7 +42,7 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
 
 ## Phase 2 – Core Pages UX Polish
 
-- [ ] `/app/plants` (All Plants / Rooms)
+- [x] `/app/plants` (All Plants / Rooms)
 - [ ] `/app/today` (Daily Task View)
 - [ ] `/app/timeline` (Plant History)
 - [ ] `/app/insights` (Analytics)
