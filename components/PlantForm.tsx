@@ -89,6 +89,13 @@ type Validation = {
   markTouched: (field: FieldName) => void;
 };
 
+const emptyValidation: Validation = {
+  errors: {},
+  touched: {},
+  validate: () => {},
+  markTouched: () => {},
+};
+
 function ChipSelect({
   options,
   value,
@@ -121,8 +128,12 @@ function ChipSelect({
 export function BasicsFields({
   state,
   setState,
-  validation,
-}: SectionProps & { validation: Validation }) {
+  validation = emptyValidation,
+  defaults,
+}: SectionProps & {
+  validation?: Validation;
+  defaults?: { pot: string; potMaterial: string; light: string };
+}) {
   const { errors, touched, validate, markTouched } = validation;
   return (
     <div className="p-5 space-y-4">
@@ -165,7 +176,7 @@ export function BasicsFields({
       </Field>
 
       <div className="grid grid-cols-3 gap-3">
-        <Field label="Pot size">
+        <Field label="Pot size" defaulted={defaults?.pot === state.pot}>
           <ChipSelect
             options={["4 in", "6 in", "8 in"]}
             value={state.pot}
@@ -173,7 +184,7 @@ export function BasicsFields({
           />
           <p className="hint">Larger pots stay moist longer.</p>
         </Field>
-        <Field label="Pot material">
+        <Field label="Pot material" defaulted={defaults?.potMaterial === state.potMaterial}>
           <ChipSelect
             options={["Plastic", "Terracotta", "Ceramic"]}
             value={state.potMaterial}
@@ -190,7 +201,7 @@ export function BasicsFields({
             </p>
           )}
         </Field>
-        <Field label="Light">
+        <Field label="Light" defaulted={defaults?.light === state.light}>
           <ChipSelect
             options={["Low", "Medium", "Bright"]}
             value={state.light}
@@ -205,8 +216,8 @@ export function BasicsFields({
 export function EnvironmentFields({
   state,
   setState,
-  validation,
-}: SectionProps & { validation: Validation }) {
+  validation = emptyValidation,
+}: SectionProps & { validation?: Validation }) {
   const { errors, touched, validate, markTouched } = validation;
   const [showMore, setShowMore] = useState(false);
   const [address, setAddress] = useState('');
@@ -388,6 +399,7 @@ export function CarePlanFields({
   } | null>(null);
   const [loadingSuggest, setLoadingSuggest] = useState(false);
   const [suggestError, setSuggestError] = useState<string | null>(null);
+  const [showMore, setShowMore] = useState(false);
 
   const fmtDate = (d: Date) =>
     new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(d);
@@ -555,7 +567,8 @@ export function CarePlanFields({
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className={`grid gap-3 ${showMore ? 'grid-cols-2' : 'grid-cols-1'}`}
+      >
         <Field label="Fertilize every (days)">
           <Stepper
             value={state.fertEvery}
@@ -566,15 +579,24 @@ export function CarePlanFields({
             <p className="hint">Next fertilizing: {fmtDate(nextFertilize)}</p>
           )}
         </Field>
-        <Field label="Formula">
-          <input
-            className="input"
-            value={state.fertFormula}
-            onChange={(e) => setState({ ...state, fertFormula: e.target.value })}
-            placeholder="e.g., 10-10-10 @ 1/2 strength"
-          />
-        </Field>
+        {showMore && (
+          <Field label="Formula">
+            <input
+              className="input"
+              value={state.fertFormula}
+              onChange={(e) => setState({ ...state, fertFormula: e.target.value })}
+              placeholder="e.g., 10-10-10 @ 1/2 strength"
+            />
+          </Field>
+        )}
       </div>
+      <button
+        type="button"
+        className="text-xs underline"
+        onClick={() => setShowMore((m) => !m)}
+      >
+        {showMore ? 'Less options' : 'More options'}
+      </button>
     </div>
   );
 }
@@ -585,12 +607,14 @@ export default function PlantForm({
   onSubmit,
   onCancel,
   initialSuggest,
+  defaults,
 }: {
   initial: PlantFormValues;
   submitLabel: string;
   onSubmit: (data: PlantFormSubmit, source?: 'ai' | 'manual') => Promise<void>;
   onCancel: () => void;
   initialSuggest?: AiCareSuggestion | null;
+  defaults?: { pot: string; potMaterial: string; light: string };
 }) {
   const [state, setState] = useState<PlantFormValues>(initial);
   const [errors, setErrors] = useState<Validation['errors']>({});
@@ -667,7 +691,12 @@ export default function PlantForm({
 
   return (
     <>
-      <BasicsFields state={state} setState={setState} validation={validation} />
+      <BasicsFields
+        state={state}
+        setState={setState}
+        validation={validation}
+        defaults={defaults}
+      />
       {hasSpecies && (
         <EnvironmentFields state={state} setState={setState} validation={validation} />
       )}
@@ -712,18 +741,33 @@ function Field({
   children,
   message,
   status,
+  defaulted,
 }: {
   label: string;
   children: React.ReactNode;
   message?: string;
   status?: 'error' | 'success';
+  defaulted?: boolean;
 }) {
   return (
     <div className="grid gap-2">
-      <label className="text-sm font-medium text-neutral-700">{label}</label>
+      <label className="text-sm font-medium text-neutral-700 flex items-center gap-2">
+        {label}
+        {defaulted && (
+          <span className="text-[10px] uppercase text-neutral-500 border px-1 rounded">
+            Default
+          </span>
+        )}
+      </label>
       {children}
       {message && (
-        <span className={`text-xs ${status === 'error' ? 'text-red-600' : 'text-green-600'}`}>{message}</span>
+        <span
+          className={`text-xs ${
+            status === 'error' ? 'text-red-600' : 'text-green-600'
+          }`}
+        >
+          {message}
+        </span>
       )}
     </div>
   );
