@@ -14,6 +14,26 @@ export const plantFieldSchemas = {
     (v) => (v === '' || v === undefined ? undefined : v),
     z.coerce.date({ invalid_type_error: 'Enter a valid date' }).optional(),
   ),
+  lat: z.preprocess(
+    (v) => (v === '' || v === undefined ? undefined : v),
+    z
+      .coerce.number()
+      .refine((n) => !isNaN(n), { message: 'Latitude must be a number' })
+      .refine((n) => n >= -90 && n <= 90, {
+        message: 'Latitude must be between -90 and 90',
+      })
+      .optional(),
+  ),
+  lon: z.preprocess(
+    (v) => (v === '' || v === undefined ? undefined : v),
+    z
+      .coerce.number()
+      .refine((n) => !isNaN(n), { message: 'Longitude must be a number' })
+      .refine((n) => n >= -180 && n <= 180, {
+        message: 'Longitude must be between -180 and 180',
+      })
+      .optional(),
+  ),
 };
 
 export const plantFormSchema = z.object(plantFieldSchemas);

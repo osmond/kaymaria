@@ -92,9 +92,20 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
   if (s.lastFertilized) {
     base.lastFertilizedAt = new Date(s.lastFertilized).toISOString();
   }
-  if (s.lat && s.lon && !isNaN(Number(s.lat)) && !isNaN(Number(s.lon))) {
-    base.lat = Number(s.lat);
-    base.lon = Number(s.lon);
+  if (s.lat && s.lon) {
+    const lat = Number(s.lat);
+    const lon = Number(s.lon);
+    if (
+      !isNaN(lat) &&
+      !isNaN(lon) &&
+      lat >= -90 &&
+      lat <= 90 &&
+      lon >= -180 &&
+      lon <= 180
+    ) {
+      base.lat = lat;
+      base.lon = lon;
+    }
   }
   base.createTasks = true;
   return base;
@@ -889,18 +900,6 @@ export default function PlantForm({
   const [touched, setTouched] = useState<Validation['touched']>({});
   const fieldSchemas: Record<FieldName, z.ZodTypeAny> = {
     ...plantFieldSchemas,
-    lat: z
-      .string()
-      .optional()
-      .refine((v) => !v || !isNaN(Number(v)), {
-        message: 'Latitude must be a number',
-      }),
-    lon: z
-      .string()
-      .optional()
-      .refine((v) => !v || !isNaN(Number(v)), {
-        message: 'Longitude must be a number',
-      }),
   };
 
   const validate: Validation['validate'] = (field, value) => {
