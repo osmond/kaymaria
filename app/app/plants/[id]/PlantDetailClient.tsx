@@ -289,7 +289,16 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               <span className="text-sm text-muted">
                 {new Intl.DateTimeFormat(undefined, { weekday:"short", month:"short", day:"numeric" }).format(new Date())}
               </span>
-              <div ref={menuRef} className="relative ml-1">
+
+              <Link
+                href={`/app/plants/${id}/edit`}
+                aria-label="Edit plant"
+                className="h-9 w-9 rounded-lg grid place-items-center hover:bg-secondary"
+              >
+                <Pencil className="h-5 w-5" />
+              </Link>
+              <div ref={menuRef} className="relative">
+
                 <button
                   aria-label="More options"
                   onClick={() => setMenuOpen(o => !o)}
@@ -300,15 +309,13 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                 {menuOpen && (
                   <div className="absolute right-0 z-10 mt-1 w-28 rounded-md border border-border bg-white shadow-card py-1 text-sm">
 
-                    <button
-                      onClick={() => {
-                        setEditOpen(true);
-                        setMenuOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-1.5 hover:bg-secondary"
+                    <Link
+                      href={`/app/plants/${id}/edit`}
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full text-left px-3 py-1.5 hover:bg-secondary"
                     >
                       Edit
-                    </button>
+                    </Link>
                     <button
                       onClick={() => { setMenuOpen(false); deletePlant(); }}
                       className="w-full text-left px-3 py-1.5 hover:bg-secondary text-destructive"
