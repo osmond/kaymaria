@@ -61,10 +61,10 @@ export default function EditPlantModal({
               fertEvery: plant.fertilizeIntervalDays !== undefined ? String(plant.fertilizeIntervalDays) : '30',
               fertFormula: plant.fertilizeFormula || '',
               lastWatered: plant.lastWateredAt
-                ? plant.lastWateredAt.slice(0, 10)
+                ? new Date(plant.lastWateredAt).toISOString().slice(0, 10)
                 : new Date().toISOString().slice(0, 10),
               lastFertilized: plant.lastFertilizedAt
-                ? plant.lastFertilizedAt.slice(0, 10)
+                ? new Date(plant.lastFertilizedAt).toISOString().slice(0, 10)
                 : new Date().toISOString().slice(0, 10),
             }}
             submitLabel="Save"
