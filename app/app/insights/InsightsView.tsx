@@ -21,7 +21,12 @@ ChartJS.register(
   Legend
 );
 
-type InsightPoint = { period: string; plantCount: number; taskCount: number };
+type InsightPoint = {
+  period: string;
+  newPlantCount: number;
+  completedTaskCount: number;
+  overdueTaskCount: number;
+};
 
 export default function InsightsView() {
   const [start, setStart] = useState(() => {
@@ -49,23 +54,33 @@ export default function InsightsView() {
     if (start && end) load();
   }, [start, end]);
 
-  const totalPlants = data?.reduce((s, d) => s + d.plantCount, 0) ?? 0;
-  const totalTasks = data?.reduce((s, d) => s + d.taskCount, 0) ?? 0;
+  const totalNewPlants =
+    data?.reduce((s, d) => s + d.newPlantCount, 0) ?? 0;
+  const totalCompletedTasks =
+    data?.reduce((s, d) => s + d.completedTaskCount, 0) ?? 0;
+  const totalOverdueTasks =
+    data?.reduce((s, d) => s + d.overdueTaskCount, 0) ?? 0;
 
   const chartData = {
     labels: data ? data.map((d) => d.period) : [],
     datasets: [
       {
-        label: "Plants",
-        data: data ? data.map((d) => d.plantCount) : [],
-        borderColor: "#86efac",
-        backgroundColor: "rgba(134,239,172,0.5)",
-      },
-      {
-        label: "Tasks",
-        data: data ? data.map((d) => d.taskCount) : [],
+        label: "Completed Tasks",
+        data: data ? data.map((d) => d.completedTaskCount) : [],
         borderColor: "#93c5fd",
         backgroundColor: "rgba(147,197,253,0.5)",
+      },
+      {
+        label: "Overdue Tasks",
+        data: data ? data.map((d) => d.overdueTaskCount) : [],
+        borderColor: "#fca5a5",
+        backgroundColor: "rgba(252,165,165,0.5)",
+      },
+      {
+        label: "New Plants",
+        data: data ? data.map((d) => d.newPlantCount) : [],
+        borderColor: "#86efac",
+        backgroundColor: "rgba(134,239,172,0.5)",
       },
     ],
   };
@@ -105,14 +120,18 @@ export default function InsightsView() {
                 />
               </label>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <div className="rounded-xl border bg-white shadow-sm p-4 text-center">
-                <div className="text-sm text-neutral-500">Plants</div>
-                <div className="text-2xl font-bold">{totalPlants}</div>
+                <div className="text-sm text-neutral-500">Completed Tasks</div>
+                <div className="text-2xl font-bold">{totalCompletedTasks}</div>
               </div>
               <div className="rounded-xl border bg-white shadow-sm p-4 text-center">
-                <div className="text-sm text-neutral-500">Tasks</div>
-                <div className="text-2xl font-bold">{totalTasks}</div>
+                <div className="text-sm text-neutral-500">Overdue Tasks</div>
+                <div className="text-2xl font-bold">{totalOverdueTasks}</div>
+              </div>
+              <div className="rounded-xl border bg-white shadow-sm p-4 text-center">
+                <div className="text-sm text-neutral-500">New Plants</div>
+                <div className="text-2xl font-bold">{totalNewPlants}</div>
               </div>
             </div>
             <div className="rounded-xl border bg-white shadow-sm p-4">

@@ -19,7 +19,12 @@ describe('GET /api/insights', () => {
       { created_at: '2024-05-01T10:00:00Z' },
       { created_at: '2024-05-01T12:00:00Z' },
     ];
-    const taskData = [{ due_at: '2024-05-02T00:00:00Z' }];
+    const completedTaskData = [
+      { last_done_at: '2024-05-02T03:00:00Z' },
+    ];
+    const dueTaskData = [
+      { due_at: '2024-05-02T00:00:00Z', last_done_at: null },
+    ];
 
     const mockPlantQuery = {
       select: jest.fn().mockReturnThis(),
@@ -27,15 +32,24 @@ describe('GET /api/insights', () => {
       gte: jest.fn().mockReturnThis(),
       lte: jest.fn().mockResolvedValue({ data: plantData, error: null }),
     };
-    const mockTaskQuery = {
+    const mockCompletedTaskQuery = {
       select: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
       gte: jest.fn().mockReturnThis(),
-      lte: jest.fn().mockResolvedValue({ data: taskData, error: null }),
+      lte: jest.fn().mockResolvedValue({ data: completedTaskData, error: null }),
     };
-    const mockFrom = jest.fn((table: string) =>
-      table === 'plants' ? mockPlantQuery : mockTaskQuery
-    );
+    const mockDueTaskQuery = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      gte: jest.fn().mockReturnThis(),
+      lte: jest.fn().mockResolvedValue({ data: dueTaskData, error: null }),
+    };
+    let taskCall = 0;
+    const mockFrom = jest.fn((table: string) => {
+      if (table === 'plants') return mockPlantQuery;
+      taskCall++;
+      return taskCall === 1 ? mockCompletedTaskQuery : mockDueTaskQuery;
+    });
 
     (createRouteHandlerClient as jest.Mock).mockResolvedValue({
       auth: { getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'u1' } }, error: null }) },
@@ -46,15 +60,28 @@ describe('GET /api/insights', () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.length).toBe(7);
-    expect(json).toContainEqual({ period: '2024-05-01', plantCount: 2, taskCount: 0 });
-    expect(json).toContainEqual({ period: '2024-05-02', plantCount: 0, taskCount: 1 });
+    expect(json).toContainEqual({
+      period: '2024-05-01',
+      newPlantCount: 2,
+      completedTaskCount: 0,
+      overdueTaskCount: 0,
+    });
+    expect(json).toContainEqual({
+      period: '2024-05-02',
+      newPlantCount: 0,
+      completedTaskCount: 1,
+      overdueTaskCount: 1,
+    });
 
     jest.useRealTimers();
   });
 
   it('returns data for custom range', async () => {
     const plantData = [{ created_at: '2024-05-01T10:00:00Z' }];
-    const taskData = [{ due_at: '2024-05-02T00:00:00Z' }];
+    const completedTaskData = [{ last_done_at: '2024-05-02T00:00:00Z' }];
+    const dueTaskData = [
+      { due_at: '2024-05-02T00:00:00Z', last_done_at: null },
+    ];
 
     const mockPlantQuery = {
       select: jest.fn().mockReturnThis(),
@@ -62,15 +89,24 @@ describe('GET /api/insights', () => {
       gte: jest.fn().mockReturnThis(),
       lte: jest.fn().mockResolvedValue({ data: plantData, error: null }),
     };
-    const mockTaskQuery = {
+    const mockCompletedTaskQuery = {
       select: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
       gte: jest.fn().mockReturnThis(),
-      lte: jest.fn().mockResolvedValue({ data: taskData, error: null }),
+      lte: jest.fn().mockResolvedValue({ data: completedTaskData, error: null }),
     };
-    const mockFrom = jest.fn((table: string) =>
-      table === 'plants' ? mockPlantQuery : mockTaskQuery
-    );
+    const mockDueTaskQuery = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      gte: jest.fn().mockReturnThis(),
+      lte: jest.fn().mockResolvedValue({ data: dueTaskData, error: null }),
+    };
+    let taskCall = 0;
+    const mockFrom = jest.fn((table: string) => {
+      if (table === 'plants') return mockPlantQuery;
+      taskCall++;
+      return taskCall === 1 ? mockCompletedTaskQuery : mockDueTaskQuery;
+    });
 
     (createRouteHandlerClient as jest.Mock).mockResolvedValue({
       auth: { getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'u1' } }, error: null }) },
@@ -83,8 +119,18 @@ describe('GET /api/insights', () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toEqual([
-      { period: '2024-05-01', plantCount: 1, taskCount: 0 },
-      { period: '2024-05-02', plantCount: 0, taskCount: 1 },
+      {
+        period: '2024-05-01',
+        newPlantCount: 1,
+        completedTaskCount: 0,
+        overdueTaskCount: 0,
+      },
+      {
+        period: '2024-05-02',
+        newPlantCount: 0,
+        completedTaskCount: 1,
+        overdueTaskCount: 1,
+      },
     ]);
   });
 });

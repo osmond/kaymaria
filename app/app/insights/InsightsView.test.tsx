@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import InsightsView from './InsightsView';
 
@@ -14,9 +14,24 @@ describe('InsightsView', () => {
       ok: true,
       json: () =>
         Promise.resolve([
-          { period: '2024-05-01', plantCount: 1, taskCount: 2 },
-          { period: '2024-05-02', plantCount: 0, taskCount: 1 },
-          { period: '2024-05-03', plantCount: 0, taskCount: 0 },
+          {
+            period: '2024-05-01',
+            newPlantCount: 1,
+            completedTaskCount: 2,
+            overdueTaskCount: 0,
+          },
+          {
+            period: '2024-05-02',
+            newPlantCount: 0,
+            completedTaskCount: 1,
+            overdueTaskCount: 1,
+          },
+          {
+            period: '2024-05-03',
+            newPlantCount: 0,
+            completedTaskCount: 0,
+            overdueTaskCount: 2,
+          },
         ]),
     }) as any;
   });
@@ -24,6 +39,16 @@ describe('InsightsView', () => {
   afterEach(() => {
     jest.useRealTimers();
     (global.fetch as jest.Mock).mockReset();
+  });
+
+  it('shows totals for metrics', async () => {
+    render(<InsightsView />);
+    const completed = await screen.findByText(/Completed Tasks/i);
+    expect(within(completed.parentElement!).getByText('3')).toBeInTheDocument();
+    const overdue = screen.getByText(/Overdue Tasks/i);
+    expect(within(overdue.parentElement!).getByText('3')).toBeInTheDocument();
+    const plants = screen.getByText(/New Plants/i);
+    expect(within(plants.parentElement!).getByText('1')).toBeInTheDocument();
   });
 
   it('fetches default range', async () => {

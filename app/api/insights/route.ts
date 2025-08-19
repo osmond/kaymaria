@@ -4,8 +4,9 @@ import { getUserId } from "@/lib/getUserId";
 
 type InsightPoint = {
   period: string;
-  plantCount: number;
-  taskCount: number;
+  newPlantCount: number;
+  completedTaskCount: number;
+  overdueTaskCount: number;
 };
 
 export async function GET(req: Request) {
@@ -33,7 +34,7 @@ export async function GET(req: Request) {
   const startIso = startDate.toISOString();
   const endIso = endDate.toISOString();
 
-  const [plantRes, taskRes] = await Promise.all([
+  const [plantRes, completedRes, dueRes] = await Promise.all([
     supabase
       .from("plants")
       .select("created_at")
@@ -42,7 +43,13 @@ export async function GET(req: Request) {
       .lte("created_at", endIso),
     supabase
       .from("tasks")
-      .select("due_at")
+      .select("last_done_at")
+      .eq("user_id", userId)
+      .gte("last_done_at", startIso)
+      .lte("last_done_at", endIso),
+    supabase
+      .from("tasks")
+      .select("due_at, last_done_at")
       .eq("user_id", userId)
       .gte("due_at", startIso)
       .lte("due_at", endIso),
@@ -52,8 +59,15 @@ export async function GET(req: Request) {
     console.error("GET /api/insights plant count failed:", plantRes.error);
     return NextResponse.json({ error: "server" }, { status: 500 });
   }
-  if (taskRes.error) {
-    console.error("GET /api/insights task count failed:", taskRes.error);
+  if (completedRes.error) {
+    console.error(
+      "GET /api/insights completed task count failed:",
+      completedRes.error,
+    );
+    return NextResponse.json({ error: "server" }, { status: 500 });
+  }
+  if (dueRes.error) {
+    console.error("GET /api/insights overdue task count failed:", dueRes.error);
     return NextResponse.json({ error: "server" }, { status: 500 });
   }
 
@@ -66,8 +80,9 @@ export async function GET(req: Request) {
   ) {
     points.push({
       period: d.toISOString().slice(0, 10),
-      plantCount: 0,
-      taskCount: 0,
+      newPlantCount: 0,
+      completedTaskCount: 0,
+      overdueTaskCount: 0,
     });
   }
   const map = new Map(points.map((p) => [p.period, p]));
@@ -75,12 +90,18 @@ export async function GET(req: Request) {
   plantRes.data?.forEach((row: any) => {
     const key = row.created_at.slice(0, 10);
     const p = map.get(key);
-    if (p) p.plantCount++;
+    if (p) p.newPlantCount++;
   });
-  taskRes.data?.forEach((row: any) => {
+  completedRes.data?.forEach((row: any) => {
+    const key = row.last_done_at.slice(0, 10);
+    const p = map.get(key);
+    if (p) p.completedTaskCount++;
+  });
+  dueRes.data?.forEach((row: any) => {
     const key = row.due_at.slice(0, 10);
     const p = map.get(key);
-    if (p) p.taskCount++;
+    if (p && (!row.last_done_at || row.last_done_at < row.due_at))
+      p.overdueTaskCount++;
   });
 
   return NextResponse.json(points);
