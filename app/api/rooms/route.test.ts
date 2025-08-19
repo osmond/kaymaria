@@ -8,6 +8,10 @@ jest.mock('@/lib/supabase', () => ({
 describe('GET/POST /api/rooms', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost';
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'anon-key';
+    delete process.env.SINGLE_USER_MODE;
+    delete process.env.SINGLE_USER_ID;
   });
 
   it('returns rooms', async () => {
@@ -55,5 +59,24 @@ describe('GET/POST /api/rooms', () => {
     const json = await res.json();
     expect(json).toEqual(created);
     expect(mockFrom).toHaveBeenCalledWith('rooms');
+  });
+
+  it('returns 500 when env vars missing', async () => {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const res = await GET();
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json).toEqual({ error: 'misconfigured server' });
+    expect(createRouteHandlerClient).not.toHaveBeenCalled();
+  });
+
+  it('returns 500 when SINGLE_USER_ID missing in single-user mode', async () => {
+    process.env.SINGLE_USER_MODE = 'true';
+    delete process.env.SINGLE_USER_ID;
+    const res = await GET();
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json).toEqual({ error: 'misconfigured server' });
+    expect(createRouteHandlerClient).not.toHaveBeenCalled();
   });
 });
