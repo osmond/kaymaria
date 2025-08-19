@@ -553,6 +553,23 @@ export function TimelineView() {
     [events, eventTypeFilter],
   );
 
+  function bucketEventsByDay(events: EventDTO[]) {
+    const buckets: { date: Date; events: EventDTO[] }[] = [];
+    events.forEach((e) => {
+      const at = new Date(e.at);
+      const day = new Date(at.getFullYear(), at.getMonth(), at.getDate());
+      const last = buckets[buckets.length - 1];
+      if (last && isSameDay(last.date, day)) {
+        last.events.push(e);
+      } else {
+        buckets.push({ date: day, events: [e] });
+      }
+    });
+    return buckets;
+  }
+
+  const dayBuckets = useMemo(() => bucketEventsByDay(filteredEvents), [filteredEvents]);
+
   return (
     <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
       <header
@@ -587,22 +604,35 @@ export function TimelineView() {
               </SelectContent>
             </Select>
           </div>
-          <ul className="text-sm px-4 py-2">
-            {eventsErr && <li className="py-3 text-red-600">{eventsErr}</li>}
+          <div className="text-sm px-4 py-2">
+            {eventsErr && <div className="py-3 text-red-600">{eventsErr}</div>}
             {!eventsErr && eventsLoading && (
-              <li className="py-3 text-neutral-500">Loading…</li>
+              <div className="py-3 text-neutral-500">Loading…</div>
             )}
-            {!eventsErr && !eventsLoading && filteredEvents.length === 0 && (
-              <li className="py-3 text-neutral-500">No events</li>
+            {!eventsErr && !eventsLoading && dayBuckets.length === 0 && (
+              <div className="py-3 text-neutral-500">No events</div>
             )}
             {!eventsErr &&
-              filteredEvents.map((e) => (
-                <li key={e.id} className="py-3 border-b last:border-b-0">
-                  <span className="font-medium">{e.plantName}</span> — {pastTenseLabel(e.type)}
-                  <span className="text-neutral-500"> {timeAgo(new Date(e.at))}</span>
-                </li>
+              dayBuckets.map((b) => (
+                <div key={b.date.toISOString()} className="py-2">
+                  <h3 className="font-medium">
+                    {new Intl.DateTimeFormat(undefined, {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    }).format(b.date)}
+                  </h3>
+                  <ul>
+                    {b.events.map((e) => (
+                      <li key={e.id} className="py-3 border-b last:border-b-0">
+                        <span className="font-medium">{e.plantName}</span> — {pastTenseLabel(e.type)}
+                        <span className="text-neutral-500"> {timeAgo(new Date(e.at))}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-          </ul>
+          </div>
         </section>
       </main>
     </div>
