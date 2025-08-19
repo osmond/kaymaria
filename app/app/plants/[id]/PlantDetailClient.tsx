@@ -10,6 +10,7 @@ import CareSummary from '@/components/CareSummary';
 import type { Plant } from '@prisma/client';
 
 type CareType = "water" | "fertilize" | "repot";
+type Tab = "stats" | "timeline" | "notes" | "photos";
 type TaskDTO = {
   id: string;
   plantId: string;
@@ -48,8 +49,8 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
   const acquired = plantState.acquiredAt ? new Date(plantState.acquiredAt) : null;
   const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const initialTab = (searchParams.get("tab") as "stats" | "timeline" | "notes" | "photos") || "stats";
-  const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">(initialTab);
+  const initialTab = (searchParams.get("tab") as Tab) || "stats";
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [notes, setNotes] = useState<Note[]>([]);
   const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
@@ -91,6 +92,19 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
   }, [nextWater?.getTime(), nextFertilize?.getTime(), weather]);
 
   const fmt = (d: Date) => new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(d);
+
+  useEffect(() => {
+    const current = (searchParams.get("tab") as Tab) || "stats";
+    setTab(current);
+  }, [searchParams]);
+
+  const changeTab = (t: Tab) => {
+    setTab(t);
+    const params = new URLSearchParams(searchParams.toString());
+    if (t === "stats") params.delete("tab");
+    else params.set("tab", t);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
 
   useEffect(() => {
     let alive = true;
@@ -340,25 +354,25 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
           <div className="mt-4 grid grid-cols-4 gap-2 text-sm">
           <button
             className={`py-2 rounded-lg border border-border ${tab === "stats" ? "bg-white shadow-sm font-medium" : "text-muted"}`}
-            onClick={() => setTab("stats")}
+            onClick={() => changeTab("stats")}
           >
             Stats
           </button>
           <button
             className={`py-2 rounded-lg border border-border ${tab === "timeline" ? "bg-white shadow-sm font-medium" : "text-muted"}`}
-            onClick={() => setTab("timeline")}
+            onClick={() => changeTab("timeline")}
           >
             Timeline
           </button>
           <button
             className={`py-2 rounded-lg border border-border ${tab === "notes" ? "bg-white shadow-sm font-medium" : "text-muted"}`}
-            onClick={() => setTab("notes")}
+            onClick={() => changeTab("notes")}
           >
             Notes
           </button>
           <button
             className={`py-2 rounded-lg border border-border ${tab === "photos" ? "bg-white shadow-sm font-medium" : "text-muted"}`}
-            onClick={() => setTab("photos")}
+            onClick={() => changeTab("photos")}
           >
             Photos
           </button>

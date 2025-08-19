@@ -2,14 +2,19 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import PlantDetailClient from '../[id]/PlantDetailClient';
 
 jest.mock('next/link', () => ({ __esModule: true, default: ({ children }: any) => <>{children}</> }));
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  useSearchParams: () => new URLSearchParams(),
-}));
+const mockReplace = jest.fn();
+var mockUseSearchParams: jest.Mock;
+jest.mock('next/navigation', () => {
+  mockUseSearchParams = jest.fn();
+  return {
+    useRouter: () => ({ push: jest.fn(), replace: mockReplace, back: jest.fn() }),
+    useSearchParams: mockUseSearchParams,
+  };
+});
 jest.mock('@/components/EditPlantModal', () => () => null);
 jest.mock('@/components/BottomNav', () => () => null);
 jest.mock('@/components/CareSummary', () => () => <div>CareSummary</div>);
@@ -26,6 +31,8 @@ describe('PlantDetailClient', () => {
       }
       return Promise.resolve({ ok: true, json: async () => [] }) as any;
     }) as any;
+    mockUseSearchParams.mockReturnValue(new URLSearchParams());
+    mockReplace.mockReset();
   });
 
   afterEach(() => {
@@ -42,6 +49,16 @@ describe('PlantDetailClient', () => {
     await waitFor(() =>
       expect(screen.getByRole('heading', { level: 1, name: 'Fern' })).toBeInTheDocument()
     );
+  });
+
+  it('updates url when switching tabs', () => {
+    render(
+      <PlantDetailClient
+        plant={{ id: '1', userId: 'u1', name: 'Fern', species: 'Pteridophyta' } as any}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Notes' }));
+    expect(mockReplace).toHaveBeenCalledWith('?tab=notes', { scroll: false });
   });
 });
 
