@@ -1,10 +1,10 @@
-export interface FetchJsonError {
+export interface FetchJsonError<T = unknown> {
   status: number;
-  data: any;
+  data: T;
   message: string;
 }
 
-export async function fetchJson<T>(
+export async function fetchJson<T, E = unknown>(
   input: RequestInfo | URL,
   init: (RequestInit & { retries?: number }) = {},
 ): Promise<T> {
@@ -30,15 +30,15 @@ export async function fetchJson<T>(
       if (!res.ok) {
         throw {
           status: res.status,
-          data,
+          data: data as E,
           message:
             (data && (data.message || data.error || data.detail)) ||
             res.statusText,
-        } as FetchJsonError;
+        } as FetchJsonError<E>;
       }
       return data as T;
-    } catch (err: any) {
-      if (err?.name === 'AbortError') throw err;
+    } catch (err: unknown) {
+      if ((err as any)?.name === 'AbortError') throw err;
       if (attempt >= retries) throw err;
       await new Promise((r) => setTimeout(r, delay));
       attempt++;
