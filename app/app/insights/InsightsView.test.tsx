@@ -1,0 +1,52 @@
+/**
+ * @jest-environment jsdom
+ */
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import InsightsView from './InsightsView';
+
+jest.mock('react-chartjs-2', () => ({ Line: () => null }));
+
+describe('InsightsView', () => {
+  beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(new Date('2024-05-03'));
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve([
+          { period: '2024-05-01', plantCount: 1, taskCount: 2 },
+          { period: '2024-05-02', plantCount: 0, taskCount: 1 },
+          { period: '2024-05-03', plantCount: 0, taskCount: 0 },
+        ]),
+    }) as any;
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    (global.fetch as jest.Mock).mockReset();
+  });
+
+  it('fetches default range', async () => {
+    render(<InsightsView />);
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    const url = (global.fetch as jest.Mock).mock.calls[0][0];
+    expect(url).toContain('start=2024-04-27');
+    expect(url).toContain('end=2024-05-03');
+  });
+
+  it('fetches custom range', async () => {
+    render(<InsightsView />);
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    (global.fetch as jest.Mock).mockClear();
+
+    const startInput = (await screen.findByLabelText(/Start/i)) as HTMLInputElement;
+    const endInput = (await screen.findByLabelText(/End/i)) as HTMLInputElement;
+    fireEvent.change(startInput, { target: { value: '2024-05-01' } });
+    fireEvent.change(endInput, { target: { value: '2024-05-02' } });
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    const url = (global.fetch as jest.Mock).mock.calls.slice(-1)[0][0];
+    expect(url).toContain('start=2024-05-01');
+    expect(url).toContain('end=2024-05-02');
+  });
+});
