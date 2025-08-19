@@ -15,7 +15,7 @@ export async function GET(
     const params = await (ctx as any).params;
     const plant = await getPlant(params.id);
     if (!plant) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    const water = getComputedWaterInfo(plant);
+    const water = await getComputedWaterInfo(plant);
     return NextResponse.json({ ...plant, water });
   } catch (e: any) {
     console.error("GET /api/plants/[id] failed:", e);

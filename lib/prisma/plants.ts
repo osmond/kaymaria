@@ -106,7 +106,26 @@ export async function deletePlant(id: string): Promise<boolean> {
   }
 }
 
-export function getComputedWaterInfo(_plant: Plant): Record<string, never> {
-  return {};
+export async function getComputedWaterInfo(plant: Plant) {
+  const task = await prisma.task.findFirst({
+    where: { plantId: plant.id, type: "water" },
+    orderBy: { dueDate: "asc" },
+  });
+  if (!task) {
+    return {
+      lastDoneAt: plant.lastWateredAt
+        ? plant.lastWateredAt.toISOString()
+        : null,
+      nextDue: null,
+    };
+  }
+  return {
+    lastDoneAt: task.lastDoneAt
+      ? task.lastDoneAt.toISOString()
+      : plant.lastWateredAt
+      ? plant.lastWateredAt.toISOString()
+      : null,
+    nextDue: task.dueDate.toISOString(),
+  };
 }
 
