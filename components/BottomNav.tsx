@@ -46,7 +46,7 @@ export default function BottomNav({ value }: { value: Tab }) {
       className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t dark:bg-neutral-900/90 dark:border-neutral-800"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="max-w-screen-sm mx-auto grid grid-cols-5">
+      <div className="grid grid-cols-5">
         <Item tab="today" label="Today" icon={<Leaf />} />
         <Item tab="timeline" label="Timeline" icon={<History />} />
         <Item tab="plants" label="Plants" icon={<Sprout />} />

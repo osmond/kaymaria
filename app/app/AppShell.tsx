@@ -354,7 +354,7 @@ export function TodayView() {
   }, [filteredTasks, taskWindow]);
 
   return (
-    <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
+    <div className="min-h-[100dvh] flex flex-col w-full">
       <header
         className="px-4 pb-2 sticky top-0 z-20 bg-gradient-to-b from-white/90 to-neutral-50/60 backdrop-blur border-b"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 1.5rem)" }}
@@ -638,7 +638,7 @@ export function TimelineView() {
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
+    <div className="min-h-[100dvh] flex flex-col w-full">
       <header
         className="px-4 pb-2 sticky top-0 z-20 bg-gradient-to-b from-white/90 to-neutral-50/60 backdrop-blur border-b"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 1.5rem)" }}
@@ -754,7 +754,7 @@ export function SettingsView() {
   }
 
   return (
-    <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
+    <div className="min-h-[100dvh] flex flex-col w-full">
       <header
         className="px-4 pb-2 sticky top-0 z-20 bg-gradient-to-b from-white/90 to-neutral-50/60 backdrop-blur border-b"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 1.5rem)" }}
