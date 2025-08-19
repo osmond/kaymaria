@@ -12,7 +12,8 @@ import {
   PlantFormValues,
   plantValuesToSubmit,
 } from './PlantForm';
-import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
+import { plantFieldSchemas } from '@/lib/plantFormSchema';
+import { plantInputSchema } from '@/lib/plantInputSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 
 type PlanSource =
@@ -73,7 +74,9 @@ export default function AddPlantModal({
     light: string;
   } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const canSubmit = values ? plantFormSchema.safeParse(values).success : false;
+  const canSubmit = values
+    ? plantInputSchema.safeParse(plantValuesToSubmit(values)).success
+    : false;
   const basicsValid = values
     ? plantFieldSchemas.name.safeParse(values.name).success &&
       plantFieldSchemas.roomId.safeParse(values.roomId).success

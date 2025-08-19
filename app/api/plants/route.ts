@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { listPlants, createPlant } from "@/lib/prisma/plants";
 import { createRouteHandlerClient } from "@/lib/supabase";
 import { getUserId } from "@/lib/getUserId";
+import { plantInputSchema } from "@/lib/plantInputSchema";
 
 const missingEnv = () =>
   !process.env.DATABASE_URL ||
@@ -50,12 +51,26 @@ export async function POST(req: NextRequest) {
     const { userId } = userRes;
 
     const body = await req.json().catch(() => ({}));
-    const { lastWateredAt, lastFertilizedAt, rules, ...rest } = body;
+    const parsed = plantInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "invalid" }, { status: 400 });
+    }
+    const { roomId, rules, ...rest } = parsed.data;
+
+    const { data: room } = await supabase
+      .from("rooms")
+      .select("id")
+      .eq("id", roomId)
+      .eq("user_id", userId)
+      .single();
+    if (!room) {
+      return NextResponse.json({ error: "invalid room" }, { status: 400 });
+    }
+
     const plant = await createPlant(userId, {
       ...rest,
+      roomId,
       ...(rules ? { carePlan: rules } : {}),
-      ...(lastWateredAt ? { lastWateredAt } : {}),
-      ...(lastFertilizedAt ? { lastFertilizedAt } : {}),
     });
     return NextResponse.json(plant, { status: 201 });
   } catch (e: any) {

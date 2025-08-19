@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { z } from 'zod';
-import { plantFieldSchemas, plantFormSchema } from '@/lib/plantFormSchema';
+import { plantFieldSchemas } from '@/lib/plantFormSchema';
+import { normalizeSpecies, plantInputSchema } from '@/lib/plantInputSchema';
 
 
 import SpeciesAutosuggest from './SpeciesAutosuggest';
@@ -60,7 +61,7 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
   const base: PlantFormSubmit = {
     name: s.name.trim(),
     roomId: s.roomId,
-    species: s.species || undefined,
+    species: normalizeSpecies(s.species) || undefined,
     potSize: s.pot,
     potMaterial: s.potMaterial,
     lightLevel: s.light,
@@ -86,9 +87,20 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
   if (s.lastFertilized) {
     base.lastFertilizedAt = new Date(s.lastFertilized).toISOString();
   }
-  if (s.lat && s.lon && !isNaN(Number(s.lat)) && !isNaN(Number(s.lon))) {
-    base.lat = Number(s.lat);
-    base.lon = Number(s.lon);
+  if (s.lat && s.lon) {
+    const lat = Number(s.lat);
+    const lon = Number(s.lon);
+    if (
+      !isNaN(lat) &&
+      !isNaN(lon) &&
+      lat >= -90 &&
+      lat <= 90 &&
+      lon >= -180 &&
+      lon <= 180
+    ) {
+      base.lat = lat;
+      base.lon = lon;
+    }
   }
   return base;
 }
@@ -834,13 +846,23 @@ export default function PlantForm({
       .optional()
       .refine((v) => !v || !isNaN(Number(v)), {
         message: 'Latitude must be a number',
-      }),
+      })
+      .refine((v) => {
+        if (!v) return true;
+        const n = Number(v);
+        return n >= -90 && n <= 90;
+      }, { message: 'Latitude must be between -90 and 90' }),
     lon: z
       .string()
       .optional()
       .refine((v) => !v || !isNaN(Number(v)), {
         message: 'Longitude must be a number',
-      }),
+      })
+      .refine((v) => {
+        if (!v) return true;
+        const n = Number(v);
+        return n >= -180 && n <= 180;
+      }, { message: 'Longitude must be between -180 and 180' }),
   };
 
   const validate: Validation['validate'] = (field, value) => {
@@ -900,7 +922,7 @@ export default function PlantForm({
     }
   }
 
-  const canSubmit = plantFormSchema.safeParse(state).success;
+  const canSubmit = plantInputSchema.safeParse(plantValuesToSubmit(state)).success;
   const validation = { errors, touched, validate, markTouched };
 
   return (

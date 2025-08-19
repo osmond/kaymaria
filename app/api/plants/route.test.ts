@@ -11,6 +11,38 @@ jest.mock('@/lib/supabase', () => ({
   createRouteHandlerClient: jest.fn(),
 }));
 
+function makeSupabase(roomExists = true) {
+  const query = {
+    select: jest.fn().mockReturnThis(),
+    eq: jest.fn().mockReturnThis(),
+    single: jest
+      .fn()
+      .mockResolvedValue(
+        roomExists ? { data: { id: 'r1' }, error: null } : { data: null, error: {} }
+      ),
+  };
+  return {
+    auth: {
+      getUser: jest
+        .fn()
+        .mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }),
+    },
+    from: jest.fn(() => query),
+  } as any;
+}
+
+const basePayload = {
+  name: 'New Plant',
+  roomId: 'r1',
+  species: 'Ficus lyrata',
+  potSize: '10 in',
+  potMaterial: 'Plastic',
+  lightLevel: 'Bright',
+  indoor: true,
+  drainage: 'ok',
+  rules: [{ type: 'water', intervalDays: 7, amountMl: 500 }],
+};
+
 describe('GET/POST /api/plants', () => {
   beforeEach(() => {
     jest.resetAllMocks();
@@ -50,35 +82,47 @@ describe('GET/POST /api/plants', () => {
     const newPlant = { id: 'p_new', name: 'New Plant' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
-    const mockSupabase = { auth: { getUser: jest.fn() } };
+    const mockSupabase = makeSupabase();
     (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
-      body: JSON.stringify({ name: 'New Plant' }),
+      body: JSON.stringify(basePayload),
     });
 
     const res = await POST(req as any);
     expect(res.status).toBe(201);
-    const json = await res.json();
-    expect(json).toEqual(newPlant);
-    expect(createPlant).toHaveBeenCalledWith('user-1', { name: 'New Plant' });
-    expect(createRouteHandlerClient).toHaveBeenCalled();
+    await res.json();
+    expect(createPlant).toHaveBeenCalledWith(
+      'user-1',
+      expect.objectContaining({ species: 'ficus-lyrata', roomId: 'r1' })
+    );
   });
 
-  it('creates plant with care plan details', async () => {
+  it('rejects invalid lat', async () => {
+    const mockSupabase = makeSupabase();
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+
+    const req = new Request('http://localhost/api/plants', {
+      method: 'POST',
+      body: JSON.stringify({ ...basePayload, lat: 200 }),
+    });
+
+    const res = await POST(req as any);
+    expect(res.status).toBe(400);
+    expect(createPlant).not.toHaveBeenCalled();
+  });
+
+  it('passes care plan details', async () => {
     const newPlant = { id: 'p_new', name: 'New Plant' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
-
-    const mockSupabase = { auth: { getUser: jest.fn() } };
+    const mockSupabase = makeSupabase();
     (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
       body: JSON.stringify({
-        name: 'New Plant',
+        ...basePayload,
         carePlanSource: 'ai',
         aiModel: 'gpt',
         aiVersion: '1',
@@ -88,12 +132,14 @@ describe('GET/POST /api/plants', () => {
     const res = await POST(req as any);
     expect(res.status).toBe(201);
     await res.json();
-    expect(createPlant).toHaveBeenCalledWith('user-1', {
-      name: 'New Plant',
-      carePlanSource: 'ai',
-      aiModel: 'gpt',
-      aiVersion: '1',
-    });
+    expect(createPlant).toHaveBeenCalledWith(
+      'user-1',
+      expect.objectContaining({
+        carePlanSource: 'ai',
+        aiModel: 'gpt',
+        aiVersion: '1',
+      })
+    );
   });
 
   it('passes last care dates when provided', async () => {
@@ -104,15 +150,13 @@ describe('GET/POST /api/plants', () => {
       lastFertilizedAt: new Date('2024-01-02T00:00:00.000Z'),
     };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
-
-    const mockSupabase = { auth: { getUser: jest.fn() } };
+    const mockSupabase = makeSupabase();
     (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
       body: JSON.stringify({
-        name: 'New Plant',
+        ...basePayload,
         lastWateredAt: '2024-01-01T00:00:00.000Z',
         lastFertilizedAt: '2024-01-02T00:00:00.000Z',
       }),
@@ -121,11 +165,13 @@ describe('GET/POST /api/plants', () => {
     const res = await POST(req as any);
     expect(res.status).toBe(201);
     const json = await res.json();
-    expect(createPlant).toHaveBeenCalledWith('user-1', {
-      name: 'New Plant',
-      lastWateredAt: '2024-01-01T00:00:00.000Z',
-      lastFertilizedAt: '2024-01-02T00:00:00.000Z',
-    });
+    expect(createPlant).toHaveBeenCalledWith(
+      'user-1',
+      expect.objectContaining({
+        lastWateredAt: '2024-01-01T00:00:00.000Z',
+        lastFertilizedAt: '2024-01-02T00:00:00.000Z',
+      })
+    );
     expect(json.lastWateredAt).toBe('2024-01-01T00:00:00.000Z');
     expect(json.lastFertilizedAt).toBe('2024-01-02T00:00:00.000Z');
   });
@@ -133,26 +179,21 @@ describe('GET/POST /api/plants', () => {
   it('passes care plan when rules provided', async () => {
     const newPlant = { id: 'p_new', name: 'New Plant' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
-
-    const mockSupabase = { auth: { getUser: jest.fn() } };
+    const mockSupabase = makeSupabase();
     (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
-      body: JSON.stringify({
-        name: 'New Plant',
-        rules: [{ type: 'water', intervalDays: 7 }],
-      }),
+      body: JSON.stringify(basePayload),
     });
 
     const res = await POST(req as any);
     expect(res.status).toBe(201);
     await res.json();
-    expect(createPlant).toHaveBeenCalledWith('user-1', {
-      name: 'New Plant',
-      carePlan: [{ type: 'water', intervalDays: 7 }],
-    });
+    expect(createPlant).toHaveBeenCalledWith(
+      'user-1',
+      expect.objectContaining({ carePlan: basePayload.rules })
+    );
   });
 
   it('returns 503 when env vars missing', async () => {

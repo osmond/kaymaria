@@ -5,6 +5,9 @@ import {
   updatePlant,
   deletePlant,
 } from "@/lib/prisma/plants";
+import { createRouteHandlerClient } from "@/lib/supabase";
+import { getUserId } from "@/lib/getUserId";
+import { plantInputSchema } from "@/lib/plantInputSchema";
 
 // In Next 15, params may be a Promise — await it.
 export async function GET(
@@ -23,16 +26,38 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  req: Request,
-  ctx: any
-) {
+export async function PATCH(req: Request, ctx: any) {
   try {
     const params = await (ctx as any).params;
+    const supabase = await createRouteHandlerClient();
+    const userRes = await getUserId(supabase);
+    if ("error" in userRes) {
+      if (userRes.error === "unauthorized")
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
+    }
+    const { userId } = userRes;
+
     const body = await req.json().catch(() => ({}));
-    const { rules, ...rest } = body;
+    const parsed = plantInputSchema.partial().safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "invalid" }, { status: 400 });
+    }
+    const { roomId, rules, ...rest } = parsed.data;
+    if (roomId) {
+      const { data: room } = await supabase
+        .from("rooms")
+        .select("id")
+        .eq("id", roomId)
+        .eq("user_id", userId)
+        .single();
+      if (!room) {
+        return NextResponse.json({ error: "invalid room" }, { status: 400 });
+      }
+    }
     const updated = await updatePlant(params.id, {
       ...rest,
+      ...(roomId ? { roomId } : {}),
       ...(rules ? { carePlan: rules } : {}),
     });
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
