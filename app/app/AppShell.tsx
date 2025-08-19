@@ -23,6 +23,8 @@ import {
   Check,
   AlertCircle,
   Droplet,
+  FlaskRound,
+  PottedPlant,
   Home,
   X,
   Filter as FilterIcon,
@@ -576,6 +578,18 @@ export function TimelineView() {
 
   const dayBuckets = useMemo(() => bucketEventsByDay(filteredEvents), [filteredEvents]);
 
+  const typeIcons = {
+    water: Droplet,
+    fertilize: FlaskRound,
+    repot: PottedPlant,
+  } as const;
+
+  const typeColors: Record<EventDTO["type"], string> = {
+    water: "text-sky-500",
+    fertilize: "text-amber-500",
+    repot: "text-emerald-500",
+  };
+
   return (
     <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
       <header
@@ -629,12 +643,19 @@ export function TimelineView() {
                     }).format(b.date)}
                   </h3>
                   <ul>
-                    {b.events.map((e) => (
-                      <li key={e.id} className="py-3 border-b last:border-b-0">
-                        <span className="font-medium">{e.plantName}</span> — {pastTenseLabel(e.type)}
-                        <span className="text-neutral-500"> {timeAgo(new Date(e.at))}</span>
-                      </li>
-                    ))}
+                    {b.events.map((e) => {
+                      const Icon = typeIcons[e.type];
+                      return (
+                        <li key={e.id} className="py-3 border-b last:border-b-0">
+                          <span className="font-medium">{e.plantName}</span> — {" "}
+                          <span className={`inline-flex items-center ${typeColors[e.type]}`}>
+                            <Icon className="h-4 w-4" aria-hidden="true" />
+                            <span className="sr-only">{pastTenseLabel(e.type)}</span>
+                          </span>
+                          <span className="text-neutral-500"> {timeAgo(new Date(e.at))}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               ))}
