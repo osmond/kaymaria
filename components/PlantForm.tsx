@@ -220,11 +220,16 @@ export function BasicsFields({
 
       <div className="grid grid-cols-3 gap-3">
         <Field label="Pot size" defaulted={defaults?.pot === state.pot}>
-          <ChipSelect
-            options={["4 in", "6 in", "8 in"]}
-            value={state.pot}
-            onChange={(v) => setState({ ...state, pot: v })}
-          />
+          <div className="flex items-center gap-2">
+            <Stepper
+              value={state.pot.replace(' in', '')}
+              onChange={(v) =>
+                setState({ ...state, pot: v ? `${v} in` : '' })
+              }
+              min={1}
+            />
+            <span className="text-sm">in</span>
+          </div>
           {defaults && defaults.pot !== state.pot && onSaveDefault && (
             <button
               type="button"
