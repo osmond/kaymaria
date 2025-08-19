@@ -1,14 +1,34 @@
-import { PATCH, DELETE } from './route';
-import { updatePlant, deletePlant } from '@/lib/prisma/plants';
+import { GET, PATCH, DELETE } from './route';
+import {
+  getPlant,
+  getComputedWaterInfo,
+  updatePlant,
+  deletePlant,
+} from '@/lib/prisma/plants';
 
 jest.mock('@/lib/prisma/plants', () => ({
+  getPlant: jest.fn(),
+  getComputedWaterInfo: jest.fn(),
   updatePlant: jest.fn(),
   deletePlant: jest.fn(),
 }));
 
-describe('PATCH/DELETE /api/plants/[id]', () => {
+describe('GET/PATCH/DELETE /api/plants/[id]', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+  });
+
+  it('returns plant with serialized dates', async () => {
+    (getPlant as jest.Mock).mockResolvedValue({
+      id: 'p1',
+      name: 'Test',
+      lastWateredAt: new Date('2024-01-01T00:00:00.000Z'),
+    });
+    (getComputedWaterInfo as jest.Mock).mockReturnValue({});
+    const res = await GET({} as any, { params: { id: 'p1' } });
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.lastWateredAt).toBe('2024-01-01T00:00:00.000Z');
   });
 
   it('updates existing plant', async () => {
