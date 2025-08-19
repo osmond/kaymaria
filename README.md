@@ -19,10 +19,10 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
 3. Prepare the database and start the app
    ```bash
    npm run db:migrate
-   npm run db:seed
    npm run dev
    # open http://localhost:3000/app
    ```
+   The `npm run db:seed` script only clears the `task` and `plant` tables and doesn’t insert mock data. Migrations already create empty tables, so run this script only if you need to wipe existing data.
 
 ## Common Scripts
 | command | description |
@@ -30,7 +30,7 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
 | `npm run dev` | start development server |
 | `npm run build` | create production build |
 | `npm run db:migrate` | run Prisma migrations |
-| `npm run db:seed` | seed database with sample data |
+| `npm run db:seed` | clear `task` and `plant` tables |
 
 ## Testing
 - Unit tests: `npm test`
