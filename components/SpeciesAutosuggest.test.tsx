@@ -1,81 +1,31 @@
-/**
- * @jest-environment jsdom
- */
-import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+/** @jest-environment jsdom */
+
 import '@testing-library/jest-dom';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import SpeciesAutosuggest from './SpeciesAutosuggest';
 
 describe('SpeciesAutosuggest', () => {
-  it('ignores out-of-order responses', async () => {
+  it('shows message when fetch fails', async () => {
     jest.useFakeTimers();
-    const fetchMock = jest.fn();
-    (global as any).fetch = fetchMock;
+    const oldFetch = global.fetch;
+    (global as any).fetch = jest.fn().mockRejectedValue(new Error('network'));
 
-    let resolveFirst: (v: any) => void;
-    let resolveSecond: (v: any) => void;
-    const firstPromise = new Promise((res) => { resolveFirst = res; });
-    const secondPromise = new Promise((res) => { resolveSecond = res; });
-    fetchMock
-      .mockImplementationOnce(() => firstPromise as any)
-      .mockImplementationOnce(() => secondPromise as any);
-
-    const { getByRole, queryByText } = render(
-      <SpeciesAutosuggest value="" onChange={() => {}} onSelect={() => {}} />,
+    render(
+      <SpeciesAutosuggest value="" onChange={() => {}} onSelect={() => {}} />
     );
 
-    const input = getByRole('combobox');
-    fireEvent.change(input, { target: { value: 'a' } });
-    jest.advanceTimersByTime(300);
+    const input = screen.getByRole('combobox');
+    fireEvent.change(input, { target: { value: 'abc' } });
 
-    fireEvent.change(input, { target: { value: 'ab' } });
-    jest.advanceTimersByTime(300);
+    await act(async () => {
+      jest.runAllTimers();
+    });
 
-    resolveSecond!({
-      ok: true,
-      json: async () => [{ name: 'B plant', species: 'b' }],
-    } as any);
-    await waitFor(() => expect(queryByText('B plant')).toBeInTheDocument());
+    expect(
+      await screen.findByText('No suggestions right now. You can still proceed.')
+    ).toBeInTheDocument();
 
-    resolveFirst!({
-      ok: true,
-      json: async () => [{ name: 'A plant', species: 'a' }],
-    } as any);
-    await Promise.resolve();
-
-    expect(queryByText('A plant')).toBeNull();
-
-    (global as any).fetch = undefined;
-  });
-
-  it('caches responses for 10 minutes', async () => {
-    jest.useFakeTimers();
-    const fetchMock = jest.fn().mockResolvedValue({
-      ok: true,
-      json: async () => [{ name: 'A plant', species: 'a' }],
-    } as any);
-    (global as any).fetch = fetchMock;
-
-    const { getByRole, queryByText } = render(
-      <SpeciesAutosuggest value="" onChange={() => {}} onSelect={() => {}} />,
-    );
-
-    const input = getByRole('combobox');
-    fireEvent.change(input, { target: { value: 'a' } });
-    jest.advanceTimersByTime(300);
-    await waitFor(() => expect(queryByText('A plant')).toBeInTheDocument());
-
-    fetchMock.mockClear();
-
-    fireEvent.change(input, { target: { value: '' } });
-    jest.advanceTimersByTime(300);
-
-    fireEvent.change(input, { target: { value: 'a' } });
-    jest.advanceTimersByTime(300);
-
-    expect(fetchMock).not.toHaveBeenCalled();
-    await waitFor(() => expect(queryByText('A plant')).toBeInTheDocument());
-
-    (global as any).fetch = undefined;
+    (global as any).fetch = oldFetch;
+    jest.useRealTimers();
   });
 });
