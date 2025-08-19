@@ -130,9 +130,11 @@ export function BasicsFields({
   setState,
   validation = emptyValidation,
   defaults,
+  nameInputRef,
 }: SectionProps & {
   validation?: Validation;
   defaults?: { pot: string; potMaterial: string; light: string };
+  nameInputRef?: React.RefObject<HTMLInputElement>;
 }) {
   const { errors, touched, validate, markTouched } = validation;
   return (
@@ -164,6 +166,7 @@ export function BasicsFields({
             markTouched('name');
             validate('name', state.name);
           }}
+          inputRef={nameInputRef}
         />
       </Field>
 
