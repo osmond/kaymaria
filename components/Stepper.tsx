@@ -12,13 +12,31 @@ export default function Stepper({
   step?: number;
 }) {
   const num = Number(value) || 0;
+  const clamp = (n: number) => {
+    let res = n;
+    if (res < min) res = min;
+    if (step > 1) {
+      res = Math.round(res / step) * step;
+    }
+    return res;
+  };
   const dec = () => {
-    const next = num - step;
-    onChange(String(next < min ? min : next));
+    onChange(String(clamp(num - step)));
   };
   const inc = () => {
-    const next = num + step;
-    onChange(String(next));
+    onChange(String(clamp(num + step)));
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      onChange(String(clamp(num + 1)));
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      onChange(String(clamp(num - 1)));
+    }
+  };
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    onChange(String(clamp(Number(e.target.value) || 0)));
   };
   return (
     <div className="flex items-center gap-2">
@@ -30,9 +48,13 @@ export default function Stepper({
         -
       </button>
       <input
+        type="number"
         className="input w-16 text-center"
         value={value}
-        onChange={(e) => onChange(e.target.value.replace(/[^0-9]/g, ''))}
+        min={min}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
       />
       <button
         type="button"
