@@ -48,7 +48,7 @@ export function DialogContent({
       <div
         role="dialog"
         aria-modal="true"
-        className={`relative z-50 w-[min(560px,92vw)] mx-4 rounded-2xl bg-white shadow-xl ${className}`}
+        className={`relative z-50 w-[min(560px,92vw)] mx-4 rounded-2xl bg-white shadow-card ${className}`}
       >
         {children}
       </div>

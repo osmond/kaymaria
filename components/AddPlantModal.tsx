@@ -327,7 +327,7 @@ export default function AddPlantModal({
       >
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-md sm:max-h-[90vh] flex flex-col">
+          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-card sm:max-h-[90vh] flex flex-col">
             <header className="sticky top-0 bg-background border-b p-6">
               <Dialog.Title
                 id={titleId}

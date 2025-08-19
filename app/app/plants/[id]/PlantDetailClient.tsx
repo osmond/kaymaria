@@ -279,7 +279,7 @@ export default function PlantDetailClient({ plant }: { plant: {
       {/* Content */}
       <main className="flex-1 px-4 pb-28">
         {/* Hero */}
-        <div className="rounded-2xl overflow-hidden border bg-white shadow-sm mt-4">
+        <div className="rounded-2xl overflow-hidden border bg-white shadow-card mt-4">
         <img src={heroPhoto} alt={name} className="h-40 w-full object-cover bg-neutral-200" />
           <div className="p-4">
             <h2 className="text-lg font-display font-semibold">{name}</h2>
@@ -368,7 +368,7 @@ export default function PlantDetailClient({ plant }: { plant: {
         )}
 
         {tab === "timeline" && (
-          <section className="mt-4 rounded-xl border bg-white shadow-sm">
+          <section className="mt-4 rounded-2xl border bg-white shadow-card">
             <div className="px-4 py-3 border-b">
               <div className="text-base font-medium">Timeline</div>
               <div className="text-xs text-neutral-500">Upcoming &amp; recent care</div>
@@ -400,7 +400,7 @@ export default function PlantDetailClient({ plant }: { plant: {
         )}
 
         {tab === "notes" && (
-          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4 text-sm">
+          <section className="mt-4 rounded-2xl border bg-white shadow-card p-4 text-sm">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -434,7 +434,7 @@ export default function PlantDetailClient({ plant }: { plant: {
         )}
 
         {tab === "photos" && (
-          <section className="mt-4 rounded-xl border bg-white shadow-sm p-4">
+          <section className="mt-4 rounded-2xl border bg-white shadow-card p-4">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -511,7 +511,7 @@ export default function PlantDetailClient({ plant }: { plant: {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border bg-white p-3 shadow-sm">
+    <div className="rounded-2xl border bg-white p-3 shadow-card">
       <div className="text-xs text-neutral-500">{label}</div>
       <div className="text-base font-medium">{value}</div>
     </div>

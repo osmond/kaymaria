@@ -462,13 +462,13 @@ export function TodayView() {
               {[...Array(2)].map((_, i) => (
                 <div
                   key={i}
-                  className="rounded-xl border bg-white shadow-sm h-16 animate-pulse"
+                  className="rounded-2xl border bg-white shadow-card h-16 animate-pulse"
                 />
               ))}
             </div>
           )}
           {!loading && err && (
-            <div className="rounded-xl border bg-white shadow-sm p-4 text-sm text-red-600">
+            <div className="rounded-2xl border bg-white shadow-card p-4 text-sm text-red-600">
               {err}
             </div>
           )}
@@ -479,7 +479,7 @@ export function TodayView() {
                 <div className="text-xs font-medium text-neutral-600 uppercase tracking-wide">
                   {plantName}
                 </div>
-                <div className="rounded-xl border bg-white shadow-sm divide-y">
+                <div className="rounded-2xl border bg-white shadow-card divide-y">
                   {items.map((t) => (
                     <TaskRow
                       key={t.id}
@@ -500,7 +500,7 @@ export function TodayView() {
               </div>
             ))}
           {!loading && !err && tasksTodayGrouped.length === 0 && (
-            <div className="rounded-xl border bg-white shadow-sm p-6 text-center text-sm text-neutral-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
+            <div className="rounded-2xl border bg-white shadow-card p-6 text-center text-sm text-neutral-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
               No tasks today — your plants are happy! 🌿
               {upcoming.length > 0 && (
                 <div className="mt-2 text-neutral-600 dark:text-neutral-300">
@@ -649,7 +649,7 @@ export function TimelineView() {
         </div>
       </header>
       <main className="flex-1 px-4 pb-28">
-        <section className="mt-4 rounded-xl border bg-white shadow-sm">
+        <section className="mt-4 rounded-2xl border bg-white shadow-card">
           <div className="px-4 py-3 border-b">
             <div className="text-base font-medium">Timeline</div>
             <div className="text-xs text-neutral-500">Recent care events</div>
@@ -785,13 +785,13 @@ export function SettingsView() {
               </Button>
             </CardContent>
           </Card>
-          <div className="rounded-xl border bg-white shadow-sm p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
+          <div className="rounded-2xl border bg-white shadow-card p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
             <div className="text-base font-medium">Theme</div>
             <ThemeToggle />
           </div>
           <button
             onClick={handleSignOut}
-            className="rounded-xl border bg-white shadow-sm p-4 text-left text-base font-medium dark:bg-neutral-800 dark:border-neutral-700"
+            className="rounded-2xl border bg-white shadow-card p-4 text-left text-base font-medium dark:bg-neutral-800 dark:border-neutral-700"
           >
             Sign out
           </button>

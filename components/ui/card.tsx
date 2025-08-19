@@ -8,7 +8,7 @@ type PProps = React.HTMLAttributes<HTMLParagraphElement>;
 export function Card({ className = "", ...props }: DivProps) {
   return (
     <div
-      className={`rounded-xl border bg-white shadow-md dark:bg-neutral-800 dark:border-neutral-700 ${className}`}
+      className={`rounded-2xl border bg-white shadow-card dark:bg-neutral-800 dark:border-neutral-700 ${className}`}
       {...props}
     />
   );

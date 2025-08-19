@@ -26,6 +26,14 @@ export default {
         },
         muted: "hsl(var(--muted))",
       },
+      borderRadius: {
+        lg: "14px",
+        xl: "18px",
+        "2xl": "22px",
+      },
+      boxShadow: {
+        card: "0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06)",
+      },
     },
   },
   plugins: [],
