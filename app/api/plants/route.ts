@@ -34,9 +34,6 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json().catch(() => ({}));
-    if (body.planSource) {
-      console.log('Plan source:', body.planSource);
-    }
     const plant = await createPlant(userId!, body);
     return NextResponse.json(plant, { status: 201 });
   } catch (e: any) {

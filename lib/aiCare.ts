@@ -14,6 +14,8 @@ export type AiCareSuggestion = {
   waterAmount: number;
   fertEvery: number;
   fertFormula?: string;
+  model?: string;
+  version?: string;
 };
 
 export async function suggestCare({
@@ -60,6 +62,8 @@ export async function suggestCare({
     waterAmount: data.waterAmount,
     fertEvery: data.fertEvery,
     fertFormula: data.fertFormula,
+    model: completion.model,
+    version: completion.system_fingerprint,
   };
 }
 

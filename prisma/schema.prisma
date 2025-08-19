@@ -19,6 +19,10 @@ model Plant {
   soilType    String?  @map("soil_type")
   latitude    Float?
   longitude   Float?
+  carePlanSource String? @map("care_plan_source")
+  presetId   String?  @map("preset_id")
+  aiModel    String?  @map("ai_model")
+  aiVersion  String?  @map("ai_version")
   createdAt   DateTime @default(now()) @map("created_at")
 
   tasks  Task[]

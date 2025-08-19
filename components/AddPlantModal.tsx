@@ -14,6 +14,11 @@ import {
 } from './PlantForm';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 
+type PlanSource =
+  | { type: 'preset'; presetId?: string }
+  | { type: 'ai'; aiModel?: string; aiVersion?: string }
+  | { type: 'manual' };
+
 export default function AddPlantModal({
   open,
   onOpenChange,
@@ -39,9 +44,7 @@ export default function AddPlantModal({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [step, setStep] = useState<0 | 1 | 2>(0);
-  const [planSource, setPlanSource] = useState<'preset' | 'ai' | 'manual' | null>(
-    null,
-  );
+  const [planSource, setPlanSource] = useState<PlanSource | null>(null);
 
   function close() {
     onOpenChange(false);
@@ -81,7 +84,7 @@ export default function AddPlantModal({
           const init = { ...base, ...json.presets };
           setInitial(init);
           setValues(init);
-          setPlanSource('preset');
+          setPlanSource({ type: 'preset', presetId: json.presetId });
           if (json.updated) {
             setNotice(
               `Found care preset • last updated ${new Date(json.updated).toLocaleDateString()}`,
@@ -111,22 +114,26 @@ export default function AddPlantModal({
             if (ai.ok) {
               const sug: AiCareSuggestion = await ai.json();
               setInitialSuggest(sug);
-              setPlanSource('ai');
+              setPlanSource({
+                type: 'ai',
+                aiModel: sug.model,
+                aiVersion: sug.version,
+              });
               setNotice('AI-generated plan…');
             } else {
               setNotice('No suggestions available.');
-              setPlanSource('manual');
+              setPlanSource({ type: 'manual' });
             }
           } catch (e) {
             setNotice('No suggestions available.');
-            setPlanSource('manual');
+            setPlanSource({ type: 'manual' });
           }
         }
       } catch (e) {
         setLoadError('Failed to load species defaults.');
         setInitial(base);
         setValues(base);
-        setPlanSource('manual');
+        setPlanSource({ type: 'manual' });
       } finally {
         setLoading(false);
       }
@@ -139,10 +146,20 @@ export default function AddPlantModal({
     source: 'ai' | 'manual' = 'manual',
   ) {
     console.log('Creating plant via', source, 'plan source', planSource);
+    const payload: any = { ...data };
+    if (planSource) {
+      payload.carePlanSource = planSource.type;
+      if (planSource.type === 'preset') {
+        payload.presetId = planSource.presetId;
+      } else if (planSource.type === 'ai') {
+        payload.aiModel = planSource.aiModel;
+        payload.aiVersion = planSource.aiVersion;
+      }
+    }
     const r = await fetch('/api/plants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, planSource }),
+      body: JSON.stringify(payload),
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const created = await r.json();
@@ -257,7 +274,7 @@ export default function AddPlantModal({
                   <button
                     className="btn"
                     onClick={() =>
-                      submitCurrent(planSource === 'ai' ? 'ai' : 'manual')
+                      submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual')
                     }
                     disabled={saving || !values.name.trim()}
                   >
