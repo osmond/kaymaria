@@ -3,7 +3,7 @@
 import Link from "next/link";
  import { useEffect, useMemo, useState, useRef } from "react";
  import { usePathname, useRouter, useSearchParams } from "next/navigation";
- import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil, MoreVertical } from "lucide-react";
+import { ArrowLeft, Droplet, FlaskConical, Sprout, MoreVertical } from "lucide-react";
 import BottomNav from '@/components/BottomNav';
 import CareSummary from '@/components/CareSummary';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
@@ -285,21 +285,11 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
           </Link>
           <div className="flex items-baseline justify-between w-full">
             <h1 className="text-xl font-display font-semibold tracking-tight">{name}</h1>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center">
               <span className="text-sm text-muted">
                 {new Intl.DateTimeFormat(undefined, { weekday:"short", month:"short", day:"numeric" }).format(new Date())}
               </span>
-              <Link
-                href={`/app/plants/${id}/edit`}
-                aria-label="Edit plant"
-
-                onClick={() => setEditOpen(true)}
-            className="h-9 w-9 rounded-lg grid place-items-center hover:bg-secondary"
-
-              >
-                <Pencil className="h-5 w-5" />
-              </Link>
-              <div ref={menuRef} className="relative">
+              <div ref={menuRef} className="relative ml-1">
                 <button
                   aria-label="More options"
                   onClick={() => setMenuOpen(o => !o)}
