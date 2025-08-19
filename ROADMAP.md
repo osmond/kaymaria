@@ -4,6 +4,11 @@ See [roadmap v1](./docs/roadmaps/roadmap-v1.md) for previous phases. Additional 
 
 This document outlines upcoming work for the Kay Maria plant care app.
 
+- [ ] Add Plant form polish
+  - [ ] UI styling
+  - [ ] Form validation
+  - [ ] Backend persistence
+  - [ ] Smoke tests
 - [ ] Multi-device sync
   - [x] Supabase Auth setup ([#90](https://github.com/osmond/kaymaria/issues/90))
   - [x] Real-time data sync across devices
