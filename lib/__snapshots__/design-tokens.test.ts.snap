@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`design tokens matches dark token snapshot 1`] = `
+{
+  "background": "#111827",
+  "foreground": "#F9F9F9",
+  "muted": "#9CA3AF",
+  "primary": "#508C7E",
+  "secondary": "#1E483D",
+}
+`;
+
+exports[`design tokens matches light token snapshot 1`] = `
+{
+  "background": "#F9F9F9",
+  "foreground": "#111827",
+  "muted": "#9CA3AF",
+  "primary": "#508C7E",
+  "secondary": "#D3EDE6",
+}
+`;
