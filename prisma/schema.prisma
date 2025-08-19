@@ -32,6 +32,15 @@ model Plant {
   @@schema("public")
 }
 
+model Room {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  name   String
+
+  @@map("rooms")
+  @@schema("public")
+}
+
 model Task {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId     String    @map("user_id") @db.Uuid
