@@ -21,9 +21,19 @@ import {
   Filter as FilterIcon,
 } from "lucide-react";
 
-const DEFAULT_TASK_WINDOW_DAYS = Number(
-  process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7",
-);
+const DEFAULT_TASK_WINDOW_DAYS = (() => {
+  const parsed = parseInt(
+    process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS ?? "7",
+    10,
+  );
+  if (Number.isNaN(parsed)) {
+    console.warn(
+      `Invalid NEXT_PUBLIC_TASK_WINDOW_DAYS value "${process.env.NEXT_PUBLIC_TASK_WINDOW_DAYS}", falling back to 7`,
+    );
+    return 7;
+  }
+  return parsed;
+})();
 const URGENT_WINDOW_DAYS = 2;
 
 function isSameDay(a: Date, b: Date) {
