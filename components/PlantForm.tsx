@@ -561,8 +561,10 @@ export function CarePlanFields({
   }, [initialSuggest, setState]);
 
   useEffect(() => {
-    async function fetchSuggest() {
-      if (!state.species) return;
+    if (!showSuggest) return;
+    if (!state.species || !state.pot) return;
+
+    const handle = setTimeout(async () => {
       setSuggestError(null);
       setLoadingSuggest(true);
       try {
@@ -607,8 +609,9 @@ export function CarePlanFields({
       } finally {
         setLoadingSuggest(false);
       }
-    }
-    if (showSuggest) fetchSuggest();
+    }, 400);
+
+    return () => clearTimeout(handle);
   }, [
     state.species,
     state.pot,

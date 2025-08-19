@@ -102,10 +102,11 @@ export default function AddPlantModal({
       try {
         stored = JSON.parse(localStorage.getItem('plantDefaults') || '{}');
       } catch {}
+      const species = prefillName?.trim() || '';
       const base: PlantFormValues = {
         name: prefillName || '',
         roomId: defaultRoomId,
-        species: prefillName || '',
+        species,
         pot: stored.pot || '6 in',
         potMaterial: stored.potMaterial || 'Plastic',
         light: stored.light || 'Medium',
@@ -128,15 +129,22 @@ export default function AddPlantModal({
         light: base.light,
       });
       try {
-        const json = await fetchJson<{
+        let json: {
           presets?: Partial<PlantFormValues>;
           presetId?: string;
           updated?: string;
-        }>(
-          `/api/species-care?species=${encodeURIComponent(prefillName || '')}`,
-          { retries: 2, signal: controller.signal },
-        );
-        if (json.presets) {
+        } | null = null;
+        if (species) {
+          json = await fetchJson<{
+            presets?: Partial<PlantFormValues>;
+            presetId?: string;
+            updated?: string;
+          }>(
+            `/api/species-care?species=${encodeURIComponent(species)}`,
+            { retries: 2, signal: controller.signal },
+          );
+        }
+        if (json?.presets) {
           const init = { ...base, ...json.presets };
           setInitial(init);
           setValues(init);
@@ -151,35 +159,37 @@ export default function AddPlantModal({
         } else {
           setInitial(base);
           setValues(base);
-          try {
-            const aiBody: any = {
-              name: base.name,
-              species: base.species,
-              potSize: base.pot,
-              potMaterial: base.potMaterial,
-              light: base.light,
-              indoor: base.indoor === 'Indoor',
-              drainage: base.drainage,
-              soil: base.soil,
-              humidity: Number(base.humidity),
-            };
-            if (base.lat && base.lon) {
-              aiBody.lat = Number(base.lat);
-              aiBody.lon = Number(base.lon);
+          if (base.species && base.pot) {
+            try {
+              const aiBody: any = {
+                name: base.name,
+                species: base.species,
+                potSize: base.pot,
+                potMaterial: base.potMaterial,
+                light: base.light,
+                indoor: base.indoor === 'Indoor',
+                drainage: base.drainage,
+                soil: base.soil,
+                humidity: Number(base.humidity),
+              };
+              if (base.lat && base.lon) {
+                aiBody.lat = Number(base.lat);
+                aiBody.lon = Number(base.lon);
+              }
+              const sug = await fetchJson<AiCareSuggestion>(
+                '/api/ai-care',
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(aiBody),
+                  signal: controller.signal,
+                },
+              );
+              setInitialSuggest(sug);
+              setNotice(null);
+            } catch (e) {
+              setNotice('No suggestions available.');
             }
-            const sug = await fetchJson<AiCareSuggestion>(
-              '/api/ai-care',
-              {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(aiBody),
-                signal: controller.signal,
-              },
-            );
-            setInitialSuggest(sug);
-            setNotice(null);
-          } catch (e) {
-            setNotice('No suggestions available.');
           }
         }
       } catch (e) {
