@@ -10,7 +10,7 @@ The `/app/plants/new` page now applies the card layout and typography defined in
 
 
 
-The Plant detail page shows a skeleton screen while loading, includes a back link to the Plants list for smoother navigation, and now displays its hero photo with a consistent aspect ratio for a more polished layout. It also uses semantic design tokens for background and text colors to stay aligned with the style guide. The active tab is synced to the URL so deep links open to the correct section and the browser back button restores the previous tab. Timeline and Notes sections display lightweight placeholders while data loads, and basic smoke tests verify the page renders successfully.
+The Plant detail page shows a skeleton screen while loading, includes a back link to the Plants list for smoother navigation, and now displays its hero photo with a consistent aspect ratio for a more polished layout. It uses semantic design tokens for background, text, and status colors so alerts and action links stay aligned with the style guide. The active tab is synced to the URL so deep links open to the correct section and the browser back button restores the previous tab. Timeline and Notes sections display lightweight placeholders while data loads, and basic smoke tests verify the page renders successfully.
 
 The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically and now shows skeleton cards while plant data loads.
 
