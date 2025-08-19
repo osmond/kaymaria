@@ -40,7 +40,7 @@ export async function PATCH(req: NextRequest, ctx: any) {
       }
       const { error } = await supabase
         .from("tasks")
-        .update({ due_at: task.dueAt })
+        .update({ due_at: task.dueAt, last_done_at: null })
         .eq("id", taskId ?? task.id)
         .eq("user_id", userId);
       if (error) {
@@ -54,7 +54,7 @@ export async function PATCH(req: NextRequest, ctx: any) {
       ? await supabase
           .from("tasks")
           .select(
-            "id, plant_id, type, due_at, plant:plants(id, name, room_id)",
+            "id, plant_id, type, due_at, last_done_at, plant:plants(id, name, room_id)",
           )
           .eq("user_id", userId)
           .eq("id", taskId)
@@ -62,7 +62,7 @@ export async function PATCH(req: NextRequest, ctx: any) {
       : await supabase
           .from("tasks")
           .select(
-            "id, plant_id, type, due_at, plant:plants(id, name, room_id)",
+            "id, plant_id, type, due_at, last_done_at, plant:plants(id, name, room_id)",
           )
           .eq("user_id", userId)
           .eq("plant_id", plantId as string)
@@ -79,7 +79,7 @@ export async function PATCH(req: NextRequest, ctx: any) {
         .from("tasks")
         .update({ due_at: d.toISOString() })
         .eq("id", existing.id)
-        .select("id, type, due_at, plant:plants(id, name, room_id)")
+        .select("id, type, due_at, last_done_at, plant:plants(id, name, room_id)")
         .single();
       if (error) {
         console.error("PATCH /api/tasks/[id] defer failed:", error);
@@ -93,7 +93,7 @@ export async function PATCH(req: NextRequest, ctx: any) {
         type: data.type,
         dueAt: data.due_at,
         status: "due" as const,
-        lastEventAt: null,
+        lastEventAt: data.last_done_at || null,
       };
       return NextResponse.json(rec);
     }
@@ -104,7 +104,7 @@ export async function PATCH(req: NextRequest, ctx: any) {
       d.setDate(d.getDate() + 1);
       const { error } = await supabase
         .from("tasks")
-        .update({ due_at: d.toISOString() })
+        .update({ due_at: d.toISOString(), last_done_at: eventAt })
         .eq("id", existing.id);
       if (error) {
         console.error("PATCH /api/tasks/[id] complete failed:", error);

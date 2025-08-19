@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("tasks")
-    .select("id, type, due_at, plant:plants(id, name, room_id)")
+    .select("id, type, due_at, last_done_at, plant:plants(id, name, room_id)")
     .eq("user_id", userId)
     .lte("due_at", maxDate.toISOString())
     .order("due_at");
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     type: t.type,
     dueAt: t.due_at,
     status: "due",
-    lastEventAt: null,
+    lastEventAt: t.last_done_at || null,
   }));
 
   return NextResponse.json(tasks);
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       type,
       due_at: dueAt,
     })
-    .select("id, type, due_at, plant:plants(id, name, room_id)")
+    .select("id, type, due_at, last_done_at, plant:plants(id, name, room_id)")
     .single();
   if (error) {
     console.error("POST /api/tasks failed:", error);
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     type: data.type,
     dueAt: data.due_at,
     status: "due",
-    lastEventAt: null,
+    lastEventAt: data.last_done_at || null,
   };
   return NextResponse.json(rec, { status: 201 });
 }
