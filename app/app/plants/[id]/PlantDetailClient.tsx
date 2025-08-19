@@ -310,12 +310,14 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                   <div className="absolute right-0 z-10 mt-1 w-28 rounded-md border border-border bg-white shadow-card py-1 text-sm">
 
                     <button
-                      onClick={() => { setEditOpen(true); setMenuOpen(false); }}
+                      onClick={() => {
+                        setEditOpen(true);
+                        setMenuOpen(false);
+                      }}
                       className="w-full text-left px-3 py-1.5 hover:bg-secondary"
-
                     >
                       Edit
-                    </Link>
+                    </button>
                     <button
                       onClick={() => { setMenuOpen(false); deletePlant(); }}
                       className="w-full text-left px-3 py-1.5 hover:bg-secondary text-destructive"
