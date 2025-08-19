@@ -217,19 +217,13 @@ export default function PlantDetailClient({ plant }: { plant: {
     const formData = new FormData();
     formData.append("file", newPhotoFile);
     try {
-      const upload = await fetch(`/api/upload`, {
+      const upload = await fetch(`/api/plants/${id}/photos`, {
         method: "POST",
         body: formData,
       });
       if (!upload.ok) throw new Error();
-      const data = await upload.json().catch(() => ({}));
-      const src: string | undefined = data.src || data.url;
+      const { src } = await upload.json();
       if (!src) throw new Error();
-      await fetch(`/api/plants/${id}/photos`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ src }),
-      });
       setPhotos((p) => [...p, src]);
       setNewPhotoFile(null);
     } catch {}
