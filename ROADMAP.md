@@ -16,6 +16,13 @@ This document outlines upcoming work for the Kay Maria plant care app.
   - [ ] Loading states
   - [ ] Smoke tests
 
+- [ ] Core pages UX polish
+  - [ ] Plants page (`/app/plants`)
+  - [ ] Today page (`/app/today`)
+  - [ ] Timeline page (`/app/timeline`)
+  - [ ] Insights page (`/app/insights`)
+  - [ ] Settings page (`/app/settings`)
+
 - [ ] Multi-device sync
   - [x] Supabase Auth setup ([#90](https://github.com/osmond/kaymaria/issues/90))
   - [x] Real-time data sync across devices
