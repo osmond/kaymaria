@@ -23,7 +23,7 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
   - [ ] UI styling
   - [x] Validation
   - [ ] Persistence
-  - [ ] Smoke tests
+  - [x] Smoke tests
 
 - [ ] Revisit New Plant Page (`/app/plants/new`)
   - [ ] Full UI/UX alignment with style guide
