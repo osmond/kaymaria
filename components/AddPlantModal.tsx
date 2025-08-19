@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useId } from 'react';
 import { Dialog } from '@headlessui/react';
 import { useRouter } from 'next/navigation';
 import {
@@ -19,6 +19,26 @@ type PlanSource =
   | { type: 'ai'; aiModel?: string; aiVersion?: string }
   | { type: 'manual' };
 
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  retries = 2,
+): Promise<Response> {
+  let attempt = 0;
+  let delay = 500;
+  while (true) {
+    try {
+      const res = await fetch(url, options);
+      if (res.ok || attempt >= retries) return res;
+    } catch (e) {
+      if (attempt >= retries) throw e;
+    }
+    await new Promise((r) => setTimeout(r, delay));
+    attempt++;
+    delay *= 2;
+  }
+}
+
 export default function AddPlantModal({
   open,
   onOpenChange,
@@ -33,10 +53,13 @@ export default function AddPlantModal({
   onCreate: (name: string) => void;
 }) {
   const router = useRouter();
+  const titleId = useId();
+  const firstFieldRef = useRef<HTMLInputElement>(null);
+  const prevFocus = useRef<HTMLElement | null>(null);
+  const requestIdRef = useRef<string | null>(null);
   const [initial, setInitial] = useState<PlantFormValues | null>(null);
   const [values, setValues] = useState<PlantFormValues | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [initialSuggest, setInitialSuggest] = useState<AiCareSuggestion | null>(
     null,
@@ -53,13 +76,14 @@ export default function AddPlantModal({
 
   function close() {
     onOpenChange(false);
+    prevFocus.current?.focus();
   }
 
   useEffect(() => {
     if (!open) return;
+    prevFocus.current = document.activeElement as HTMLElement | null;
     async function loadDefaults() {
       setLoading(true);
-      setLoadError(null);
       setNotice(null);
       setStep(0);
       let stored: any = {};
@@ -89,8 +113,10 @@ export default function AddPlantModal({
         light: base.light,
       });
       try {
-        const r = await fetch(
+        const r = await fetchWithRetry(
           `/api/species-care?species=${encodeURIComponent(prefillName || '')}`,
+          {},
+          2,
         );
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const json = await r.json();
@@ -144,7 +170,8 @@ export default function AddPlantModal({
           }
         }
       } catch (e) {
-        setLoadError('Failed to load species defaults.');
+        console.error('Failed to load species defaults', e);
+        setNotice("Couldn't fetch a plan—using a safe starting point.");
         setInitial(base);
         setValues(base);
         setPlanSource({ type: 'manual' });
@@ -161,6 +188,10 @@ export default function AddPlantModal({
   ) {
     console.log('Creating plant via', source, 'plan source', planSource);
     const payload: any = { ...data };
+    if (!requestIdRef.current) {
+      requestIdRef.current = crypto.randomUUID();
+    }
+    payload.clientRequestId = requestIdRef.current;
     if (planSource) {
       payload.carePlanSource = planSource.type;
       if (planSource.type === 'preset') {
@@ -170,16 +201,21 @@ export default function AddPlantModal({
         payload.aiVersion = planSource.aiVersion;
       }
     }
-    const r = await fetch('/api/plants', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    const r = await fetchWithRetry(
+      '/api/plants',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      },
+      2,
+    );
     if (!r.ok) {
       // Throw the full response so callers can inspect status and body
       throw r;
     }
     const created = await r.json();
+    requestIdRef.current = null;
     onCreate(data.name);
     close();
     router.push(`/app/plants/${created.id}?tab=photos`);
@@ -253,12 +289,23 @@ export default function AddPlantModal({
   if (!open) return null;
 
   return (
-    <Dialog open={open} onClose={close} className="relative z-50">
+    <Dialog
+      open={open}
+      onClose={close}
+      className="relative z-50"
+      initialFocus={firstFieldRef}
+      aria-labelledby={titleId}
+    >
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
       <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
         <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-white rounded-none sm:rounded-2xl shadow-xl overflow-y-auto sm:max-h-[90vh]">
           <div className="p-5 border-b">
-            <Dialog.Title className="text-lg font-display font-semibold">Add Plant</Dialog.Title>
+            <Dialog.Title
+              id={titleId}
+              className="text-lg font-display font-semibold"
+            >
+              Add Plant
+            </Dialog.Title>
           </div>
           {loading && (
             <div className="p-5 space-y-4 animate-pulse">
@@ -269,9 +316,6 @@ export default function AddPlantModal({
           )}
           {!loading && values && (
             <>
-              {loadError && (
-                <div className="p-5 text-sm text-red-600">{loadError}</div>
-              )}
               {notice && (
                 <div className="p-5 text-sm text-gray-600">{notice}</div>
               )}
@@ -280,6 +324,7 @@ export default function AddPlantModal({
                   state={values}
                   setState={setValues}
                   defaults={defaults || undefined}
+                  nameInputRef={firstFieldRef}
                 />
               )}
               {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
@@ -291,10 +336,10 @@ export default function AddPlantModal({
                   onPlanModeChange={setPlanSource}
                 />
               )}
-              {saveError && step === 2 && (
-                <div className="p-5 text-xs text-red-600">{saveError}</div>
-              )}
-              <div className="p-5 border-t flex gap-2 justify-end">
+              <div className="p-5 border-t flex gap-2 justify-end items-center">
+                {saveError && step === 2 && (
+                  <div className="text-xs text-red-600 mr-auto">{saveError}</div>
+                )}
                 <button className="btn-secondary" onClick={close}>
                   Cancel
                 </button>
@@ -316,7 +361,13 @@ export default function AddPlantModal({
                     }
                     disabled={saving || !values.name.trim()}
                   >
-                    {saving ? 'Saving…' : 'Create Plant'}
+                    {saving
+                      ? 'Saving…'
+                      : saveError
+                      ? 'Retry'
+                      : planSource && planSource.type !== 'manual'
+                      ? 'Create with Suggested Plan'
+                      : 'Create Plant (Manual)'}
                   </button>
                 )}
               </div>
