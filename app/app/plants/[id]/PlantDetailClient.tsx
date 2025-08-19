@@ -258,7 +258,11 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
       {/* Header */}
       <header className="px-4 pt-6 pb-2 sticky top-0 bg-white/90 backdrop-blur border-b border-border">
         <div className="flex items-center gap-2">
-          <Link href="/app" aria-label="Back" className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100">
+          <Link
+            href="/app/plants"
+            aria-label="Back to plants"
+            className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-baseline justify-between w-full">
