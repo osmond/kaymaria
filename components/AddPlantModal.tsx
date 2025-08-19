@@ -57,11 +57,27 @@ export default function AddPlantModal({
     light: string;
   } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const validationId = useId();
+  const saveErrorId = useId();
   const canSubmit = values ? plantFormSchema.safeParse(values).success : false;
   const basicsValid = values
     ? plantFieldSchemas.name.safeParse(values.name).success &&
       plantFieldSchemas.roomId.safeParse(values.roomId).success
     : false;
+
+  const validationMessage =
+    step === 0 && !basicsValid
+      ? 'Name and room are required to continue.'
+      : step === 2 && !canSubmit
+      ? 'Please fill out all required fields before submitting.'
+      : null;
+  const submitDescribedBy = [
+    validationMessage ? validationId : null,
+    saveError ? saveErrorId : null,
+  ]
+    .filter((v): v is string => Boolean(v))
+    .join(' ') || undefined;
 
   function saveDefault(
     field: 'pot' | 'potMaterial' | 'light',
@@ -83,6 +99,10 @@ export default function AddPlantModal({
     const t = setTimeout(() => setToast(null), 3000);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    setSaveError(null);
+  }, [step]);
 
   function close() {
     onOpenChange(false);
@@ -241,8 +261,9 @@ export default function AddPlantModal({
     if (!values) return;
     const current = override ?? values;
     if (!current.name.trim()) return;
+    if (!canSubmit) return;
     setSaving(true);
-    close();
+    setSaveError(null);
     try {
       const created = await handleSubmit(
         plantValuesToSubmit(current),
@@ -262,6 +283,7 @@ export default function AddPlantModal({
         );
       } catch {}
       onCreate({ id: created.id, name: created.name || current.name });
+      close();
     } catch (e: any) {
       let message = 'Failed to save plant.';
       const status: number | undefined = e?.status;
@@ -278,8 +300,7 @@ export default function AddPlantModal({
         message = e.message;
       }
       console.error('Error saving plant', e, { status, data });
-      setToast(message);
-      return;
+      setSaveError(message);
     } finally {
       setSaving(false);
     }
@@ -334,7 +355,13 @@ export default function AddPlantModal({
               {!loading && values && (
                 <>
                   {notice && (
-                    <div className="py-6 text-sm text-gray-600">{notice}</div>
+                    <div
+                      role="status"
+                      aria-live="polite"
+                      className="py-6 text-sm text-gray-600"
+                    >
+                      {notice}
+                    </div>
                   )}
                   {step === 0 && (
                     <BasicsFields
@@ -369,6 +396,26 @@ export default function AddPlantModal({
             </div>
             {!loading && values && (
               <footer className="sticky bottom-0 border-t bg-background p-6 flex gap-2 justify-end items-center">
+                {validationMessage && (
+                  <div
+                    id={validationId}
+                    role="status"
+                    aria-live="polite"
+                    className="mr-auto text-sm text-red-600"
+                  >
+                    {validationMessage}
+                  </div>
+                )}
+                {step === 2 && saveError && (
+                  <div
+                    id={saveErrorId}
+                    role="status"
+                    aria-live="polite"
+                    className="mr-auto text-sm text-red-600"
+                  >
+                    {saveError}
+                  </div>
+                )}
                 <button
                   className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                   onClick={close}
@@ -390,6 +437,7 @@ export default function AddPlantModal({
                     className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                     onClick={nextStep}
                     disabled={step === 0 && !basicsValid}
+                    aria-describedby={validationMessage ? validationId : undefined}
                   >
                     <ArrowRight className="h-4 w-4" />
                     Next
@@ -402,6 +450,7 @@ export default function AddPlantModal({
                       submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual')
                     }
                     disabled={saving || !canSubmit}
+                    aria-describedby={submitDescribedBy}
                   >
                     <Check className="h-4 w-4" />
                     {saving
