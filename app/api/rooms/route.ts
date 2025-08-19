@@ -13,14 +13,13 @@ export async function GET() {
     }
 
     const supabase = await createRouteHandlerClient();
-    const { userId, error: userIdError } = await getUserId(supabase);
-    if (userIdError === "unauthorized")
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    if (userIdError)
-      return NextResponse.json(
-        { error: "misconfigured server" },
-        { status: 500 }
-      );
+    const userRes = await getUserId(supabase);
+    if ("error" in userRes) {
+      if (userRes.error === "unauthorized")
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
+    }
+    const { userId } = userRes;
 
     const { data, error: dbError } = await supabase
       .from("rooms")
@@ -49,14 +48,13 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = await createRouteHandlerClient();
-    const { userId, error: userIdError } = await getUserId(supabase);
-    if (userIdError === "unauthorized")
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    if (userIdError)
-      return NextResponse.json(
-        { error: "misconfigured server" },
-        { status: 500 }
-      );
+    const userRes = await getUserId(supabase);
+    if ("error" in userRes) {
+      if (userRes.error === "unauthorized")
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
+    }
+    const { userId } = userRes;
 
     const body = await req.json().catch(() => ({}));
     const name = String(body.name || "").trim();

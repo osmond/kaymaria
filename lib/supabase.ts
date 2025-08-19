@@ -1,5 +1,4 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
 import type { Database } from "./supabase.types";
 
 function getSupabaseEnv() {
@@ -19,6 +18,7 @@ export function createSupabaseClient(): SupabaseClient<Database> {
 
 // Authenticated client helper for Route Handlers
 export async function createRouteHandlerClient(): Promise<SupabaseClient<Database>> {
+  const { cookies } = await import("next/headers");
   const { url, anonKey } = getSupabaseEnv();
   // `cookies()` is now asynchronous in Next 15 and must be awaited
   const cookieStore = await cookies();

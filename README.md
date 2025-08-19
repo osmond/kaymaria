@@ -10,6 +10,7 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
 2. Create `.env` from `.env.example` and supply the required values:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
    - `NEXT_PUBLIC_BASE_URL`
    - `DATABASE_URL`
    - `OPENAI_API_KEY` *(optional)*
@@ -27,6 +28,7 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
    # open http://localhost:3000/app
    ```
    The `npm run db:seed` script only clears the `task` and `plant` tables and doesn’t insert mock data. Run it only if you need to wipe existing data.
+   Log in at `http://localhost:3000/login` with a Supabase email/password account. Use the Settings page to sign out.
 
 ## Common Scripts
 | command | description |

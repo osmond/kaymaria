@@ -4,8 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import TaskRow from "@/components/TaskRow";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
+
+import { createSupabaseClient } from "@/lib/supabase";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+
 import { motion } from "framer-motion";
 import {
   Select,
@@ -606,6 +610,14 @@ export function TimelineView() {
 }
 
 export function SettingsView() {
+  const supabase = useRef(createSupabaseClient());
+
+  async function handleSignOut() {
+    await supabase.current.auth.signOut();
+    document.cookie = "sb-access-token=; Path=/; Max-Age=0";
+    window.location.href = "/login";
+  }
+
   return (
     <div className="min-h-[100dvh] flex flex-col w-full max-w-screen-sm mx-auto">
       <header
@@ -635,6 +647,21 @@ export function SettingsView() {
               </Button>
               <Button variant="default" size="sm">
                 Import
+
+              </button>
+            </div>
+          </div>
+          <div className="rounded-xl border bg-white shadow-sm p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
+            <div className="text-base font-medium">Theme</div>
+            <ThemeToggle />
+          </div>
+          <button
+            onClick={handleSignOut}
+            className="rounded-xl border bg-white shadow-sm p-4 text-left text-base font-medium dark:bg-neutral-800 dark:border-neutral-700"
+          >
+            Sign out
+          </button>
+
               </Button>
             </CardContent>
           </Card>
@@ -644,6 +671,7 @@ export function SettingsView() {
               <ThemeToggle />
             </CardContent>
           </Card>
+
         </section>
       </main>
     </div>

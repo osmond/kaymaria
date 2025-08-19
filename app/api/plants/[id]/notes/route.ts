@@ -28,13 +28,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   try {
     const { id } = await ctx.params;
     const supabase = await createRouteHandlerClient();
-    const { userId, error: userIdError } = await getUserId(supabase);
-    if (userIdError === "unauthorized") {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
-    if (userIdError) {
+    const userRes = await getUserId(supabase);
+    if ("error" in userRes) {
+      if (userRes.error === "unauthorized") {
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      }
       return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
     }
+    const { userId } = userRes;
 
     const body = await req.json().catch(() => ({}));
     const note = typeof body.note === "string" ? body.note.trim() : "";
