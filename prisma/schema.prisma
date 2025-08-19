@@ -23,6 +23,8 @@ model Plant {
   presetId   String?  @map("preset_id")
   aiModel    String?  @map("ai_model")
   aiVersion  String?  @map("ai_version")
+  lastWateredAt   DateTime? @map("last_watered_at")
+  lastFertilizedAt DateTime? @map("last_fertilized_at")
   createdAt   DateTime @default(now()) @map("created_at")
 
   tasks  Task[]

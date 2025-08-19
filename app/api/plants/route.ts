@@ -51,7 +51,12 @@ export async function POST(req: NextRequest) {
       );
 
     const body = await req.json().catch(() => ({}));
-    const plant = await createPlant(userId!, body);
+    const { lastWateredAt, lastFertilizedAt, ...rest } = body;
+    const plant = await createPlant(userId!, {
+      ...rest,
+      ...(lastWateredAt ? { lastWateredAt } : {}),
+      ...(lastFertilizedAt ? { lastFertilizedAt } : {}),
+    });
     return NextResponse.json(plant, { status: 201 });
   } catch (e: any) {
     console.error("POST /api/plants failed:", e);

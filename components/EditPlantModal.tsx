@@ -58,6 +58,12 @@ export default function EditPlantModal({
               waterAmount: plant.waterAmountMl !== undefined ? String(plant.waterAmountMl) : '500',
               fertEvery: plant.fertilizeIntervalDays !== undefined ? String(plant.fertilizeIntervalDays) : '30',
               fertFormula: plant.fertilizeFormula || '',
+              lastWatered: plant.lastWateredAt
+                ? plant.lastWateredAt.slice(0, 10)
+                : new Date().toISOString().slice(0, 10),
+              lastFertilized: plant.lastFertilizedAt
+                ? plant.lastFertilizedAt.slice(0, 10)
+                : new Date().toISOString().slice(0, 10),
             }}
             submitLabel="Save"
             onSubmit={handleSubmit}
