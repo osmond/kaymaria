@@ -14,7 +14,7 @@ This document outlines upcoming work for the Kay Maria plant care app.
   - [x] UI styling
   - [x] Navigation improvements
   - [x] Loading states
-  - [ ] Smoke tests
+  - [x] Smoke tests
 
 - [ ] Core pages UX polish
   - [ ] Plants page (`/app/plants`)
