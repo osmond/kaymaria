@@ -8,6 +8,7 @@ import type { AiCareSuggestion } from '@/lib/aiCare';
 import SpeciesAutosuggest from './SpeciesAutosuggest';
 
 import RoomSelector from './RoomSelector';
+import Stepper from './Stepper';
 
 
 export type PlantFormValues = {
@@ -170,6 +171,7 @@ export function BasicsFields({
             value={state.pot}
             onChange={(v) => setState({ ...state, pot: v })}
           />
+          <p className="hint">Larger pots stay moist longer.</p>
         </Field>
         <Field label="Pot material">
           <ChipSelect
@@ -177,6 +179,16 @@ export function BasicsFields({
             value={state.potMaterial}
             onChange={(v) => setState({ ...state, potMaterial: v })}
           />
+          {state.pot && (
+            <p className="hint">
+              {state.pot}{' '}
+              {state.potMaterial === 'Terracotta'
+                ? 'terracotta dries faster than plastic.'
+                : state.potMaterial === 'Plastic'
+                ? 'plastic retains moisture longer.'
+                : 'ceramic balances moisture.'}
+            </p>
+          )}
         </Field>
         <Field label="Light">
           <ChipSelect
@@ -377,6 +389,15 @@ export function CarePlanFields({
   const [loadingSuggest, setLoadingSuggest] = useState(false);
   const [suggestError, setSuggestError] = useState<string | null>(null);
 
+  const fmtDate = (d: Date) =>
+    new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(d);
+  const nextWater = Number(state.waterEvery) > 0
+    ? new Date(Date.now() + Number(state.waterEvery) * 864e5)
+    : null;
+  const nextFertilize = Number(state.fertEvery) > 0
+    ? new Date(Date.now() + Number(state.fertEvery) * 864e5)
+    : null;
+
   useEffect(() => {
     if (!initialSuggest) return;
     setPrevManual({
@@ -517,35 +538,33 @@ export function CarePlanFields({
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="Water every (days)">
-          <input
-            className="input"
-            type="number"
-            min={1}
+          <Stepper
             value={state.waterEvery}
-            onChange={(e) => setState({ ...state, waterEvery: e.target.value })}
+            onChange={(v) => setState({ ...state, waterEvery: v })}
+            min={1}
           />
+          {nextWater && <p className="hint">Next watering: {fmtDate(nextWater)}</p>}
         </Field>
         <Field label="Water amount (ml)">
-          <input
-            className="input"
-            type="number"
+          <Stepper
+            value={state.waterAmount}
+            onChange={(v) => setState({ ...state, waterAmount: v })}
             min={50}
             step={10}
-            value={state.waterAmount}
-            onChange={(e) => setState({ ...state, waterAmount: e.target.value })}
           />
         </Field>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="Fertilize every (days)">
-          <input
-            className="input"
-            type="number"
-            min={7}
+          <Stepper
             value={state.fertEvery}
-            onChange={(e) => setState({ ...state, fertEvery: e.target.value })}
+            onChange={(v) => setState({ ...state, fertEvery: v })}
+            min={7}
           />
+          {nextFertilize && (
+            <p className="hint">Next fertilizing: {fmtDate(nextFertilize)}</p>
+          )}
         </Field>
         <Field label="Formula">
           <input
