@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import InsightsSkeleton from "./InsightsSkeleton";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -96,7 +97,7 @@ export default function InsightsView() {
           </div>
         )}
 
-        {!data && !err && <div className="text-sm text-neutral-500">Loading…</div>}
+        {!data && !err && <InsightsSkeleton />}
 
         {data && (
           <>
