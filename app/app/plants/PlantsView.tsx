@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Fab from "@/components/Fab";
 import AddPlantModal from "@/components/AddPlantModal";
@@ -10,6 +10,12 @@ export default function PlantsView() {
   const [items, setItems] = useState<Plant[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    visible: boolean;
+    message: string;
+    action?: { label: string; onClick: () => void };
+  }>({ visible: false, message: "" });
+  const timer = useRef<number | null>(null);
   const sortedItems =
     items?.slice().sort((a, b) => {
       const roomA = a.room || "";
@@ -75,11 +81,39 @@ export default function PlantsView() {
         open={addOpen}
         onOpenChange={setAddOpen}
         defaultRoomId="room-1"
-        onCreate={() => {
+        onCreate={(p) => {
           setAddOpen(false);
           load();
+          if (timer.current) window.clearTimeout(timer.current);
+          setSnackbar({
+            visible: true,
+            message: `${p.name} added`,
+            action: {
+              label: "Undo",
+              onClick: async () => {
+                setSnackbar({ visible: false, message: "" });
+                await fetch(`/api/plants/${p.id}`, { method: "DELETE" });
+                load();
+              },
+            },
+          });
+          // @ts-ignore
+          timer.current = window.setTimeout(
+            () => setSnackbar({ visible: false, message: "" }),
+            5000,
+          );
         }}
       />
+      {snackbar.visible && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-sm px-4 py-2 rounded-full shadow-lg flex items-center gap-3">
+          <span>{snackbar.message}</span>
+          {snackbar.action && (
+            <button className="underline" onClick={snackbar.action.onClick}>
+              {snackbar.action.label}
+            </button>
+          )}
+        </div>
+      )}
     </>
   );
 }
