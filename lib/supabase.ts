@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./supabase.types";
 
-function getSupabaseEnv() {
+export function ensureSupabaseEnv() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) {
@@ -12,14 +12,14 @@ function getSupabaseEnv() {
 
 // Factory for an unauthenticated client
 export function createSupabaseClient(): SupabaseClient<Database> {
-  const { url, anonKey } = getSupabaseEnv();
+  const { url, anonKey } = ensureSupabaseEnv();
   return createClient<Database>(url, anonKey);
 }
 
 // Authenticated client helper for Route Handlers
 export async function createRouteHandlerClient(): Promise<SupabaseClient<Database>> {
   const { cookies } = await import("next/headers");
-  const { url, anonKey } = getSupabaseEnv();
+  const { url, anonKey } = ensureSupabaseEnv();
   // `cookies()` is now asynchronous in Next 15 and must be awaited
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("sb-access-token")?.value;
