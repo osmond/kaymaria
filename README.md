@@ -7,6 +7,7 @@ All pages should follow the [style guide](./docs/style-guide.md) to ensure a con
 The Add Plant form uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Form fields include validation for required entries, numeric values, and latitude/longitude ranges. Submitting the form now persists the plant to the backend and pre-creates care tasks. A Playwright smoke test ensures the Add Plant page renders.
 
 
+
 The Plant detail page shows a skeleton screen while loading, includes a back link to the Plants list for smoother navigation, and now displays its hero photo with a consistent aspect ratio for a more polished layout. Basic smoke tests verify the page renders successfully.
 
 The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically.
