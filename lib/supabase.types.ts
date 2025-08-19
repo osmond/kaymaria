@@ -155,6 +155,32 @@ export interface Database {
           }
         ];
       };
+      rooms: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          created_at?: string | null;
+        };
+        Update: {
+          name?: string;
+          created_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "rooms_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

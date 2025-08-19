@@ -27,11 +27,29 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "file required" }, { status: 400 });
     }
+
     const supabase = await createRouteHandlerClient();
+
+    const singleUser = process.env.SINGLE_USER_MODE === "true";
+    let userId: string | undefined;
+    if (singleUser) {
+      if (!process.env.SINGLE_USER_ID)
+        return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
+      userId = process.env.SINGLE_USER_ID;
+    } else {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user)
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      userId = user.id;
+    }
+
     const url = await uploadPlantPhoto(supabase, id, file);
     const { error } = await supabase
       .from('plant_photos')
-      .insert({ plant_id: id, url });
+      .insert({ user_id: userId, plant_id: id, url });
     if (error) throw error;
     return NextResponse.json({ src: url }, { status: 201 });
   } catch (e) {
