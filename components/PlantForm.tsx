@@ -120,10 +120,10 @@ function ChipSelect({
         <button
           key={opt}
           type="button"
-          className={`px-3 py-1 rounded-full border text-sm ${
+          className={`min-w-11 min-h-11 px-3 py-2 rounded-full border text-sm flex items-center justify-center ${
             value === opt
               ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
-              : 'bg-white dark:bg-neutral-800'
+              : 'bg-white text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
           }`}
           onClick={() => onChange(opt)}
         >
@@ -862,8 +862,8 @@ export function FormStyles() {
   return (
     <style jsx>{`
       .input { @apply w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-300; }
-      .btn { @apply rounded-lg bg-neutral-900 text-white text-sm px-3 py-2 disabled:opacity-70; }
-      .btn-secondary { @apply rounded-lg border text-sm px-3 py-2 bg-white; }
+      .btn { @apply inline-flex items-center justify-center rounded-lg bg-neutral-900 text-white text-sm px-4 py-3 min-h-11 min-w-11 disabled:opacity-70 dark:bg-neutral-100 dark:text-neutral-900; }
+      .btn-secondary { @apply inline-flex items-center justify-center rounded-lg border border-neutral-300 text-sm px-4 py-3 bg-white text-neutral-900 min-h-11 min-w-11 dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-700; }
       .hint { @apply text-xs text-neutral-500 mt-1; }
     `}</style>
   );

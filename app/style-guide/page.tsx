@@ -3,10 +3,11 @@
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { coreColors } from "@/lib/design-tokens"
+import { lightTokens, darkTokens } from "@/lib/design-tokens"
 
 export default function StyleGuidePreviewPage() {
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("light")
+  const tokens = previewMode === "light" ? lightTokens : darkTokens
 
   return (
     <div
@@ -32,11 +33,11 @@ export default function StyleGuidePreviewPage() {
         <CardContent className="p-6">
           <h2 className="text-xl font-display font-semibold mb-4">Core Tokens</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <ColorSwatch name="Primary" hex={coreColors.primary} />
-            <ColorSwatch name="Secondary" hex={coreColors.secondary} />
-            <ColorSwatch name="Background" hex={coreColors.background} text="black" />
-            <ColorSwatch name="Foreground" hex={coreColors.foreground} />
-            <ColorSwatch name="Muted" hex={coreColors.muted} />
+            <ColorSwatch name="Primary" hex={tokens.primary} />
+            <ColorSwatch name="Secondary" hex={tokens.secondary} />
+            <ColorSwatch name="Background" hex={tokens.background} text="black" />
+            <ColorSwatch name="Foreground" hex={tokens.foreground} />
+            <ColorSwatch name="Muted" hex={tokens.muted} />
           </div>
         </CardContent>
       </Card>
