@@ -10,7 +10,12 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   return (
     <div className="p-4 text-center">
       <h1 className="text-2xl font-bold">Something went wrong</h1>
-      <button className="mt-4 underline" onClick={() => reset()}>Try again</button>
+      {error?.message && (
+        <p className="mt-2 text-sm text-red-600">{error.message}</p>
+      )}
+      <button className="mt-4 underline" onClick={() => reset()}>
+        Try again
+      </button>
     </div>
   );
 }
