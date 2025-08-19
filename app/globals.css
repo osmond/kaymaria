@@ -2,24 +2,32 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 221 39% 11%;
-    --primary: 166 27% 43%;
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+    --primary: 142 70% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 164 42% 88%;
-    --secondary-foreground: 221 39% 11%;
-    --muted: 218 11% 65%;
-    --border: 221 14% 90%;
+    --secondary: 222 47% 91%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 215 16% 47%;
+    --border: 214 32% 91%;
+    --accent: 200 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
   }
   .dark {
-    --background: 221 39% 11%;
-    --foreground: 0 0% 98%;
-    --primary: 166 27% 43%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --primary: 142 70% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 164 42% 20%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 218 11% 65%;
-    --border: 221 14% 30%;
+    --secondary: 222 47% 20%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 213 27% 52%;
+    --border: 213 27% 26%;
+    --accent: 200 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 210 40% 98%;
   }
   body {
     background-color: hsl(var(--background));
