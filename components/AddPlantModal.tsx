@@ -175,7 +175,10 @@ export default function AddPlantModal({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    if (!r.ok) {
+      // Throw the full response so callers can inspect status and body
+      throw r;
+    }
     const created = await r.json();
     onCreate(data.name);
     close();
