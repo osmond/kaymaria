@@ -47,4 +47,35 @@ describe('SpeciesAutosuggest', () => {
 
     (global as any).fetch = undefined;
   });
+
+  it('caches responses for 10 minutes', async () => {
+    jest.useFakeTimers();
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [{ name: 'A plant', species: 'a' }],
+    } as any);
+    (global as any).fetch = fetchMock;
+
+    const { getByRole, queryByText } = render(
+      <SpeciesAutosuggest value="" onChange={() => {}} onSelect={() => {}} />,
+    );
+
+    const input = getByRole('combobox');
+    fireEvent.change(input, { target: { value: 'a' } });
+    jest.advanceTimersByTime(300);
+    await waitFor(() => expect(queryByText('A plant')).toBeInTheDocument());
+
+    fetchMock.mockClear();
+
+    fireEvent.change(input, { target: { value: '' } });
+    jest.advanceTimersByTime(300);
+
+    fireEvent.change(input, { target: { value: 'a' } });
+    jest.advanceTimersByTime(300);
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    await waitFor(() => expect(queryByText('A plant')).toBeInTheDocument());
+
+    (global as any).fetch = undefined;
+  });
 });
