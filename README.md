@@ -3,20 +3,23 @@
 This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion with real-time task syncing across devices. The goal of this README is to give contributors (like me) a fast reference for building, testing and exploring the project.
 
 ## Quick Start
+Kay Maria is intended to run in single-user mode by default.
+
 1. Install dependencies
    ```bash
    npm install
    ```
-2. Create `.env` from `.env.example` and supply the required values:
+2. Create `.env` from `.env.example` and supply the mandatory values:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `NEXT_PUBLIC_BASE_URL`
    - `DATABASE_URL`
+   - `SINGLE_USER_MODE=true`
+   - `SINGLE_USER_ID=<supabase user uuid>`
+   - `NEXT_PUBLIC_TASK_WINDOW_DAYS` *(defaults to `7`)*
    - `OPENAI_API_KEY` *(optional)*
    - `TREFLE_API_TOKEN` *(optional, enables [Trefle](https://trefle.io) species search. Without a valid token, searches fall back to a small built-in list.)*
-   - `NEXT_PUBLIC_TASK_WINDOW_DAYS` *(defaults to `7`)*
-   - `SINGLE_USER_MODE` and `SINGLE_USER_ID` for skipping Supabase auth
 3. Sync Prisma schema and client
    ```bash
    npm run db:sync
@@ -69,10 +72,11 @@ Trefle request fails after several retries—lookups fall back to a small
 built-in list. In those cases results may be limited compared to the full Trefle database.
 
 ## Single-User Mode
-Useful when running locally without authentication.
+Kay Maria runs in single-user mode by default. Set the following variables in `.env`:
 ```
 SINGLE_USER_MODE=true
 SINGLE_USER_ID=<supabase user uuid>
+SUPABASE_SERVICE_ROLE_KEY=<service role key>
 ```
 Restart the dev server after changing these values.
 
