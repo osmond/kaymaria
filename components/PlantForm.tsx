@@ -241,18 +241,27 @@ export function EnvironmentFields({
   const { errors, touched, validate, markTouched } = validation;
   const [showMore, setShowMore] = useState(false);
   const [address, setAddress] = useState('');
+  const [geoError, setGeoError] = useState<string | null>(null);
 
   function useCurrentLocation() {
     if (!('geolocation' in navigator)) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const lat = pos.coords.latitude.toFixed(6);
-      const lon = pos.coords.longitude.toFixed(6);
-      setState({ ...state, lat, lon });
-      markTouched('lat');
-      markTouched('lon');
-      validate('lat', lat);
-      validate('lon', lon);
-    });
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        setState({ ...state, lat, lon });
+        markTouched('lat');
+        markTouched('lon');
+        validate('lat', lat);
+        validate('lon', lon);
+        setGeoError(null);
+      },
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setGeoError('Location permission denied.');
+        }
+      }
+    );
   }
 
   async function lookupAddress() {
@@ -314,9 +323,15 @@ export function EnvironmentFields({
 
       <Field label="Location (for weather)">
         <div className="grid gap-2">
-          <button type="button" className="btn-secondary" onClick={useCurrentLocation}>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={useCurrentLocation}
+            title="We’ll tailor watering to local weather."
+          >
             Use current location
           </button>
+          {geoError && <p className="text-xs text-red-600">{geoError}</p>}
           <div className="flex gap-2">
             <input
               className="input flex-1"
