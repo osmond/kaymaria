@@ -13,7 +13,14 @@ import {
   plantValuesToSubmit,
   PlanSource,
 } from './PlantForm';
-import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
+import {
+  plantFormSchema,
+  plantFieldSchemas,
+  indoorEnum,
+  drainageEnum,
+  type IndoorOption,
+  type DrainageOption,
+} from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { fetchJson } from '@/lib/fetchJson';
 
@@ -28,13 +35,13 @@ export default function AddPlantModal({
   open,
   onOpenChange,
   prefillName,
-  defaultRoomId,
+  defaultRoomId = '',
   onCreate,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   prefillName?: string;
-  defaultRoomId: string;
+  defaultRoomId?: string;
   onCreate: (plant: { id: string; name: string }) => void;
 }) {
   const titleId = useId();
@@ -130,8 +137,8 @@ export default function AddPlantModal({
         pot: stored.pot || '6 in',
         potMaterial: stored.potMaterial || 'Plastic',
         light: stored.light || 'Medium',
-        indoor: 'Indoor',
-        drainage: 'ok',
+        indoor: indoorEnum.options[0] as IndoorOption,
+        drainage: drainageEnum.options[1] as DrainageOption,
         soil: stored.soil || 'Well-draining mix',
         humidity: stored.humidity || '50',
         lat: '',
@@ -314,6 +321,20 @@ export default function AddPlantModal({
     setStep((s) => Math.max(s - 1, 0));
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.target instanceof HTMLTextAreaElement) return;
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (e.shiftKey) {
+      prevStep();
+    } else if (step < 2) {
+      if (step === 0 && !basicsValid) return;
+      nextStep();
+    } else if (!saving && canSubmit) {
+      submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual');
+    }
+  }
+
   if (!open) return null;
 
   return (
@@ -327,7 +348,10 @@ export default function AddPlantModal({
       >
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-md sm:max-h-[90vh] flex flex-col">
+          <Dialog.Panel
+            className="relative w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-md sm:max-h-[90vh] flex flex-col"
+            onKeyDown={handleKeyDown}
+          >
             <header className="sticky top-0 bg-background border-b p-6">
               <Dialog.Title
                 id={titleId}

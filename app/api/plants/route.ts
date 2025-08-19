@@ -3,6 +3,7 @@ import { listPlants, createPlant } from "@/lib/prisma/plants";
 import { createRouteHandlerClient } from "@/lib/supabase";
 import { getUserId } from "@/lib/getUserId";
 import { z } from "zod";
+import { drainageEnum } from "@/lib/plantFormSchema";
 
 const missingEnv = () =>
   !process.env.DATABASE_URL ||
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
       soilType: z.string().optional(),
       lightLevel: z.string().optional(),
       indoor: z.coerce.boolean().optional(),
-      drainage: z.enum(["poor", "ok", "great"]).optional(),
+      drainage: drainageEnum.optional(),
       lat: z.coerce.number().optional(),
       lon: z.coerce.number().optional(),
       carePlanSource: z.string().optional(),

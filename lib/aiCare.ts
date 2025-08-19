@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import type { DrainageOption } from './plantFormSchema';
 
 export type AiCareParams = {
   name?: string;
@@ -7,7 +8,7 @@ export type AiCareParams = {
   potMaterial?: string;
   light?: string;
   indoor?: boolean;
-  drainage?: string;
+  drainage?: DrainageOption;
   soil?: string;
   humidity?: number;
   lat?: number;
@@ -30,7 +31,7 @@ export async function suggestCare({
   potMaterial = '',
   light = '',
   indoor,
-  drainage = '',
+  drainage,
   soil = '',
   humidity,
   lat,

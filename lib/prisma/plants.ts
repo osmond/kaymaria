@@ -1,4 +1,5 @@
 import { PrismaClient, Plant, Prisma } from "@prisma/client";
+import type { DrainageOption } from "@/lib/plantFormSchema";
 
 const prisma = new PrismaClient();
 
@@ -11,7 +12,7 @@ type PlantData = {
   soilType?: string | null;
   lightLevel?: string | null;
   indoor?: boolean | null;
-  drainage?: 'poor' | 'ok' | 'great' | null;
+  drainage?: DrainageOption | null;
   lat?: number | null;
   lon?: number | null;
   carePlanSource?: string | null;

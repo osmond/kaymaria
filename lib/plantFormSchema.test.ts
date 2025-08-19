@@ -5,6 +5,8 @@ describe('plantFormSchema', () => {
     const res = plantFormSchema.safeParse({
       name: '',
       roomId: '',
+      indoor: 'Indoor',
+      drainage: 'ok',
       waterEvery: '1',
       waterAmount: '10',
       fertEvery: '1',
@@ -21,6 +23,8 @@ describe('plantFormSchema', () => {
     const res = plantFormSchema.safeParse({
       name: 'A',
       roomId: 'r1',
+      indoor: 'Indoor',
+      drainage: 'ok',
       waterEvery: '0',
       waterAmount: '9',
       fertEvery: '0',
@@ -38,6 +42,8 @@ describe('plantFormSchema', () => {
     const res = plantFormSchema.safeParse({
       name: 'A',
       roomId: 'r1',
+      indoor: 'Indoor',
+      drainage: 'ok',
       waterEvery: '1',
       waterAmount: '10',
       fertEvery: '1',

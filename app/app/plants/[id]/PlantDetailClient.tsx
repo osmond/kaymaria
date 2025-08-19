@@ -7,6 +7,7 @@ import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
 import BottomNav from '@/components/BottomNav';
 import CareSummary from '@/components/CareSummary';
+import type { DrainageOption } from '@/lib/plantFormSchema';
 
 type CareType = "water" | "fertilize" | "repot";
 type TaskDTO = {
@@ -40,7 +41,7 @@ export default function PlantDetailClient({ plant }: { plant: {
   potSize?: string;
   potMaterial?: string;
   soilType?: string;
-  drainage?: 'poor' | 'ok' | 'great';
+  drainage?: DrainageOption;
   indoor?: boolean;
   latitude?: number;
   longitude?: number;

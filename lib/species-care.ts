@@ -6,12 +6,14 @@
  * `SpeciesCareDefaults` type must be provided so that lookups remain
  * consistent.
  */
+import type { IndoorOption, DrainageOption } from './plantFormSchema';
+
 export type SpeciesCareDefaults = {
   pot: string;
   potMaterial: string;
   light: string;
-  indoor: 'Indoor' | 'Outdoor';
-  drainage: 'poor' | 'ok' | 'great';
+  indoor: IndoorOption;
+  drainage: DrainageOption;
   soil: string;
   waterEvery: string;
   waterAmount: string;

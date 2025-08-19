@@ -4,7 +4,14 @@ import React, { useEffect, useState } from 'react';
 
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { z } from 'zod';
-import { plantFieldSchemas, plantFormSchema } from '@/lib/plantFormSchema';
+import {
+  plantFieldSchemas,
+  plantFormSchema,
+  indoorEnum,
+  drainageEnum,
+  type IndoorOption,
+  type DrainageOption,
+} from '@/lib/plantFormSchema';
 
 
 import SpeciesAutosuggest from './SpeciesAutosuggest';
@@ -20,8 +27,8 @@ export type PlantFormValues = {
   pot: string;
   potMaterial: string;
   light: string;
-  indoor: 'Indoor' | 'Outdoor';
-  drainage: 'poor' | 'ok' | 'great';
+  indoor: IndoorOption;
+  drainage: DrainageOption;
   soil: string;
   humidity: string;
   lat?: string;
@@ -43,7 +50,7 @@ export type PlantFormSubmit = {
   lightLevel: string;
   indoor: boolean;
   soilType?: string;
-  drainage: 'poor' | 'ok' | 'great';
+  drainage: DrainageOption;
   lat?: number;
   lon?: number;
   lastWateredAt?: string;
@@ -106,6 +113,8 @@ type SectionProps = {
 type FieldName =
   | 'name'
   | 'roomId'
+  | 'indoor'
+  | 'drainage'
   | 'waterEvery'
   | 'waterAmount'
   | 'fertEvery'
@@ -360,22 +369,29 @@ export function EnvironmentFields({
             className="input"
             value={state.indoor}
             onChange={(e) =>
-              setState({ ...state, indoor: e.target.value as 'Indoor' | 'Outdoor' })
+              setState({ ...state, indoor: e.target.value as IndoorOption })
             }
           >
-            <option>Indoor</option>
-            <option>Outdoor</option>
+            {indoorEnum.options.map((o) => (
+              <option key={o}>{o}</option>
+            ))}
           </select>
           <select
             className="input"
             value={state.drainage}
             onChange={(e) =>
-              setState({ ...state, drainage: e.target.value as 'poor' | 'ok' | 'great' })
+              setState({ ...state, drainage: e.target.value as DrainageOption })
             }
           >
-            <option value="poor">Poor drainage</option>
-            <option value="ok">OK drainage</option>
-            <option value="great">Great drainage</option>
+            {drainageEnum.options.map((o) => (
+              <option key={o} value={o}>
+                {o === 'poor'
+                  ? 'Poor drainage'
+                  : o === 'ok'
+                  ? 'OK drainage'
+                  : 'Great drainage'}
+              </option>
+            ))}
           </select>
         </div>
       </Field>
