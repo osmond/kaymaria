@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useRef, useId } from 'react';
 import { Dialog } from '@headlessui/react';
-import { useRouter } from 'next/navigation';
 import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import {
   BasicsFields,
@@ -13,6 +12,7 @@ import {
   PlantFormValues,
   plantValuesToSubmit,
 } from './PlantForm';
+import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 
 type PlanSource =
@@ -51,9 +51,8 @@ export default function AddPlantModal({
   onOpenChange: (v: boolean) => void;
   prefillName?: string;
   defaultRoomId: string;
-  onCreate: (name: string) => void;
+  onCreate: (plant: { id: string; name: string }) => void;
 }) {
-  const router = useRouter();
   const titleId = useId();
   const firstFieldRef = useRef<HTMLInputElement>(null);
   const prevFocus = useRef<HTMLElement | null>(null);
@@ -66,7 +65,6 @@ export default function AddPlantModal({
     null,
   );
   const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const [step, setStep] = useState<0 | 1 | 2>(0);
   const [planSource, setPlanSource] = useState<PlanSource | null>(null);
   const [defaults, setDefaults] = useState<{
@@ -75,6 +73,11 @@ export default function AddPlantModal({
     light: string;
   } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const canSubmit = values ? plantFormSchema.safeParse(values).success : false;
+  const basicsValid = values
+    ? plantFieldSchemas.name.safeParse(values.name).success &&
+      plantFieldSchemas.roomId.safeParse(values.roomId).success
+    : false;
 
   function saveDefault(
     field: 'pot' | 'potMaterial' | 'light',
@@ -247,9 +250,7 @@ export default function AddPlantModal({
     }
     const created = await r.json();
     requestIdRef.current = null;
-    onCreate(data.name);
-    close();
-    router.push(`/app/plants/${created.id}?tab=photos`);
+    return created;
   }
 
   async function submitCurrent(
@@ -260,9 +261,12 @@ export default function AddPlantModal({
     const current = override ?? values;
     if (!current.name.trim()) return;
     setSaving(true);
-    setSaveError(null);
+    close();
     try {
-      await handleSubmit(plantValuesToSubmit(current), source);
+      const created = await handleSubmit(
+        plantValuesToSubmit(current),
+        source,
+      );
       try {
         localStorage.setItem(
           'plantDefaults',
@@ -276,6 +280,7 @@ export default function AddPlantModal({
           }),
         );
       } catch {}
+      onCreate({ id: created.id, name: created.name || current.name });
     } catch (e: any) {
       let message = 'Failed to save plant.';
       let status: number | undefined;
@@ -307,7 +312,7 @@ export default function AddPlantModal({
       if (status !== undefined) context.status = status;
       if (data !== null) context.data = data;
       console.error('Error saving plant', context);
-      setSaveError(message);
+      setToast(message);
       return;
     } finally {
       setSaving(false);
@@ -374,10 +379,17 @@ export default function AddPlantModal({
                     onPlanModeChange={setPlanSource}
                   />
                 )}
-                <div className="pt-6 mt-6 flex gap-2 justify-end items-center">
-                  {saveError && step === 2 && (
-                    <div className="text-xs text-red-600 mr-auto">{saveError}</div>
+                <div className="mt-6 flex flex-wrap gap-2 text-xs">
+                  <span className="rounded-full border bg-white px-3 py-1 shadow-sm">
+                    {`Water every ${values.waterEvery}d · ${values.waterAmount} ml • Fertilize every ${values.fertEvery}d`}
+                  </span>
+                  {planSource && planSource.type !== 'manual' && (
+                    <span className="rounded-full border bg-white px-3 py-1 shadow-sm">
+                      {planSource.type === 'ai' ? 'AI plan' : 'Preset plan'}
+                    </span>
                   )}
+                </div>
+                <div className="pt-6 mt-6 flex gap-2 justify-end items-center">
                   <button
                     className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                     onClick={close}
@@ -398,6 +410,7 @@ export default function AddPlantModal({
                     <button
                       className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                       onClick={nextStep}
+                      disabled={step === 0 && !basicsValid}
                     >
                       <ArrowRight className="h-4 w-4" />
                       Next
@@ -409,13 +422,11 @@ export default function AddPlantModal({
                       onClick={() =>
                         submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual')
                       }
-                      disabled={saving || !values.name.trim()}
+                      disabled={saving || !canSubmit}
                     >
                       <Check className="h-4 w-4" />
                       {saving
                         ? 'Saving…'
-                        : saveError
-                        ? 'Retry'
                         : planSource && planSource.type !== 'manual'
                         ? 'Create with Suggested Plan'
                         : 'Create Plant (Manual)'}
