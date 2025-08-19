@@ -24,7 +24,7 @@ import {
   AlertCircle,
   Droplet,
   FlaskRound,
-  PottedPlant,
+  Sprout,
   Home,
   X,
   Filter as FilterIcon,
@@ -628,7 +628,7 @@ export function TimelineView() {
   const typeIcons = {
     water: Droplet,
     fertilize: FlaskRound,
-    repot: PottedPlant,
+    repot: Sprout,
   } as const;
 
   const typeColors: Record<EventDTO["type"], string> = {
