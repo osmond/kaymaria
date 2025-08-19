@@ -48,6 +48,7 @@ export default function EditPlantModal({
               roomId: plant.roomId || '',
               species: plant.species || '',
               pot: plant.potSize || '6 in',
+              potHeight: plant.potSize || '6 in',
               potMaterial: plant.potMaterial || 'Plastic',
               light: plant.lightLevel || plant.light || 'Medium',
               indoor: plant.indoor ? 'Indoor' : 'Outdoor',

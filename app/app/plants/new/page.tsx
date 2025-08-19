@@ -30,6 +30,7 @@ export default function NewPlantPage() {
           roomId: '',
           species: '',
           pot: '6 in',
+          potHeight: '6 in',
           potMaterial: 'Plastic',
           light: 'Medium',
           indoor: 'Indoor',

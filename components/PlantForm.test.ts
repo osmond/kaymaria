@@ -6,6 +6,7 @@ describe('plantValuesToSubmit', () => {
     roomId: 'room-1',
     species: 'Ficus',
     pot: '10cm',
+    potHeight: '10cm',
     potMaterial: 'Ceramic',
     light: 'Bright',
     indoor: 'Indoor',
