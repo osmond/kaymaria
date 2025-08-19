@@ -2,6 +2,8 @@
 
 This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion with real-time task syncing across devices. The goal of this README is to give contributors (like me) a fast reference for building, testing and exploring the project.
 
+All pages should follow the [style guide](./docs/style-guide.md) to ensure a consistent look and feel across the app.
+
 The Add Plant form uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Form fields include validation for required entries and numeric values. Submitting the form now persists the plant to the backend and pre-creates care tasks.
 
 The Plant detail page shows a skeleton screen while loading to provide a smoother experience and includes a back link to the Plants list for smoother navigation.
