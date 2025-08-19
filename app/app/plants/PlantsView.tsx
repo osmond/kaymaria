@@ -1,14 +1,12 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import Fab from "@/components/Fab";
 import AddPlantModal from "@/components/AddPlantModal";
-
-type Plant = { id: string; name: string; room?: string; species?: string };
+import usePlants from "./usePlants";
 
 export default function PlantsView() {
-  const [items, setItems] = useState<Plant[] | null>(null);
-  const [err, setErr] = useState<string | null>(null);
+  const { plants: items, error: err, isLoading, mutate } = usePlants();
   const [addOpen, setAddOpen] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     visible: boolean;
@@ -23,20 +21,6 @@ export default function PlantsView() {
       if (roomA !== roomB) return roomA.localeCompare(roomB);
       return a.name.localeCompare(b.name);
     }) ?? null;
-  async function load() {
-    try {
-      setErr(null);
-      const r = await fetch("/api/plants", { cache: "no-store" });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      setItems(await r.json());
-    } catch (e: any) {
-      setErr(e?.message || "Failed to load");
-    }
-  }
-
-  useEffect(() => {
-    load();
-  }, []);
 
   return (
     <>
@@ -55,7 +39,9 @@ export default function PlantsView() {
             </div>
           )}
 
-          {!items && !err && <div className="text-sm text-neutral-500">Loading…</div>}
+          {isLoading && !items && (
+            <div className="text-sm text-neutral-500">Loading…</div>
+          )}
 
           {sortedItems && (
             <div className="grid grid-cols-2 gap-3">
@@ -83,7 +69,7 @@ export default function PlantsView() {
         defaultRoomId="room-1"
         onCreate={(p) => {
           setAddOpen(false);
-          load();
+          mutate();
           if (timer.current) window.clearTimeout(timer.current);
           setSnackbar({
             visible: true,
@@ -93,7 +79,7 @@ export default function PlantsView() {
               onClick: async () => {
                 setSnackbar({ visible: false, message: "" });
                 await fetch(`/api/plants/${p.id}`, { method: "DELETE" });
-                load();
+                mutate();
               },
             },
           });
