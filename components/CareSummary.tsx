@@ -26,7 +26,7 @@ export default function CareSummary({
 
   return (
     <div className="mt-4 grid grid-cols-2 gap-3">
-      <div className="flex items-center gap-2 rounded-xl border bg-white p-3 shadow-sm">
+      <div className="flex items-center gap-2 rounded-2xl border bg-white p-3 shadow-card">
         <Droplet className="h-4 w-4" />
         <div>
           <div className="text-xs text-neutral-500">Water</div>
@@ -39,7 +39,7 @@ export default function CareSummary({
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2 rounded-xl border bg-white p-3 shadow-sm">
+      <div className="flex items-center gap-2 rounded-2xl border bg-white p-3 shadow-card">
         <FlaskConical className="h-4 w-4" />
         <div>
           <div className="text-xs text-neutral-500">Fertilize</div>

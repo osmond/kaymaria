@@ -653,7 +653,7 @@ export function CarePlanFields({
   return (
     <div className="p-6 space-y-6">
       {showSuggest && (
-        <div className="rounded-xl border p-3 bg-neutral-50">
+        <div className="rounded-2xl border p-3 bg-neutral-50">
           <div className="text-sm font-medium mb-2">
             AI-generated plan — Review and customize before saving.
           </div>

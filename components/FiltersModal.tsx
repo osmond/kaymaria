@@ -40,7 +40,7 @@ export default function FiltersModal({
     <Dialog open={open} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
       <div className="fixed inset-0 flex items-end sm:items-center justify-center p-4">
-        <Dialog.Panel className="relative w-full sm:max-w-sm bg-white rounded-t-2xl sm:rounded-2xl p-4 shadow-xl max-h-[90vh] overflow-y-auto">
+        <Dialog.Panel className="relative w-full sm:max-w-sm bg-white rounded-t-2xl sm:rounded-2xl p-4 shadow-card max-h-[90vh] overflow-y-auto">
           <div className="mb-3">
             <Dialog.Title className="text-lg font-semibold">Filters</Dialog.Title>
           </div>

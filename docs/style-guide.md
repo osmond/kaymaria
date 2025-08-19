@@ -35,7 +35,7 @@ Use varied sizes for hierarchy:
 - Use grid layouts for dashboards and plant galleries.
 - Consistent padding: `p-4`, `p-6` for sections.
 - Rounded corners: `rounded-2xl`
-- Soft drop shadows: `shadow-md`
+- Soft drop shadows: `shadow-card`
 
 ---
 

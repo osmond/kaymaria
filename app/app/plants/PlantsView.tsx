@@ -34,7 +34,7 @@ export default function PlantsView() {
           </div>
 
           {err && (
-            <div className="rounded-xl border bg-white shadow-sm p-4 text-sm text-red-600">
+            <div className="rounded-2xl border bg-white shadow-card p-4 text-sm text-red-600">
               {err}
             </div>
           )}
@@ -47,7 +47,7 @@ export default function PlantsView() {
             <div className="grid grid-cols-2 gap-3">
               {sortedItems.map((p) => (
                 <Link key={p.id} href={`/app/plants/${p.id}`} className="text-left">
-                  <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
+                  <div className="rounded-2xl border bg-white shadow-card overflow-hidden">
                     <div className="h-24 bg-neutral-100" />
                     <div className="p-2">
                       <div className="text-sm font-medium truncate">{p.name}</div>

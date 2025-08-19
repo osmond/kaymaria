@@ -64,7 +64,7 @@ export default function TaskRow({
       aria-label={`Task for ${plant}: ${action}. Last ${last}. Due ${due}. Press Enter or O to open, C to complete, S to snooze.`}
     >
       <div className="sr-only" aria-live="polite">{announce}</div>
-      <div className="absolute inset-0 rounded-xl overflow-hidden">
+      <div className="absolute inset-0 rounded-2xl overflow-hidden">
         <div className="absolute inset-y-0 left-0 w-20 grid place-items-center bg-emerald-100 text-emerald-700">
           <div className="flex items-center gap-2 text-xs font-medium">
             <Check className="h-4 w-4" />
@@ -88,7 +88,7 @@ export default function TaskRow({
         }}
         className="relative"
       >
-        <div className="rounded-xl border bg-white shadow-sm dark:bg-neutral-800 dark:border-neutral-700">
+        <div className="rounded-2xl border bg-white shadow-card dark:bg-neutral-800 dark:border-neutral-700">
           <div className="p-3 flex items-center gap-3">
             <button
               onClick={onOpen}

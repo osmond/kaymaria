@@ -15,14 +15,14 @@ export default function InsightsSkeleton() {
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-xl border bg-white shadow-sm p-4 space-y-2"
+            className="rounded-2xl border bg-white shadow-card p-4 space-y-2"
           >
             <div className="h-4 w-3/4 bg-neutral-200 rounded" />
             <div className="h-6 w-1/2 bg-neutral-200 rounded" />
           </div>
         ))}
       </div>
-      <div className="rounded-xl border bg-white shadow-sm p-4">
+      <div className="rounded-2xl border bg-white shadow-card p-4">
         <div className="h-48 bg-neutral-200 rounded" />
       </div>
     </div>

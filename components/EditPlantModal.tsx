@@ -37,7 +37,7 @@ export default function EditPlantModal({
     <Dialog open={open} onClose={close} className="relative z-50">
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
       <div className="fixed inset-0 flex items-end sm:items-center justify-center p-4">
-        <Dialog.Panel className="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto">
+        <Dialog.Panel className="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-card max-h-[90vh] overflow-y-auto">
           <div className="p-5 border-b">
             <Dialog.Title className="text-lg font-display font-semibold">Edit Plant</Dialog.Title>
           </div>

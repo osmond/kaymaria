@@ -92,7 +92,7 @@ export default function InsightsView() {
         <h2 className="text-sm font-display font-medium text-neutral-600">Insights</h2>
 
         {err && (
-          <div className="rounded-xl border bg-white shadow-sm p-4 text-sm text-red-600">
+          <div className="rounded-2xl border bg-white shadow-card p-4 text-sm text-red-600">
             {err}
           </div>
         )}
@@ -122,20 +122,20 @@ export default function InsightsView() {
               </label>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-xl border bg-white shadow-sm p-4 text-center">
+              <div className="rounded-2xl border bg-white shadow-card p-4 text-center">
                 <div className="text-sm text-neutral-500">Completed Tasks</div>
                 <div className="text-2xl font-bold">{totalCompletedTasks}</div>
               </div>
-              <div className="rounded-xl border bg-white shadow-sm p-4 text-center">
+              <div className="rounded-2xl border bg-white shadow-card p-4 text-center">
                 <div className="text-sm text-neutral-500">Overdue Tasks</div>
                 <div className="text-2xl font-bold">{totalOverdueTasks}</div>
               </div>
-              <div className="rounded-xl border bg-white shadow-sm p-4 text-center">
+              <div className="rounded-2xl border bg-white shadow-card p-4 text-center">
                 <div className="text-sm text-neutral-500">New Plants</div>
                 <div className="text-2xl font-bold">{totalNewPlants}</div>
               </div>
             </div>
-            <div className="rounded-xl border bg-white shadow-sm p-4">
+            <div className="rounded-2xl border bg-white shadow-card p-4">
               <div className="h-48">
                 <Line
                   data={chartData}
