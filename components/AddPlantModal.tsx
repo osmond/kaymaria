@@ -334,8 +334,8 @@ export default function AddPlantModal({
       >
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-white rounded-none sm:rounded-2xl shadow-xl overflow-y-auto sm:max-h-[90vh]">
-            <div className="p-5 border-b">
+          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-md p-6 overflow-y-auto sm:max-h-[90vh]">
+            <div className="mb-6">
               <Dialog.Title
                 id={titleId}
                 className="text-lg font-display font-semibold"
@@ -344,7 +344,7 @@ export default function AddPlantModal({
               </Dialog.Title>
             </div>
             {loading && (
-              <div className="p-5 space-y-4 animate-pulse">
+              <div className="py-6 space-y-4 animate-pulse">
                 <div className="h-6 bg-neutral-200 rounded" />
                 <div className="h-6 bg-neutral-200 rounded" />
                 <div className="h-6 bg-neutral-200 rounded" />
@@ -353,7 +353,7 @@ export default function AddPlantModal({
             {!loading && values && (
               <>
                 {notice && (
-                  <div className="p-5 text-sm text-gray-600">{notice}</div>
+                  <div className="py-6 text-sm text-gray-600">{notice}</div>
                 )}
                 {step === 0 && (
                   <BasicsFields
@@ -373,7 +373,7 @@ export default function AddPlantModal({
                     onPlanModeChange={setPlanSource}
                   />
                 )}
-                <div className="p-5 border-t flex gap-2 justify-end items-center">
+                <div className="pt-6 mt-6 flex gap-2 justify-end items-center">
                   {saveError && step === 2 && (
                     <div className="text-xs text-red-600 mr-auto">{saveError}</div>
                   )}
