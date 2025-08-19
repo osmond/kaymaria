@@ -65,6 +65,9 @@ export default function AddPlantModal({
   const [toast, setToast] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [locationTag, setLocationTag] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [recognizing, setRecognizing] = useState(false);
+  const [recognizeError, setRecognizeError] = useState<string | null>(null);
   const validationId = useId();
   const saveErrorId = useId();
   const canSubmit = values ? plantFormSchema.safeParse(values).success : false;
@@ -118,6 +121,85 @@ export default function AddPlantModal({
   function close() {
     onOpenChange(false);
     prevFocus.current?.focus();
+  }
+
+  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setRecognizing(true);
+    setRecognizeError(null);
+    try {
+      const form = new FormData();
+      form.append('image', file);
+      const r = await fetch('/api/species-identify', {
+        method: 'POST',
+        body: form,
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const json = await r.json();
+      const suggestion = json?.suggestions?.[0] || json;
+      const identifiedName =
+        suggestion?.plant_name || suggestion?.name || suggestion?.common_name;
+      const identifiedSpecies =
+        suggestion?.plant_details?.scientific_name ||
+        suggestion?.species ||
+        suggestion?.slug;
+      if (identifiedName) {
+        try {
+          if (identifiedSpecies) {
+            const care = await fetchJson<{
+              presets?: Partial<PlantFormValues>;
+              presetId?: string;
+              updated?: string;
+            }>(
+              `/api/species-care?species=${encodeURIComponent(identifiedSpecies)}`,
+              { retries: 2 },
+            );
+            if (care?.presets) {
+              setValues((v) => ({
+                ...(v || {}),
+                name: identifiedName,
+                species: identifiedSpecies || '',
+                ...care.presets,
+              }));
+              setPlanSource({ type: 'preset', presetId: care.presetId });
+              if (care.updated) {
+                setNotice(
+                  `Found care preset • last updated ${new Date(care.updated).toLocaleDateString()}`,
+                );
+              } else {
+                setNotice('Found care preset');
+              }
+            } else {
+              setValues((v) => ({
+                ...(v || {}),
+                name: identifiedName,
+                species: identifiedSpecies || '',
+              }));
+            }
+          } else {
+            setValues((v) => ({
+              ...(v || {}),
+              name: identifiedName,
+              species: identifiedSpecies || '',
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to load care defaults', err);
+          setValues((v) => ({
+            ...(v || {}),
+            name: identifiedName,
+            species: identifiedSpecies || '',
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Species identification failed', err);
+      setRecognizeError('Could not identify plant');
+    } finally {
+      setRecognizing(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   }
 
   useEffect(() => {
@@ -396,14 +478,39 @@ export default function AddPlantModal({
                     </div>
                   )}
                   {step === 0 && (
-                    <BasicsFields
-                      state={values}
-                      setState={setValues}
-                      defaults={defaults || undefined}
-                      nameInputRef={firstFieldRef}
-                      onSaveDefault={saveDefault}
-                      careTips={careTips}
-                    />
+                    <>
+                      <div className="mb-4">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          ref={fileInputRef}
+                          className="hidden"
+                          onChange={handleImageChange}
+                        />
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-2 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={recognizing}
+                        >
+                          {recognizing ? 'Identifying…' : 'Identify from photo'}
+                        </button>
+                        {recognizeError && (
+                          <div className="mt-2 text-sm text-red-600">
+                            {recognizeError}
+                          </div>
+                        )}
+                      </div>
+                      <BasicsFields
+                        state={values}
+                        setState={setValues}
+                        defaults={defaults || undefined}
+                        nameInputRef={firstFieldRef}
+                        onSaveDefault={saveDefault}
+                        careTips={careTips}
+                      />
+                    </>
                   )}
                   {step === 1 && (
                     <EnvironmentFields
