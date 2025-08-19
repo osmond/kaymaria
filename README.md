@@ -30,6 +30,13 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
    The `npm run db:seed` script only clears the `task` and `plant` tables and doesn’t insert mock data. Run it only if you need to wipe existing data.
    Log in at `http://localhost:3000/login` with a Supabase email/password account. Use the Settings page to sign out.
 
+## Post-merge workflow
+After pulling new changes:
+
+1. **Dependencies** – Run `npm install` only when `package.json` or `package-lock.json` has changed.
+2. **Prisma schema** – Run `npm run db:sync` if `prisma/schema.prisma` or files in `prisma/migrations/` have been updated.
+3. **Development server** – Restart `npm run dev` after applying the above updates.
+
 ## Common Scripts
 | command | description |
 |---|---|
