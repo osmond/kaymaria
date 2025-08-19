@@ -74,4 +74,36 @@ describe('InsightsView', () => {
     expect(url).toContain('start=2024-05-01');
     expect(url).toContain('end=2024-05-02');
   });
+
+  it('shows skeleton before data loads', async () => {
+    let resolveFetch: any;
+    (global.fetch as jest.Mock).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        })
+    );
+
+    render(<InsightsView />);
+
+    expect(screen.getByTestId('insights-skeleton')).toBeInTheDocument();
+
+    resolveFetch({
+      ok: true,
+      json: () =>
+        Promise.resolve([
+          {
+            period: '2024-05-01',
+            newPlantCount: 1,
+            completedTaskCount: 2,
+            overdueTaskCount: 0,
+          },
+        ]),
+    });
+
+    await screen.findByText(/Completed Tasks/i);
+    await waitFor(() =>
+      expect(screen.queryByTestId('insights-skeleton')).not.toBeInTheDocument()
+    );
+  });
 });
