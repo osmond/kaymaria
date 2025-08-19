@@ -302,14 +302,10 @@ export default function AddPlantModal({
       } catch (_) {
         // ignore parse errors
       }
-      const context: Record<string, unknown> = {};
+      const context: Record<string, unknown> = { error: e };
       if (status !== undefined) context.status = status;
       if (data !== null) context.data = data;
-      if (Object.keys(context).length > 0) {
-        console.error('Error saving plant', e, context);
-      } else {
-        console.error('Error saving plant', e);
-      }
+      console.error('Error saving plant', context);
       setSaveError(message);
       return;
     } finally {
