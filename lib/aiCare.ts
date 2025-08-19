@@ -22,6 +22,9 @@ export type AiCareSuggestion = {
   fertFormula?: string;
   model?: string;
   version?: string;
+  et0?: number;
+  weatherSource?: string;
+  fetchedAt?: string;
 };
 
 export async function suggestCare({
@@ -58,6 +61,7 @@ export async function suggestCare({
   if (typeof humidity === 'number') parts.push(`Humidity: ${humidity}%`);
 
   let et0: number | null = null;
+  let weatherSource: string | undefined;
   if (typeof lat === 'number' && typeof lon === 'number') {
     try {
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=et0_fao_evapotranspiration&timezone=auto`;
@@ -65,6 +69,7 @@ export async function suggestCare({
       if (r.ok) {
         const data = await r.json();
         et0 = data.daily?.et0_fao_evapotranspiration?.[0] ?? null;
+        weatherSource = 'Open-Meteo';
       }
     } catch {}
   }
@@ -109,6 +114,9 @@ export async function suggestCare({
     fertFormula: data.fertFormula,
     model: completion.model,
     version: completion.system_fingerprint,
+    et0: et0 ?? undefined,
+    weatherSource,
+    fetchedAt: new Date().toISOString(),
   };
 }
 

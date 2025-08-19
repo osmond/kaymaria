@@ -478,7 +478,7 @@ export function EnvironmentFields({
                 setAddress(e.target.value);
                 onLocationEdit?.();
               }}
-              placeholder="Search address"
+              placeholder="ZIP or address"
             />
             <button
               type="button"
@@ -543,9 +543,13 @@ export function EnvironmentFields({
             </div>
           )}
         </div>
+        {state.lat && state.lon ? (
+          <span className="text-xs text-neutral-600">Using your location to adjust watering schedule</span>
+        ) : (
+          <span className="text-xs text-neutral-600">Location not available. Set manually?</span>
+        )}
         <p className="hint">
-          Used to tailor intervals based on local conditions. Without a location
-          we'll use standard intervals.
+          Used to tailor intervals based on local conditions. Without a location we'll use standard intervals.
         </p>
       </Field>
 
@@ -588,6 +592,7 @@ export function CarePlanFields({
   const [loadingSuggest, setLoadingSuggest] = useState(false);
   const [suggestError, setSuggestError] = useState<string | null>(null);
   const [showMore, setShowMore] = useState(false);
+  const [showCard, setShowCard] = useState(true);
 
   const fmtDate = (d: Date) =>
     new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(d);
@@ -603,6 +608,11 @@ export function CarePlanFields({
     lastFertilizedDate && Number(state.fertEvery) > 0
       ? new Date(lastFertilizedDate.getTime() + Number(state.fertEvery) * 864e5)
       : null;
+
+  const aiWaterEvery = prevManual && state.waterEvery !== prevManual.waterEvery;
+  const aiWaterAmount = prevManual && state.waterAmount !== prevManual.waterAmount;
+  const aiFertEvery = prevManual && state.fertEvery !== prevManual.fertEvery;
+  const aiFertFormula = prevManual && state.fertFormula !== prevManual.fertFormula;
 
   useEffect(() => {
     if (!initialSuggest) return;
@@ -626,7 +636,8 @@ export function CarePlanFields({
       fertFormula: initialSuggest.fertFormula ?? s.fertFormula,
     }));
     setSuggest(initialSuggest);
-  }, [initialSuggest, setState]);
+    onSuggestChange?.(initialSuggest);
+  }, [initialSuggest, setState, onSuggestChange]);
 
   useEffect(() => {
     if (!showSuggest) return;
@@ -673,6 +684,7 @@ export function CarePlanFields({
           fertFormula: json.fertFormula ?? s.fertFormula,
         }));
         setSuggest(json);
+        onSuggestChange?.(json);
       } catch (e: any) {
         setSuggestError("Couldn't reach the server. Your info is safe—try again.");
       } finally {
@@ -697,18 +709,16 @@ export function CarePlanFields({
     showSuggest,
   ]);
 
-  useEffect(() => {
-    onSuggestChange?.(suggest);
-  }, [suggest, onSuggestChange]);
-
   function applySuggest() {
     onPlanModeChange?.({
       type: 'ai',
       aiModel: suggest?.model,
       aiVersion: suggest?.version,
     });
+    onSuggestChange?.(suggest);
     setSuggest(null);
     setPrevManual(null);
+    setShowCard(false);
   }
 
   function customizePlan() {
@@ -718,68 +728,71 @@ export function CarePlanFields({
     setSuggest(null);
     setPrevManual(null);
     onPlanModeChange?.({ type: 'manual' });
+    onSuggestChange?.(null);
+    setShowCard(true);
   }
 
   return (
     <div className="p-0 space-y-6">
-      {showSuggest && (
-        <div className="rounded-2xl border p-3 bg-neutral-50">
-          <div className="text-sm font-medium mb-2">
-            AI-generated plan — Review and customize before saving.
-          </div>
+      {showSuggest && showCard && (
+        <section className="bg-neutral-50 rounded-2xl border p-4">
+          <h2 className="text-xl font-medium mb-2">Smart Care Plan</h2>
           {loadingSuggest && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 animate-pulse">
-              <div className="h-20 rounded-lg bg-neutral-200" />
-              <div className="h-20 rounded-lg bg-neutral-200" />
-            </div>
+            <p className="text-sm text-neutral-600">🌤 Generating personalized care plan…</p>
           )}
           {suggestError && (
             <div className="text-xs text-red-600 mb-2">{suggestError}</div>
           )}
-          {!suggest && !loadingSuggest && (
-            <div className="text-xs text-neutral-600">
-              Select species and pot info to get AI recommendations.
-            </div>
+          {!suggest && !loadingSuggest && !suggestError && (
+            <p className="text-sm text-neutral-600">
+              We’re building a care plan based on your plant’s needs and local weather…
+            </p>
           )}
           {suggest && !loadingSuggest && (
-            <div className="grid gap-2 text-sm">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div className="rounded-lg border bg-white p-2">
-                  <div className="text-xs text-neutral-500">Water</div>
-                  <div className="font-medium">
-                    every {suggest.waterEvery} d · {suggest.waterAmount} ml
-                  </div>
-                </div>
-                <div className="rounded-lg border bg-white p-2">
-                  <div className="text-xs text-neutral-500">Fertilize</div>
-                  <div className="font-medium">every {suggest.fertEvery} d</div>
-                  {suggest.fertFormula && (
-                    <div className="text-xs text-neutral-500">{suggest.fertFormula}</div>
-                  )}
-                </div>
+            <>
+              <p className="text-sm text-neutral-600 mb-2">Based on weather and environment:</p>
+              <ul className="text-sm list-disc pl-5 mb-3">
+                <li>
+                  Water every <strong>{suggest.waterEvery} days</strong>, {suggest.waterAmount}ml
+                </li>
+                <li>
+                  Fertilize every <strong>{suggest.fertEvery} days</strong>
+                  {suggest.fertFormula && ` with ${suggest.fertFormula}`}
+                </li>
+              </ul>
+              <div className="flex gap-2 mb-2">
+                <button className="btn" onClick={applySuggest}>Apply Suggestions</button>
+                <button className="btn-secondary" onClick={customizePlan}>Reset to defaults</button>
               </div>
-              <div className="flex gap-2">
-                <button className="btn" onClick={applySuggest}>Apply Suggested Plan</button>
-                <button className="btn-secondary" onClick={customizePlan}>
-                  Customize
-                </button>
-              </div>
-            </div>
+              {suggest.et0 && (
+                <details className="text-xs text-neutral-600 mt-2">
+                  <summary className="cursor-pointer">Why this plan?</summary>
+                  <p className="mt-1">
+                    Your plant's ET₀ is {suggest.et0.toFixed(1)} mm/day in your climate. Pot size and species needs suggest {suggest.waterAmount} ml every {suggest.waterEvery} days.
+                  </p>
+                </details>
+              )}
+            </>
           )}
-        </div>
+        </section>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Water every (days)">
-          <Stepper
-            value={state.waterEvery}
-            onChange={(v) => {
-              setState({ ...state, waterEvery: v });
-              markTouched('waterEvery');
-              validate('waterEvery', v);
-            }}
-            min={1}
-          />
+          <div className="flex items-center gap-2">
+            <Stepper
+              value={state.waterEvery}
+              onChange={(v) => {
+                setState({ ...state, waterEvery: v });
+                markTouched('waterEvery');
+                validate('waterEvery', v);
+              }}
+              min={1}
+            />
+            {aiWaterEvery && (
+              <span className="text-[10px] px-1 rounded bg-brand text-white">AI</span>
+            )}
+          </div>
           {touched.waterEvery && (
             errors.waterEvery ? (
               <span className="text-xs text-red-600">{errors.waterEvery}</span>
@@ -791,16 +804,21 @@ export function CarePlanFields({
           {nextWater && <p className="hint">Next watering: {fmtDate(nextWater)}</p>}
         </Field>
         <Field label="Water amount (ml)">
-          <Stepper
-            value={state.waterAmount}
-            onChange={(v) => {
-              setState({ ...state, waterAmount: v });
-              markTouched('waterAmount');
-              validate('waterAmount', v);
-            }}
-            min={10}
-            step={10}
-          />
+          <div className="flex items-center gap-2">
+            <Stepper
+              value={state.waterAmount}
+              onChange={(v) => {
+                setState({ ...state, waterAmount: v });
+                markTouched('waterAmount');
+                validate('waterAmount', v);
+              }}
+              min={10}
+              step={10}
+            />
+            {aiWaterAmount && (
+              <span className="text-[10px] px-1 rounded bg-brand text-white">AI</span>
+            )}
+          </div>
           {touched.waterAmount && (
             errors.waterAmount ? (
               <span className="text-xs text-red-600">{errors.waterAmount}</span>
@@ -835,15 +853,20 @@ export function CarePlanFields({
       <div className={`grid grid-cols-1 gap-4 ${showMore ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}
       >
         <Field label="Fertilize every (days)">
-          <Stepper
-            value={state.fertEvery}
-            onChange={(v) => {
-              setState({ ...state, fertEvery: v });
-              markTouched('fertEvery');
-              validate('fertEvery', v);
-            }}
-            min={1}
-          />
+          <div className="flex items-center gap-2">
+            <Stepper
+              value={state.fertEvery}
+              onChange={(v) => {
+                setState({ ...state, fertEvery: v });
+                markTouched('fertEvery');
+                validate('fertEvery', v);
+              }}
+              min={1}
+            />
+            {aiFertEvery && (
+              <span className="text-[10px] px-1 rounded bg-brand text-white">AI</span>
+            )}
+          </div>
           {touched.fertEvery && (
             errors.fertEvery ? (
               <span className="text-xs text-red-600">{errors.fertEvery}</span>
@@ -877,12 +900,17 @@ export function CarePlanFields({
         </Field>
         {showMore && (
           <Field label="Formula">
-            <input
-              className="input"
-              value={state.fertFormula}
-              onChange={(e) => setState({ ...state, fertFormula: e.target.value })}
-              placeholder="e.g., 10-10-10 @ 1/2 strength"
-            />
+            <div className="flex items-center gap-2">
+              <input
+                className="input"
+                value={state.fertFormula}
+                onChange={(e) => setState({ ...state, fertFormula: e.target.value })}
+                placeholder="e.g., 10-10-10 @ 1/2 strength"
+              />
+              {aiFertFormula && (
+                <span className="text-[10px] px-1 rounded bg-brand text-white">AI</span>
+              )}
+            </div>
           </Field>
         )}
       </div>
@@ -932,6 +960,7 @@ export default function PlantForm({
   const [saveError, setSaveError] = useState(false);
   const hasSpecies = Boolean(state.species);
   const [planSource, setPlanSource] = useState<PlanSource>({ type: 'manual' });
+  const [aiMeta, setAiMeta] = useState<AiCareSuggestion | null>(initialSuggest ?? null);
 
   useEffect(() => {
     setState(initial);
@@ -995,7 +1024,14 @@ export default function PlantForm({
         showSuggest={hasSpecies}
         onPlanModeChange={setPlanSource}
         validation={validation}
+        onSuggestChange={setAiMeta}
       />
+      {planSource.type === 'ai' && aiMeta && (
+        <p className="mt-4 text-center text-xs text-neutral-500">
+          AI-generated care plan • {aiMeta.model} • {aiMeta.weatherSource || 'Open-Meteo'} •{' '}
+          {aiMeta.fetchedAt ? new Date(aiMeta.fetchedAt).toLocaleDateString() : ''}
+        </p>
+      )}
       <div className="p-5 border-t flex gap-2 justify-end items-center">
         <button className="btn-secondary" onClick={onCancel}>
           Cancel
