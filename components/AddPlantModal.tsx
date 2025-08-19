@@ -15,7 +15,7 @@ import {
 } from './PlantForm';
 import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
-import { fetchJson } from '@/lib/fetchJson';
+import { fetchJson, FetchJsonError } from '@/lib/fetchJson';
 
 export function todayLocalYYYYMMDD(): string {
   const d = new Date();
@@ -244,7 +244,10 @@ export default function AddPlantModal({
         payload.aiVersion = planSource.aiVersion;
       }
     }
-    const created = await fetchJson<any>('/api/plants', {
+    const created = await fetchJson<
+      any,
+      { error?: string; message?: string; detail?: string }
+    >('/api/plants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -284,10 +287,15 @@ export default function AddPlantModal({
       } catch {}
       onCreate({ id: created.id, name: created.name || current.name });
       close();
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const err = e as FetchJsonError<{
+        error?: string;
+        message?: string;
+        detail?: string;
+      }>;
       let message = 'Failed to save plant.';
-      const status: number | undefined = e?.status;
-      const data: any = e?.data;
+      const status: number | undefined = err?.status;
+      const data = err?.data;
       if (status === 401) {
         message = 'Please log in before adding a plant.';
       } else if (data?.error) {
@@ -296,10 +304,10 @@ export default function AddPlantModal({
         message = data.message;
       } else if (data?.detail) {
         message = data.detail;
-      } else if (typeof e?.message === 'string') {
-        message = e.message;
+      } else if (typeof err?.message === 'string') {
+        message = err.message;
       }
-      console.error('Error saving plant', e, { status, data });
+      console.error('Error saving plant', err, { status, data });
       setSaveError(message);
     } finally {
       setSaving(false);
