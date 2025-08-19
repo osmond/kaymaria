@@ -11,14 +11,10 @@ import {
   PlantFormSubmit,
   PlantFormValues,
   plantValuesToSubmit,
+  PlanSource,
 } from './PlantForm';
 import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
-
-type PlanSource =
-  | { type: 'preset'; presetId?: string }
-  | { type: 'ai'; aiModel?: string; aiVersion?: string }
-  | { type: 'manual' };
 
 async function fetchWithRetry(
   url: string,
@@ -112,6 +108,7 @@ export default function AddPlantModal({
       setLoading(true);
       setNotice(null);
       setStep(0);
+      setPlanSource({ type: 'manual' });
       let stored: any = {};
       try {
         stored = JSON.parse(localStorage.getItem('plantDefaults') || '{}');
@@ -188,19 +185,12 @@ export default function AddPlantModal({
             if (ai.ok) {
               const sug: AiCareSuggestion = await ai.json();
               setInitialSuggest(sug);
-              setPlanSource({
-                type: 'ai',
-                aiModel: sug.model,
-                aiVersion: sug.version,
-              });
               setNotice(null);
             } else {
               setNotice('No suggestions available.');
-              setPlanSource({ type: 'manual' });
             }
           } catch (e) {
             setNotice('No suggestions available.');
-            setPlanSource({ type: 'manual' });
           }
         }
       } catch (e) {
@@ -208,7 +198,6 @@ export default function AddPlantModal({
         setNotice("Couldn't fetch a plan—using a safe starting point.");
         setInitial(base);
         setValues(base);
-        setPlanSource({ type: 'manual' });
       } finally {
         setLoading(false);
       }
@@ -376,7 +365,7 @@ export default function AddPlantModal({
                     state={values}
                     setState={setValues}
                     initialSuggest={initialSuggest}
-                    onPlanModeChange={setPlanSource}
+                    onPlanModeChange={(v) => setPlanSource(v)}
                   />
                 )}
                 <div className="mt-6 flex flex-wrap gap-2 text-xs">
@@ -427,8 +416,10 @@ export default function AddPlantModal({
                       <Check className="h-4 w-4" />
                       {saving
                         ? 'Saving…'
-                        : planSource && planSource.type !== 'manual'
+                        : planSource?.type === 'ai'
                         ? 'Create with Suggested Plan'
+                        : planSource?.type === 'preset'
+                        ? 'Create with Preset Plan'
                         : 'Create Plant (Manual)'}
                     </button>
                   )}

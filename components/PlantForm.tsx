@@ -53,8 +53,13 @@ export type PlantFormSubmit = {
     intervalDays: number;
     amountMl?: number;
     formula?: string;
-  }[];
+}[];
 };
+
+export type PlanSource =
+  | { type: 'preset'; presetId?: string }
+  | { type: 'ai'; aiModel?: string; aiVersion?: string }
+  | { type: 'manual' };
 
 export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
   const base: PlantFormSubmit = {
@@ -491,7 +496,7 @@ type CarePlanProps = SectionProps & {
   initialSuggest?: AiCareSuggestion | null;
   onSuggestChange?: (s: AiCareSuggestion | null) => void;
   showSuggest?: boolean;
-  onPlanModeChange?: (mode: 'ai' | 'manual') => void;
+  onPlanModeChange?: (mode: PlanSource) => void;
   validation?: Validation;
 };
 
@@ -553,8 +558,7 @@ export function CarePlanFields({
       fertFormula: initialSuggest.fertFormula ?? s.fertFormula,
     }));
     setSuggest(initialSuggest);
-    onPlanModeChange?.('ai');
-  }, [initialSuggest, setState, onPlanModeChange]);
+  }, [initialSuggest, setState]);
 
   useEffect(() => {
     async function fetchSuggest() {
@@ -598,7 +602,6 @@ export function CarePlanFields({
           fertFormula: json.fertFormula ?? s.fertFormula,
         }));
         setSuggest(json);
-        onPlanModeChange?.('ai');
       } catch (e: any) {
         setSuggestError("Couldn't reach the server. Your info is safe—try again.");
       } finally {
@@ -626,9 +629,13 @@ export function CarePlanFields({
   }, [suggest, onSuggestChange]);
 
   function applySuggest() {
+    onPlanModeChange?.({
+      type: 'ai',
+      aiModel: suggest?.model,
+      aiVersion: suggest?.version,
+    });
     setSuggest(null);
     setPrevManual(null);
-    onPlanModeChange?.('ai');
   }
 
   function customizePlan() {
@@ -637,7 +644,7 @@ export function CarePlanFields({
     }
     setSuggest(null);
     setPrevManual(null);
-    onPlanModeChange?.('manual');
+    onPlanModeChange?.({ type: 'manual' });
   }
 
   return (
@@ -863,9 +870,7 @@ export default function PlantForm({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const hasSpecies = Boolean(state.species);
-  const [planSource, setPlanSource] = useState<'ai' | 'manual' | null>(
-    initialSuggest ? 'ai' : null,
-  );
+  const [planSource, setPlanSource] = useState<PlanSource>({ type: 'manual' });
 
   useEffect(() => {
     setState(initial);
@@ -941,7 +946,9 @@ export default function PlantForm({
             </span>
             <button
               className="btn"
-              onClick={() => handleSubmit(planSource === 'ai' ? 'ai' : 'manual')}
+              onClick={() =>
+                handleSubmit(planSource.type === 'ai' ? 'ai' : 'manual')
+              }
               disabled={saving}
             >
               Retry
@@ -950,7 +957,9 @@ export default function PlantForm({
         ) : (
           <button
             className="btn"
-            onClick={() => handleSubmit(planSource === 'ai' ? 'ai' : 'manual')}
+            onClick={() =>
+              handleSubmit(planSource.type === 'ai' ? 'ai' : 'manual')
+            }
             disabled={saving || !canSubmit}
           >
             {saving ? 'Saving…' : submitLabel}
