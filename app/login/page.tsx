@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createSupabaseClient } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const singleUser = process.env.SINGLE_USER_MODE === "true";
+
+  useEffect(() => {
+    if (singleUser) {
+      window.location.href = "/app";
+    }
+  }, [singleUser]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,6 +30,14 @@ export default function LoginPage() {
     } catch (e: any) {
       setError(e.message || "Login failed");
     }
+  }
+
+  if (singleUser) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Login is disabled.</p>
+      </div>
+    );
   }
 
   return (
