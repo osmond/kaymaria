@@ -164,11 +164,13 @@ export function BasicsFields({
   defaults,
   nameInputRef,
   onSaveDefault,
+  careTips,
 }: SectionProps & {
   validation?: Validation;
   defaults?: { pot: string; potMaterial: string; light: string };
   nameInputRef?: React.RefObject<HTMLInputElement>;
   onSaveDefault?: (field: 'pot' | 'potMaterial' | 'light', value: string) => void;
+  careTips?: { potMaterial?: string; light?: string };
 }) {
   const { errors, touched, validate, markTouched } = validation;
   return (
@@ -268,15 +270,8 @@ export function BasicsFields({
                 Save as new default
               </button>
             )}
-          {state.pot && (
-            <p className="hint">
-              {state.pot}{' '}
-              {state.potMaterial === 'Terracotta'
-                ? 'terracotta dries faster than plastic.'
-                : state.potMaterial === 'Plastic'
-                ? 'plastic retains moisture longer.'
-                : 'ceramic balances moisture.'}
-            </p>
+          {careTips?.potMaterial && (
+            <p className="hint">{careTips.potMaterial}</p>
           )}
         </Field>
         <Field label="Light" defaulted={defaults?.light === state.light}>
@@ -294,6 +289,7 @@ export function BasicsFields({
               Save as new default
             </button>
           )}
+          {careTips?.light && <p className="hint">{careTips.light}</p>}
         </Field>
       </div>
     </div>
