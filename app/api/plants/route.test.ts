@@ -47,4 +47,33 @@ describe('GET/POST /api/plants', () => {
     expect(createPlant).toHaveBeenCalledWith('user-1', { name: 'New Plant' });
     expect(createRouteHandlerClient).toHaveBeenCalled();
   });
+
+  it('creates plant with care plan details', async () => {
+    const newPlant = { id: 'p_new', name: 'New Plant' };
+    (createPlant as jest.Mock).mockResolvedValue(newPlant);
+
+    const mockSupabase = { auth: { getUser: jest.fn() } };
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+
+    const req = new Request('http://localhost/api/plants', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'New Plant',
+        carePlanSource: 'ai',
+        aiModel: 'gpt',
+        aiVersion: '1',
+      }),
+    });
+
+    const res = await POST(req as any);
+    expect(res.status).toBe(201);
+    await res.json();
+    expect(createPlant).toHaveBeenCalledWith('user-1', {
+      name: 'New Plant',
+      carePlanSource: 'ai',
+      aiModel: 'gpt',
+      aiVersion: '1',
+    });
+  });
 });

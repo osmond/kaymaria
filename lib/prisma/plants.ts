@@ -11,6 +11,10 @@ type PlantData = {
   soilType?: string | null;
   lat?: number | null;
   lon?: number | null;
+  carePlanSource?: string | null;
+  presetId?: string | null;
+  aiModel?: string | null;
+  aiVersion?: string | null;
 };
 
 export async function listPlants(): Promise<Plant[]> {
@@ -33,6 +37,10 @@ export async function createPlant(userId: string, data: PlantData): Promise<Plan
       soilType: data.soilType,
       latitude: data.lat ?? undefined,
       longitude: data.lon ?? undefined,
+      carePlanSource: data.carePlanSource ?? undefined,
+      presetId: data.presetId ?? undefined,
+      aiModel: data.aiModel ?? undefined,
+      aiVersion: data.aiVersion ?? undefined,
     },
   });
 }
@@ -47,11 +55,15 @@ export async function updatePlant(id: string, data: PlantData): Promise<Plant | 
         species: data.species,
         potSize: data.potSize,
         potMaterial: data.potMaterial,
-        soilType: data.soilType,
-        latitude: data.lat ?? undefined,
-        longitude: data.lon ?? undefined,
-      },
-    });
+      soilType: data.soilType,
+      latitude: data.lat ?? undefined,
+      longitude: data.lon ?? undefined,
+      carePlanSource: data.carePlanSource ?? undefined,
+      presetId: data.presetId ?? undefined,
+      aiModel: data.aiModel ?? undefined,
+      aiVersion: data.aiVersion ?? undefined,
+    },
+  });
   } catch (e: any) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025") {
       return null;
