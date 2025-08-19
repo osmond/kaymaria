@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import TaskRow from "@/components/TaskRow";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
@@ -129,6 +130,7 @@ type EventDTO = {
 
 export function TodayView() {
   const taskWindow = DEFAULT_TASK_WINDOW_DAYS;
+  const router = useRouter();
 
   // ui
   const [confetti, setConfetti] = useState<number[]>([]);
@@ -468,7 +470,7 @@ export function TodayView() {
             </div>
           )}
           {!loading && err && (
-            <div className="rounded-2xl border bg-white shadow-card p-4 text-sm text-red-600">
+            <div className="rounded-2xl border bg-white shadow-card p-4 text-sm text-destructive">
               {err}
             </div>
           )}
@@ -476,34 +478,38 @@ export function TodayView() {
             !err &&
             tasksTodayGrouped.map(([plantName, items]) => (
               <div key={plantName} className="space-y-2">
-                <div className="text-xs font-medium text-neutral-600 uppercase tracking-wide">
+                <div className="text-xs font-medium text-muted uppercase tracking-wide">
                   {plantName}
                 </div>
                 <div className="rounded-2xl border bg-white shadow-card divide-y">
                   {items.map((t) => (
                     <TaskRow
                       key={t.id}
-                      overdue={new Date(t.dueAt).getTime() < Date.now()}
-                      label={labelForType(t.type as any)}
-                      status={
-                        isSameDay(today, new Date(t.dueAt)) ? "due" : "upcoming"
+                      plant={t.plantName}
+                      action={labelForType(t.type as any)}
+                      last={
+                        t.lastEventAt
+                          ? timeAgo(new Date(t.lastEventAt))
+                          : "—"
                       }
                       due={new Date(t.dueAt).toLocaleTimeString([], {
                         hour: "numeric",
                         minute: "2-digit",
                       })}
+                      onOpen={() => router.push(`/app/plants/${t.plantId}`)}
                       onComplete={() => complete(t)}
                       onDefer={() => deferTask(t)}
+                      showPlant={false}
                     />
                   ))}
                 </div>
               </div>
             ))}
           {!loading && !err && tasksTodayGrouped.length === 0 && (
-            <div className="rounded-2xl border bg-white shadow-card p-6 text-center text-sm text-neutral-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
+            <div className="rounded-2xl border bg-white shadow-card p-6 text-center text-sm text-muted dark:bg-neutral-800 dark:border-neutral-700">
               No tasks today — your plants are happy! 🌿
               {upcoming.length > 0 && (
-                <div className="mt-2 text-neutral-600 dark:text-neutral-300">
+                <div className="mt-2 text-muted">
                   Next up: {upcoming[0][1][0].plantName} {labelForType(upcoming[0][1][0].type)} {dueLabel(new Date(upcoming[0][1][0].dueAt), today)}
                 </div>
               )}
