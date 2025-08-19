@@ -6,13 +6,15 @@ import {
   deletePlant,
 } from "@/lib/prisma/plants";
 
+type Params = { params: { id: string } };
+
 // In Next 15, params may be a Promise — await it.
 export async function GET(
   _req: Request,
-  ctx: any
+  ctx: Params | Promise<Params>
 ) {
   try {
-    const params = await (ctx as any).params;
+    const { params } = await ctx;
     const plant = await getPlant(params.id);
     if (!plant) return NextResponse.json({ error: "Not found" }, { status: 404 });
     const water = await getComputedWaterInfo(plant);
@@ -25,10 +27,10 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  ctx: any
+  ctx: Params | Promise<Params>
 ) {
   try {
-    const params = await (ctx as any).params;
+    const { params } = await ctx;
     const body = await req.json().catch(() => ({}));
     const { rules, ...rest } = body;
     const updated = await updatePlant(params.id, {
@@ -45,10 +47,10 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  ctx: any
+  ctx: Params | Promise<Params>
 ) {
   try {
-    const params = await (ctx as any).params;
+    const { params } = await ctx;
     const ok = await deletePlant(params.id);
     if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ ok: true });
