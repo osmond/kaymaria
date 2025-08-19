@@ -48,12 +48,13 @@ export type PlantFormSubmit = {
   lon?: number;
   lastWateredAt?: string;
   lastFertilizedAt?: string;
+  createTasks?: boolean;
   rules: {
     type: 'water' | 'fertilize';
     intervalDays: number;
     amountMl?: number;
     formula?: string;
-}[];
+  }[];
 };
 
 export type PlanSource =
@@ -95,6 +96,7 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
     base.lat = Number(s.lat);
     base.lon = Number(s.lon);
   }
+  base.createTasks = true;
   return base;
 }
 
