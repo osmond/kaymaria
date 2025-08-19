@@ -121,6 +121,40 @@ export interface Database {
           }
         ];
       };
+      plant_notes: {
+        Row: {
+          id: string;
+          user_id: string;
+          plant_id: string;
+          note: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          plant_id: string;
+          note: string;
+          created_at?: string | null;
+        };
+        Update: {
+          note?: string;
+          created_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "plant_notes_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "plant_notes_plant_id_fkey";
+            columns: ["plant_id"];
+            referencedRelation: "plants";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
