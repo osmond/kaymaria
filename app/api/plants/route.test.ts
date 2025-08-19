@@ -14,6 +14,11 @@ jest.mock('@/lib/supabase', () => ({
 describe('GET/POST /api/plants', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    process.env.DATABASE_URL = 'postgres://localhost';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost';
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'anon-key';
+    delete process.env.SINGLE_USER_MODE;
+    delete process.env.SINGLE_USER_ID;
   });
 
   it('returns plants', async () => {
@@ -75,5 +80,28 @@ describe('GET/POST /api/plants', () => {
       aiModel: 'gpt',
       aiVersion: '1',
     });
+  });
+
+  it('returns 500 when env vars missing', async () => {
+    delete process.env.DATABASE_URL;
+    const res = await GET();
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json).toEqual({ error: 'misconfigured server' });
+    expect(listPlants).not.toHaveBeenCalled();
+  });
+
+  it('returns 500 when SINGLE_USER_ID missing in single-user mode', async () => {
+    process.env.SINGLE_USER_MODE = 'true';
+    delete process.env.SINGLE_USER_ID;
+    const req = new Request('http://localhost/api/plants', {
+      method: 'POST',
+      body: JSON.stringify({ name: 'Test' }),
+    });
+    const res = await POST(req as any);
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json).toEqual({ error: 'misconfigured server' });
+    expect(createRouteHandlerClient).not.toHaveBeenCalled();
   });
 });
