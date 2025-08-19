@@ -6,8 +6,14 @@ export const plantFieldSchemas = {
   waterEvery: z.coerce.number().min(1, 'Must be at least 1 day'),
   waterAmount: z.coerce.number().min(10, 'Must be at least 10 ml'),
   fertEvery: z.coerce.number().min(1, 'Must be at least 1 day'),
-  lastWatered: z.coerce.date({ invalid_type_error: 'Enter a valid date' }),
-  lastFertilized: z.coerce.date({ invalid_type_error: 'Enter a valid date' }),
+  lastWatered: z.preprocess(
+    (v) => (v === '' || v === undefined ? undefined : v),
+    z.coerce.date({ invalid_type_error: 'Enter a valid date' }).optional(),
+  ),
+  lastFertilized: z.preprocess(
+    (v) => (v === '' || v === undefined ? undefined : v),
+    z.coerce.date({ invalid_type_error: 'Enter a valid date' }).optional(),
+  ),
 };
 
 export const plantFormSchema = z.object(plantFieldSchemas);
