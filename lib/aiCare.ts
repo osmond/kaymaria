@@ -5,6 +5,11 @@ export type AiCareParams = {
   species?: string;
   potSize?: string;
   potMaterial?: string;
+  light?: string;
+  indoor?: boolean;
+  drainage?: string;
+  soil?: string;
+  humidity?: number;
   lat?: number;
   lon?: number;
 };
@@ -23,6 +28,11 @@ export async function suggestCare({
   species = '',
   potSize = '',
   potMaterial = '',
+  light = '',
+  indoor,
+  drainage = '',
+  soil = '',
+  humidity,
   lat,
   lon,
 }: AiCareParams): Promise<AiCareSuggestion> {
@@ -32,15 +42,47 @@ export async function suggestCare({
   }
   const client = new OpenAI({ apiKey });
 
-  const location =
-    typeof lat === 'number' && typeof lon === 'number'
-      ? ` at latitude ${lat} and longitude ${lon}`
-      : '';
+  const parts = [
+    `Name: ${name}`,
+    `Species: ${species}`,
+    `Pot size: ${potSize}`,
+    `Pot material: ${potMaterial}`,
+  ];
+  if (light) parts.push(`Light: ${light}`);
+  if (typeof indoor === 'boolean') parts.push(indoor ? 'Indoor' : 'Outdoor');
+  if (drainage) parts.push(`Drainage: ${drainage}`);
+  if (soil) parts.push(`Soil: ${soil}`);
+  if (typeof humidity === 'number') parts.push(`Humidity: ${humidity}%`);
 
-  const prompt = `Suggest a simple care plan for a plant.\nName: ${name}\nSpecies: ${species}\nPot size: ${potSize}\nPot material: ${potMaterial}${location}\nReturn a JSON object with fields: waterEvery (days), waterAmount (ml), fertEvery (days), fertFormula (string).`;
+  let et0: number | null = null;
+  if (typeof lat === 'number' && typeof lon === 'number') {
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=et0_fao_evapotranspiration&timezone=auto`;
+      const r = await fetch(url);
+      if (r.ok) {
+        const data = await r.json();
+        et0 = data.daily?.et0_fao_evapotranspiration?.[0] ?? null;
+      }
+    } catch {}
+  }
+
+  if (et0 !== null) parts.push(`Evapotranspiration: ${et0.toFixed(2)}mm`);
+
+  const month = new Date().getMonth();
+  const season =
+    month < 2 || month === 11
+      ? 'winter'
+      : month < 5
+      ? 'spring'
+      : month < 8
+      ? 'summer'
+      : 'fall';
+  parts.push(`Season: ${season}`);
+
+  const prompt = `Suggest a simple care plan for a plant.\n${parts.join('\n')}\nReturn a JSON object with fields: waterEvery (days), waterAmount (ml), fertEvery (days), fertFormula (string).`;
 
   const completion = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
     messages: [
       {
         role: 'system',
