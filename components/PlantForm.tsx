@@ -167,7 +167,7 @@ export function BasicsFields({
 }) {
   const { errors, touched, validate, markTouched } = validation;
   return (
-    <div className="p-5 space-y-4">
+    <div className="p-6 space-y-6">
       <Field
         label="Name"
         message={
@@ -218,7 +218,7 @@ export function BasicsFields({
         <p className="hint">Stored locally in Settings → Defaults.</p>
       </Field>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Field label="Pot size" defaulted={defaults?.pot === state.pot}>
           <div className="flex items-center gap-2">
             <Stepper
@@ -345,9 +345,9 @@ export function EnvironmentFields({
   }
 
   return (
-    <div className="p-5 space-y-4">
+    <div className="p-6 space-y-6">
       <Field label="Environment">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <select
             className="input"
             value={state.indoor}
@@ -415,7 +415,7 @@ export function EnvironmentFields({
             </button>
           </div>
           {showMore && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="grid gap-1">
                 <input
                   className="input"
@@ -635,12 +635,12 @@ export function CarePlanFields({
   }
 
   return (
-    <div className="p-5 space-y-4">
+    <div className="p-6 space-y-6">
       {showSuggest && (
         <div className="rounded-xl border p-3 bg-neutral-50">
           <div className="text-sm font-medium mb-2">Suggested plan</div>
           {loadingSuggest && (
-            <div className="grid grid-cols-2 gap-2 animate-pulse">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 animate-pulse">
               <div className="h-20 rounded-lg bg-neutral-200" />
               <div className="h-20 rounded-lg bg-neutral-200" />
             </div>
@@ -655,7 +655,7 @@ export function CarePlanFields({
           )}
           {suggest && !loadingSuggest && (
             <div className="grid gap-2 text-sm">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div className="rounded-lg border bg-white p-2">
                   <div className="text-xs text-neutral-500">Water</div>
                   <div className="font-medium">
@@ -681,7 +681,7 @@ export function CarePlanFields({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Water every (days)">
           <Stepper
             value={state.waterEvery}
@@ -744,7 +744,7 @@ export function CarePlanFields({
         )}
       </Field>
 
-      <div className={`grid gap-3 ${showMore ? 'grid-cols-3' : 'grid-cols-2'}`}
+      <div className={`grid grid-cols-1 gap-4 ${showMore ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}
       >
         <Field label="Fertilize every (days)">
           <Stepper
