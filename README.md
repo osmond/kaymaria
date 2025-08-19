@@ -12,6 +12,8 @@ The Plant detail page shows a skeleton screen while loading, includes a back lin
 
 The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically and now shows skeleton cards while plant data loads.
 
+Authenticated sessions also use a Supabase-backed `/api/sync` endpoint to persist and fetch user data across devices.
+
 ## Quick Start
 Kay Maria is intended to run in single-user mode by default.
 
