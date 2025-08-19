@@ -25,6 +25,10 @@ export default {
           foreground: "hsl(var(--secondary-foreground))",
         },
         muted: "hsl(var(--muted))",
+        border: "hsl(var(--border))",
+      },
+      borderColor: {
+        DEFAULT: "hsl(var(--border))",
       },
       borderRadius: {
         lg: "14px",

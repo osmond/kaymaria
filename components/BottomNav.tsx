@@ -43,7 +43,7 @@ export default function BottomNav({ value }: { value: Tab }) {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t dark:bg-neutral-900/90 dark:border-neutral-800"
+      className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t border-border dark:bg-neutral-900/90"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="max-w-screen-sm mx-auto grid grid-cols-5">

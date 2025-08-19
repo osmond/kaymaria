@@ -88,7 +88,7 @@ export default function TaskRow({
         }}
         className="relative"
       >
-        <div className="rounded-2xl border bg-white shadow-card dark:bg-neutral-800 dark:border-neutral-700">
+        <div className="rounded-2xl border border-border bg-white shadow-card dark:bg-neutral-800">
           <div className="p-3 flex items-center gap-3">
             <button
               onClick={onOpen}
@@ -129,7 +129,7 @@ export default function TaskRow({
               >
                 <Check className="h-4 w-4" />
               </button>
-              <div className="flex items-center gap-1 ml-2 pl-2 border-l border-neutral-200 dark:border-neutral-600">
+              <div className="flex items-center gap-1 ml-2 pl-2 border-l border-neutral-200 dark:border-neutral-700">
                 <button
                   aria-label="Defer"
                   aria-keyshortcuts="s"
