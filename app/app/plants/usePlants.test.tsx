@@ -5,12 +5,15 @@ import { renderHook, waitFor } from '@testing-library/react';
 import usePlants from './usePlants';
 
 describe('usePlants', () => {
+  let originalFetch: typeof global.fetch;
+
   beforeEach(() => {
-    // @ts-ignore
-    global.fetch = jest.fn();
+    originalFetch = global.fetch;
+    global.fetch = jest.fn() as jest.Mock;
   });
 
   afterEach(() => {
+    global.fetch = originalFetch;
     jest.resetAllMocks();
   });
 
