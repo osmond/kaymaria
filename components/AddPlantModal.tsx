@@ -274,11 +274,11 @@ export default function AddPlantModal({
         );
       } catch {}
     } catch (e: any) {
-      console.error('Error saving plant', e);
       let message = 'Failed to save plant.';
+      let status: number | undefined;
+      let data: any = null;
       try {
-        const status = e?.status ?? e?.response?.status;
-        let data: any = null;
+        status = e?.status ?? e?.response?.status;
         if (e instanceof Response) {
           data = await e.json().catch(() => null);
         } else if (e?.response && typeof e.response.json === 'function') {
@@ -300,6 +300,7 @@ export default function AddPlantModal({
       } catch (_) {
         // ignore parse errors
       }
+      console.error('Error saving plant', { status, data, error: e });
       setSaveError(message);
       return;
     } finally {
