@@ -82,12 +82,16 @@ describe('GET/POST /api/plants', () => {
     });
   });
 
-  it('returns 500 when env vars missing', async () => {
+  it('returns 503 when env vars missing', async () => {
     delete process.env.DATABASE_URL;
     const res = await GET();
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(503);
     const json = await res.json();
-    expect(json).toEqual({ error: 'misconfigured server' });
+    expect(json).toEqual({
+      error: 'misconfigured server',
+      message:
+        'Set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and DATABASE_URL, or enable SINGLE_USER_MODE',
+    });
     expect(listPlants).not.toHaveBeenCalled();
   });
 

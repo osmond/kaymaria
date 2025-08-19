@@ -3,14 +3,26 @@ import { listPlants, createPlant } from "@/lib/prisma/plants";
 import { createRouteHandlerClient } from "@/lib/supabase";
 import { getUserId } from "@/lib/getUserId";
 
+const missingEnv = () =>
+  !process.env.DATABASE_URL ||
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const envErrorResponse = () =>
+  NextResponse.json(
+    {
+      error: "misconfigured server",
+      message:
+        "Set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and DATABASE_URL, or enable SINGLE_USER_MODE",
+    },
+    { status: 503 }
+  );
+
 export async function GET() {
   try {
-    if (!process.env.DATABASE_URL) {
-      console.error("Missing DATABASE_URL environment variable");
-      return NextResponse.json(
-        { error: "misconfigured server" },
-        { status: 500 }
-      );
+    if (missingEnv()) {
+      console.error("Missing Supabase or database environment variables");
+      return envErrorResponse();
     }
 
     const plants = await listPlants();
@@ -23,16 +35,9 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    if (
-      !process.env.DATABASE_URL ||
-      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    ) {
+    if (missingEnv()) {
       console.error("Missing Supabase or database environment variables");
-      return NextResponse.json(
-        { error: "misconfigured server" },
-        { status: 500 }
-      );
+      return envErrorResponse();
     }
 
     const supabase = await createRouteHandlerClient();
