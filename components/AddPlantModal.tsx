@@ -45,6 +45,11 @@ export default function AddPlantModal({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [step, setStep] = useState<0 | 1 | 2>(0);
   const [planSource, setPlanSource] = useState<PlanSource | null>(null);
+  const [defaults, setDefaults] = useState<{
+    pot: string;
+    potMaterial: string;
+    light: string;
+  } | null>(null);
 
   function close() {
     onOpenChange(false);
@@ -57,23 +62,32 @@ export default function AddPlantModal({
       setLoadError(null);
       setNotice(null);
       setStep(0);
+      let stored: any = {};
+      try {
+        stored = JSON.parse(localStorage.getItem('plantDefaults') || '{}');
+      } catch {}
       const base: PlantFormValues = {
         name: prefillName || '',
         roomId: defaultRoomId,
         species: prefillName || '',
-        pot: '6 in',
-        potMaterial: 'Plastic',
-        light: 'Medium',
+        pot: stored.pot || '6 in',
+        potMaterial: stored.potMaterial || 'Plastic',
+        light: stored.light || 'Medium',
         indoor: 'Indoor',
         drainage: 'ok',
-        soil: 'Well-draining mix',
+        soil: stored.soil || 'Well-draining mix',
         lat: '',
         lon: '',
         waterEvery: '7',
         waterAmount: '500',
         fertEvery: '30',
-        fertFormula: '10-10-10 @ 1/2 strength',
+        fertFormula: stored.fertFormula || '10-10-10 @ 1/2 strength',
       };
+      setDefaults({
+        pot: base.pot,
+        potMaterial: base.potMaterial,
+        light: base.light,
+      });
       try {
         const r = await fetch(
           `/api/species-care?species=${encodeURIComponent(prefillName || '')}`,
@@ -168,7 +182,10 @@ export default function AddPlantModal({
     router.push(`/app/plants/${created.id}?tab=photos`);
   }
 
-  async function submitCurrent(source: 'ai' | 'manual' = 'manual', override?: PlantFormValues) {
+  async function submitCurrent(
+    source: 'ai' | 'manual' = 'manual',
+    override?: PlantFormValues,
+  ) {
     if (!values) return;
     const current = override ?? values;
     if (!current.name.trim()) return;
@@ -176,6 +193,18 @@ export default function AddPlantModal({
     setSaveError(null);
     try {
       await handleSubmit(plantValuesToSubmit(current), source);
+      try {
+        localStorage.setItem(
+          'plantDefaults',
+          JSON.stringify({
+            pot: current.pot,
+            potMaterial: current.potMaterial,
+            light: current.light,
+            soil: current.soil,
+            fertFormula: current.fertFormula,
+          }),
+        );
+      } catch {}
     } catch (e: any) {
       console.error('Error saving plant', e);
       let message = 'Failed to save plant.';
@@ -243,7 +272,13 @@ export default function AddPlantModal({
               {notice && (
                 <div className="p-5 text-sm text-gray-600">{notice}</div>
               )}
-              {step === 0 && <BasicsFields state={values} setState={setValues} />}
+              {step === 0 && (
+                <BasicsFields
+                  state={values}
+                  setState={setValues}
+                  defaults={defaults || undefined}
+                />
+              )}
               {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
               {step === 2 && (
                 <CarePlanFields
