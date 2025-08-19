@@ -59,4 +59,37 @@ describe('plantFormSchema', () => {
     });
     expect(res.success).toBe(true);
   });
+
+  it('validates lat/lon ranges', () => {
+    const res = plantFormSchema.safeParse({
+      name: 'A',
+      roomId: 'r1',
+      waterEvery: '1',
+      waterAmount: '10',
+      fertEvery: '1',
+      lastWatered: '',
+      lastFertilized: '',
+      lat: '91',
+      lon: '200',
+    });
+    expect(res.success).toBe(false);
+    const errors = (res as any).error.flatten().fieldErrors;
+    expect(errors.lat).toContain('Latitude must be between -90 and 90');
+    expect(errors.lon).toContain('Longitude must be between -180 and 180');
+  });
+
+  it('accepts valid lat/lon', () => {
+    const res = plantFormSchema.safeParse({
+      name: 'A',
+      roomId: 'r1',
+      waterEvery: '1',
+      waterAmount: '10',
+      fertEvery: '1',
+      lastWatered: '',
+      lastFertilized: '',
+      lat: '45',
+      lon: '-120',
+    });
+    expect(res.success).toBe(true);
+  });
 });

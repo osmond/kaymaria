@@ -21,7 +21,7 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
 
 - [ ] Add Plant Form Polish
   - [ ] UI styling
-  - [ ] Validation
+  - [x] Validation
   - [ ] Persistence
   - [ ] Smoke tests
 
