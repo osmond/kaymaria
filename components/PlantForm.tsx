@@ -356,6 +356,7 @@ type CarePlanProps = SectionProps & {
   initialSuggest?: AiCareSuggestion | null;
   onSuggestChange?: (s: AiCareSuggestion | null) => void;
   showSuggest?: boolean;
+  onPlanModeChange?: (mode: 'ai' | 'manual') => void;
 };
 
 export function CarePlanFields({
@@ -364,6 +365,7 @@ export function CarePlanFields({
   initialSuggest,
   onSuggestChange,
   showSuggest = true,
+  onPlanModeChange,
 }: CarePlanProps) {
   const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
   const [prevManual, setPrevManual] = useState<{
@@ -397,7 +399,8 @@ export function CarePlanFields({
       fertFormula: initialSuggest.fertFormula ?? s.fertFormula,
     }));
     setSuggest(initialSuggest);
-  }, [initialSuggest, setState]);
+    onPlanModeChange?.('ai');
+  }, [initialSuggest, setState, onPlanModeChange]);
 
   useEffect(() => {
     async function fetchSuggest() {
@@ -436,6 +439,7 @@ export function CarePlanFields({
           fertFormula: json.fertFormula ?? s.fertFormula,
         }));
         setSuggest(json);
+        onPlanModeChange?.('ai');
       } catch (e: any) {
         setSuggestError(e?.message || 'Could not get suggestions.');
       } finally {
@@ -449,17 +453,19 @@ export function CarePlanFields({
     onSuggestChange?.(suggest);
   }, [suggest, onSuggestChange]);
 
-  function acceptSuggest() {
+  function applySuggest() {
     setSuggest(null);
     setPrevManual(null);
+    onPlanModeChange?.('ai');
   }
 
-  function overrideSuggest() {
+  function customizePlan() {
     if (prevManual) {
       setState((s) => ({ ...s, ...prevManual }));
     }
     setSuggest(null);
     setPrevManual(null);
+    onPlanModeChange?.('manual');
   }
 
   return (
@@ -468,7 +474,10 @@ export function CarePlanFields({
         <div className="rounded-xl border p-3 bg-neutral-50">
           <div className="text-sm font-medium mb-2">Suggested plan</div>
           {loadingSuggest && (
-            <div className="text-xs text-neutral-600">Getting suggestions…</div>
+            <div className="grid grid-cols-2 gap-2 animate-pulse">
+              <div className="h-20 rounded-lg bg-neutral-200" />
+              <div className="h-20 rounded-lg bg-neutral-200" />
+            </div>
           )}
           {suggestError && (
             <div className="text-xs text-red-600 mb-2">{suggestError}</div>
@@ -496,9 +505,9 @@ export function CarePlanFields({
                 </div>
               </div>
               <div className="flex gap-2">
-                <button className="btn" onClick={acceptSuggest}>Use suggestions</button>
-                <button className="btn-secondary" onClick={overrideSuggest}>
-                  Override manually
+                <button className="btn" onClick={applySuggest}>Apply Suggested Plan</button>
+                <button className="btn-secondary" onClick={customizePlan}>
+                  Customize
                 </button>
               </div>
             </div>
@@ -556,14 +565,12 @@ export default function PlantForm({
   submitLabel,
   onSubmit,
   onCancel,
-  enableAiSubmit,
   initialSuggest,
 }: {
   initial: PlantFormValues;
   submitLabel: string;
   onSubmit: (data: PlantFormSubmit, source?: 'ai' | 'manual') => Promise<void>;
   onCancel: () => void;
-  enableAiSubmit?: boolean;
   initialSuggest?: AiCareSuggestion | null;
 }) {
   const [state, setState] = useState<PlantFormValues>(initial);
@@ -583,20 +590,18 @@ export default function PlantForm({
   const markTouched: Validation['markTouched'] = (field) => {
     setTouched((t) => ({ ...t, [field]: true }));
   };
-  const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const hasSpecies = Boolean(state.species);
+  const [planSource, setPlanSource] = useState<'ai' | 'manual' | null>(
+    initialSuggest ? 'ai' : null,
+  );
 
   useEffect(() => {
     setState(initial);
     setErrors({});
     setTouched({});
   }, [initial]);
-
-  function toSubmit() {
-    return plantValuesToSubmit(state);
-  }
 
   async function handleSubmit(source: 'ai' | 'manual' = 'manual', override?: PlantFormValues) {
     const current = override ?? state;
@@ -639,18 +644,6 @@ export default function PlantForm({
     }
   }
 
-  async function handleSubmitAi() {
-    if (!suggest) return;
-    const s: PlantFormValues = {
-      ...state,
-      waterEvery: String(suggest.waterEvery ?? Number(state.waterEvery)),
-      waterAmount: String(suggest.waterAmount ?? Number(state.waterAmount)),
-      fertEvery: String(suggest.fertEvery ?? Number(state.fertEvery)),
-      fertFormula: suggest.fertFormula ?? state.fertFormula,
-    };
-    await handleSubmit('ai', s);
-  }
-
   const validation = { errors, touched, validate, markTouched };
 
   return (
@@ -663,20 +656,19 @@ export default function PlantForm({
         state={state}
         setState={setState}
         initialSuggest={initialSuggest}
-        onSuggestChange={setSuggest}
         showSuggest={hasSpecies}
+        onPlanModeChange={setPlanSource}
       />
       {saveError && <div className="p-5 text-xs text-red-600">{saveError}</div>}
       <div className="p-5 border-t flex gap-2 justify-end">
         <button className="btn-secondary" onClick={onCancel}>
           Cancel
         </button>
-        {enableAiSubmit && suggest && (
-          <button className="btn" onClick={handleSubmitAi} disabled={saving || !state.name.trim()}>
-            {saving ? 'Saving…' : 'Create with AI Plan'}
-          </button>
-        )}
-        <button className="btn" onClick={() => handleSubmit('manual')} disabled={saving || !state.name.trim()}>
+        <button
+          className="btn"
+          onClick={() => handleSubmit(planSource === 'ai' ? 'ai' : 'manual')}
+          disabled={saving || !state.name.trim()}
+        >
           {saving ? 'Saving…' : submitLabel}
         </button>
       </div>

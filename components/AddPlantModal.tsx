@@ -36,11 +36,12 @@ export default function AddPlantModal({
   const [initialSuggest, setInitialSuggest] = useState<AiCareSuggestion | null>(
     null,
   );
-  const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [step, setStep] = useState<0 | 1 | 2>(0);
-  const [planSource, setPlanSource] = useState<'preset' | 'ai' | null>(null);
+  const [planSource, setPlanSource] = useState<'preset' | 'ai' | 'manual' | null>(
+    null,
+  );
 
   function close() {
     onOpenChange(false);
@@ -81,10 +82,16 @@ export default function AddPlantModal({
           setInitial(init);
           setValues(init);
           setPlanSource('preset');
+          if (json.updated) {
+            setNotice(
+              `Found care preset • last updated ${new Date(json.updated).toLocaleDateString()}`,
+            );
+          } else {
+            setNotice('Found care preset');
+          }
         } else {
           setInitial(base);
           setValues(base);
-          setNotice('No presets found—generating AI suggestion');
           try {
             const aiBody: any = {
               name: base.name,
@@ -104,19 +111,22 @@ export default function AddPlantModal({
             if (ai.ok) {
               const sug: AiCareSuggestion = await ai.json();
               setInitialSuggest(sug);
-              setSuggest(sug);
               setPlanSource('ai');
+              setNotice('AI-generated plan…');
             } else {
-              setNotice('No presets found and AI suggestion failed');
+              setNotice('No suggestions available.');
+              setPlanSource('manual');
             }
           } catch (e) {
-            setNotice('No presets found and AI suggestion failed');
+            setNotice('No suggestions available.');
+            setPlanSource('manual');
           }
         }
       } catch (e) {
         setLoadError('Failed to load species defaults.');
         setInitial(base);
         setValues(base);
+        setPlanSource('manual');
       } finally {
         setLoading(false);
       }
@@ -183,18 +193,6 @@ export default function AddPlantModal({
     }
   }
 
-  async function handleSubmitAi() {
-    if (!suggest || !values) return;
-    const s: PlantFormValues = {
-      ...values,
-      waterEvery: String(suggest.waterEvery ?? Number(values.waterEvery)),
-      waterAmount: String(suggest.waterAmount ?? Number(values.waterAmount)),
-      fertEvery: String(suggest.fertEvery ?? Number(values.fertEvery)),
-      fertFormula: suggest.fertFormula ?? values.fertFormula,
-    };
-    await submitCurrent('ai', s);
-  }
-
   function nextStep() {
     setStep((s) => Math.min(s + 1, 2));
   }
@@ -213,7 +211,13 @@ export default function AddPlantModal({
           <div className="p-5 border-b">
             <Dialog.Title className="text-lg font-display font-semibold">Add Plant</Dialog.Title>
           </div>
-          {loading && <div className="p-5">Loading defaults…</div>}
+          {loading && (
+            <div className="p-5 space-y-4 animate-pulse">
+              <div className="h-6 bg-neutral-200 rounded" />
+              <div className="h-6 bg-neutral-200 rounded" />
+              <div className="h-6 bg-neutral-200 rounded" />
+            </div>
+          )}
           {!loading && values && (
             <>
               {loadError && (
@@ -229,10 +233,7 @@ export default function AddPlantModal({
                   state={values}
                   setState={setValues}
                   initialSuggest={initialSuggest}
-                  onSuggestChange={(s) => {
-                    setSuggest(s);
-                    if (s) setPlanSource('ai');
-                  }}
+                  onPlanModeChange={setPlanSource}
                 />
               )}
               {saveError && step === 2 && (
@@ -253,24 +254,15 @@ export default function AddPlantModal({
                   </button>
                 )}
                 {step === 2 && (
-                  <>
-                    {suggest && (
-                      <button
-                        className="btn"
-                        onClick={handleSubmitAi}
-                        disabled={saving || !values.name.trim()}
-                      >
-                        {saving ? 'Saving…' : 'Create with AI Plan'}
-                      </button>
-                    )}
-                    <button
-                      className="btn"
-                      onClick={() => submitCurrent('manual')}
-                      disabled={saving || !values.name.trim()}
-                    >
-                      {saving ? 'Saving…' : 'Create Plant'}
-                    </button>
-                  </>
+                  <button
+                    className="btn"
+                    onClick={() =>
+                      submitCurrent(planSource === 'ai' ? 'ai' : 'manual')
+                    }
+                    disabled={saving || !values.name.trim()}
+                  >
+                    {saving ? 'Saving…' : 'Create Plant'}
+                  </button>
                 )}
               </div>
               <FormStyles />
