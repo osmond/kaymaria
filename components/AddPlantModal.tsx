@@ -17,6 +17,7 @@ import {
   plantValuesToSubmit,
   PlanSource,
 } from './PlantForm';
+import PlanSummary from './PlanSummary';
 import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { fetchJson, FetchJsonError } from '@/lib/fetchJson';
@@ -53,7 +54,7 @@ export default function AddPlantModal({
     null,
   );
   const [saving, setSaving] = useState(false);
-  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [planSource, setPlanSource] = useState<PlanSource | null>(null);
   const [defaults, setDefaults] = useState<{
     pot: string;
@@ -74,6 +75,8 @@ export default function AddPlantModal({
     step === 0 && !basicsValid
       ? 'Name and room are required to continue.'
       : step === 2 && !canSubmit
+      ? 'Please fill out all required fields to continue.'
+      : step === 3 && !canSubmit
       ? 'Please fill out all required fields before submitting.'
       : null;
   const submitDescribedBy = [
@@ -321,7 +324,7 @@ export default function AddPlantModal({
   }
 
   function nextStep() {
-    setStep((s) => Math.min(s + 1, 2));
+    setStep((s) => Math.min(s + 1, 3));
   }
 
   function prevStep() {
@@ -350,7 +353,7 @@ export default function AddPlantModal({
                 Add Plant
               </Dialog.Title>
               <div className="mt-4 flex gap-2">
-                {[0, 1, 2].map((n) => (
+                {[0, 1, 2, 3].map((n) => (
                   <div
                     key={n}
                     className={`h-1 flex-1 rounded ${step >= n ? 'bg-primary' : 'bg-neutral-200'}`}
@@ -395,6 +398,7 @@ export default function AddPlantModal({
                       onPlanModeChange={(v) => setPlanSource(v)}
                     />
                   )}
+                  {step === 3 && <PlanSummary values={values} />}
                   <div className="mt-6 flex flex-wrap gap-2 text-xs">
                     <span className="rounded-full border bg-white px-3 py-1 shadow-sm">
                       {`Water every ${values.waterEvery}d · ${values.waterAmount} ml • Fertilize every ${values.fertEvery}d`}
@@ -420,7 +424,7 @@ export default function AddPlantModal({
                     {validationMessage}
                   </div>
                 )}
-                {step === 2 && saveError && (
+                {step === 3 && saveError && (
                   <div
                     id={saveErrorId}
                     role="status"
@@ -446,18 +450,18 @@ export default function AddPlantModal({
                     Back
                   </button>
                 )}
-                {step < 2 && (
+                {step < 3 && (
                   <button
                     className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                     onClick={nextStep}
-                    disabled={step === 0 && !basicsValid}
+                    disabled={(step === 0 && !basicsValid) || (step === 2 && !canSubmit)}
                     aria-describedby={validationMessage ? validationId : undefined}
                   >
                     <ArrowRight className="h-4 w-4" />
                     Next
                   </button>
                 )}
-                {step === 2 && (
+                {step === 3 && (
                   <button
                     className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                     onClick={() =>
@@ -467,13 +471,7 @@ export default function AddPlantModal({
                     aria-describedby={submitDescribedBy}
                   >
                     <Check className="h-4 w-4" />
-                    {saving
-                      ? 'Saving…'
-                      : planSource?.type === 'ai'
-                      ? 'Create with Suggested Plan'
-                      : planSource?.type === 'preset'
-                      ? 'Create with Preset Plan'
-                      : 'Create Plant (Manual)'}
+                    {saving ? 'Saving…' : 'Confirm Plan'}
                   </button>
                 )}
               </footer>
