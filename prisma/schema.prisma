@@ -17,8 +17,8 @@ model Plant {
   potSize     String?  @map("pot_size")
   potMaterial String?  @map("pot_material")
   soilType    String?  @map("soil_type")
-  latitude    Float?
-  longitude   Float?
+  latitude    Float?  @db.DoublePrecision
+  longitude   Float?  @db.DoublePrecision
   carePlanSource String? @map("care_plan_source")
   presetId   String?  @map("preset_id")
   aiModel    String?  @map("ai_model")
