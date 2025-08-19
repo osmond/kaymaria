@@ -1,6 +1,5 @@
-import { PrismaClient, Plant, Prisma } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Plant, Prisma } from "@prisma/client";
+import { prisma } from "./client";
 
 type PlantData = {
   name?: string;
