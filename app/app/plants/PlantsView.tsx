@@ -13,7 +13,7 @@ export default function PlantsView() {
     message: string;
     action?: { label: string; onClick: () => void };
   }>({ visible: false, message: "" });
-  const timer = useRef<number | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sortedItems =
     items?.slice().sort((a, b) => {
       const roomA = a.room || "";
@@ -83,7 +83,6 @@ export default function PlantsView() {
               },
             },
           });
-          // @ts-ignore
           timer.current = window.setTimeout(
             () => setSnackbar({ visible: false, message: "" }),
             5000,
