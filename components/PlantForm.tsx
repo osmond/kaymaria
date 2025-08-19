@@ -197,6 +197,9 @@ export function BasicsFields({
           }}
           inputRef={nameInputRef}
         />
+        <p className="hint">
+          Species helps personalize care. If unknown, generic tips apply.
+        </p>
       </Field>
 
       <Field label="Room">
@@ -467,7 +470,10 @@ export function EnvironmentFields({
             </div>
           )}
         </div>
-        <p className="hint">Used to tailor intervals based on local conditions.</p>
+        <p className="hint">
+          Used to tailor intervals based on local conditions. Without a location
+          we'll use standard intervals.
+        </p>
       </Field>
 
       <button
@@ -594,7 +600,7 @@ export function CarePlanFields({
         setSuggest(json);
         onPlanModeChange?.('ai');
       } catch (e: any) {
-        setSuggestError(e?.message || 'Could not get suggestions.');
+        setSuggestError("Couldn't reach the server. Your info is safe—try again.");
       } finally {
         setLoadingSuggest(false);
       }
@@ -638,7 +644,9 @@ export function CarePlanFields({
     <div className="p-6 space-y-6">
       {showSuggest && (
         <div className="rounded-xl border p-3 bg-neutral-50">
-          <div className="text-sm font-medium mb-2">Suggested plan</div>
+          <div className="text-sm font-medium mb-2">
+            AI-generated plan — Review and customize before saving.
+          </div>
           {loadingSuggest && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 animate-pulse">
               <div className="h-20 rounded-lg bg-neutral-200" />

@@ -179,7 +179,7 @@ export default function SpeciesAutosuggest({
                 <>
                   {error && (
                     <li className="px-3 py-2 text-sm text-neutral-500 pointer-events-none">
-                      No suggestions right now. You can still proceed.
+                      Couldn't reach the server. Your info is safe—try again.
                     </li>
                   )}
                   {suggestions.map((s) => (

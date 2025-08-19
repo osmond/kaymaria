@@ -22,7 +22,9 @@ describe('SpeciesAutosuggest', () => {
     });
 
     expect(
-      await screen.findByText('No suggestions right now. You can still proceed.')
+      await screen.findByText(
+        "Couldn't reach the server. Your info is safe—try again."
+      )
     ).toBeInTheDocument();
 
     (global as any).fetch = oldFetch;
