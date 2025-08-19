@@ -66,7 +66,7 @@ After pulling new changes:
 ## Testing
 - Unit tests: `npm test`
 - Manual scenarios live in [docs/manual-test-cases.md](./docs/manual-test-cases.md)
-- End-to-end tests: `npm run test:e2e` (starts the Next.js dev server and runs Playwright smoke tests, including the Add Plant page)
+- End-to-end tests: `npm run test:e2e` (starts the Next.js dev server and runs Playwright smoke tests, including the Add Plant and Plant Detail pages)
 
 ## Project Structure
 ```
