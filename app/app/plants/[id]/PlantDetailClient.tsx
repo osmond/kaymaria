@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
 import BottomNav from '@/components/BottomNav';
+import CareSummary from '@/components/CareSummary';
 
 type CareType = "water" | "fertilize" | "repot";
 type TaskDTO = {
@@ -54,17 +55,28 @@ export default function PlantDetailClient({ plant }: { plant: {
   const [newPhotoFile, setNewPhotoFile] = useState<File | null>(null);
   const heroPhoto = photos[0] || "https://placehold.co/600x400?text=Plant";
   const acquired = plantState.acquiredAt ? new Date(plantState.acquiredAt) : null;
-  const nextWater = plantState.nextWater ? new Date(plantState.nextWater) : null;
-  const nextFertilize = plantState.nextFertilize ? new Date(plantState.nextFertilize) : null;
-    const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
-    const [err, setErr] = useState<string | null>(null);
-    const initialTab = (searchParams.get("tab") as "stats" | "timeline" | "notes" | "photos") || "stats";
-    const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">(initialTab);
-    const [notes, setNotes] = useState<Note[]>([]);
-    const [noteText, setNoteText] = useState("");
+  const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const initialTab = (searchParams.get("tab") as "stats" | "timeline" | "notes" | "photos") || "stats";
+  const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">(initialTab);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
+  const plantTasks = useMemo(() => (allTasks ?? []).filter(t => t.plantId === id), [allTasks, id]);
+  const nextWater = useMemo(() => {
+    const t = plantTasks
+      .filter(t => t.type === "water")
+      .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())[0];
+    return t ? new Date(t.dueAt) : plantState.nextWater ? new Date(plantState.nextWater) : null;
+  }, [plantTasks, plantState.nextWater]);
+  const nextFertilize = useMemo(() => {
+    const t = plantTasks
+      .filter(t => t.type === "fertilize")
+      .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())[0];
+    return t ? new Date(t.dueAt) : plantState.nextFertilize ? new Date(plantState.nextFertilize) : null;
+  }, [plantTasks, plantState.nextFertilize]);
   const careTips = useMemo(() => {
     const tips: string[] = [];
     const now = Date.now();
@@ -141,8 +153,6 @@ export default function PlantDetailClient({ plant }: { plant: {
   }, [id, plantState.latitude, plantState.longitude]);
 
 
-
-  const plantTasks = useMemo(() => (allTasks ?? []).filter(t => t.plantId === id), [allTasks, id]);
 
   const iconFor = (type: CareType) => {
     const className = "inline h-4 w-4";
@@ -285,16 +295,23 @@ export default function PlantDetailClient({ plant }: { plant: {
             </div>
           </div>
         </div>
-        {careTips.length > 0 && (
-          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-            {careTips.map((t, i) => (
-              <div key={i}>{t}</div>
-            ))}
-          </div>
-        )}
+          {careTips.length > 0 && (
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+              {careTips.map((t, i) => (
+                <div key={i}>{t}</div>
+              ))}
+            </div>
+          )}
 
-        {/* Tabs */}
-        <div className="mt-4 grid grid-cols-4 gap-2 text-sm">
+          <CareSummary
+            nextWater={nextWater}
+            nextFertilize={nextFertilize}
+            waterIntervalDays={plantState.waterIntervalDays}
+            fertilizeIntervalDays={plantState.fertilizeIntervalDays}
+          />
+
+          {/* Tabs */}
+          <div className="mt-4 grid grid-cols-4 gap-2 text-sm">
           <button
             className={`py-2 rounded-lg border ${tab === "stats" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
             onClick={() => setTab("stats")}
