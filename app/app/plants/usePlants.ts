@@ -1,30 +1,33 @@
-import useSWR from 'swr';
+import { useCallback, useEffect, useState } from 'react';
 
 export type Plant = { id: string; name: string; room?: string; species?: string };
 
-async function fetcher(url: string): Promise<Plant[]> {
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
-  }
-  return res.json();
-}
-
 export default function usePlants() {
-  const { data, error, isLoading, mutate } = useSWR<Plant[]>(
-    '/api/plants',
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      errorRetryInterval: 5000,
-      errorRetryCount: 3,
-    },
-  );
+  const [plants, setPlants] = useState<Plant[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  return {
-    plants: data ?? null,
-    error: error instanceof Error ? error.message : null,
-    isLoading,
-    mutate,
-  };
+  const fetchPlants = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/plants', { cache: 'no-store' });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data: Plant[] = await res.json();
+      setPlants(data);
+      setError(null);
+    } catch (err) {
+      setPlants(null);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPlants();
+  }, [fetchPlants]);
+
+  return { plants, error, isLoading, mutate: fetchPlants };
 }

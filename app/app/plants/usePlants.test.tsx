@@ -1,50 +1,50 @@
 /**
  * @jest-environment jsdom
  */
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import usePlants from './usePlants';
-import useSWR from 'swr';
-
-jest.mock('swr');
-const mockUseSWR = useSWR as unknown as jest.Mock;
 
 describe('usePlants', () => {
-  it('returns data on success', () => {
-    mockUseSWR.mockReturnValue({
-      data: [{ id: '1', name: 'Fern' }],
-      error: undefined,
-      isLoading: false,
-      mutate: jest.fn(),
+  beforeEach(() => {
+    // @ts-ignore
+    global.fetch = jest.fn();
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('returns data on success', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => [{ id: '1', name: 'Fern' }],
     });
     const { result } = renderHook(() => usePlants());
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
     expect(result.current.plants).toEqual([{ id: '1', name: 'Fern' }]);
     expect(result.current.error).toBeNull();
-    expect(result.current.isLoading).toBe(false);
   });
 
   it('indicates loading state', () => {
-    mockUseSWR.mockReturnValue({
-      data: undefined,
-      error: undefined,
-      isLoading: true,
-      mutate: jest.fn(),
-    });
+    (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
     const { result } = renderHook(() => usePlants());
     expect(result.current.plants).toBeNull();
     expect(result.current.error).toBeNull();
     expect(result.current.isLoading).toBe(true);
   });
 
-  it('returns error state', () => {
-    mockUseSWR.mockReturnValue({
-      data: undefined,
-      error: new Error('failed'),
-      isLoading: false,
-      mutate: jest.fn(),
+  it('returns error state', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 500,
     });
     const { result } = renderHook(() => usePlants());
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
     expect(result.current.plants).toBeNull();
-    expect(result.current.error).toBe('failed');
-    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBe('HTTP 500');
   });
 });
