@@ -15,26 +15,7 @@ import {
 } from './PlantForm';
 import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
-
-async function fetchWithRetry(
-  url: string,
-  options: RequestInit,
-  retries = 2,
-): Promise<Response> {
-  let attempt = 0;
-  let delay = 500;
-  while (true) {
-    try {
-      const res = await fetch(url, options);
-      if (res.ok || attempt >= retries) return res;
-    } catch (e) {
-      if (attempt >= retries) throw e;
-    }
-    await new Promise((r) => setTimeout(r, delay));
-    attempt++;
-    delay *= 2;
-  }
-}
+import { fetchJson } from '@/lib/fetchJson';
 
 export default function AddPlantModal({
   open,
@@ -104,6 +85,7 @@ export default function AddPlantModal({
   useEffect(() => {
     if (!open) return;
     prevFocus.current = document.activeElement as HTMLElement | null;
+    const controller = new AbortController();
     async function loadDefaults() {
       setLoading(true);
       setNotice(null);
@@ -139,13 +121,14 @@ export default function AddPlantModal({
         light: base.light,
       });
       try {
-        const r = await fetchWithRetry(
+        const json = await fetchJson<{
+          presets?: Partial<PlantFormValues>;
+          presetId?: string;
+          updated?: string;
+        }>(
           `/api/species-care?species=${encodeURIComponent(prefillName || '')}`,
-          {},
-          2,
+          { retries: 2, signal: controller.signal },
         );
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const json = await r.json();
         if (json.presets) {
           const init = { ...base, ...json.presets };
           setInitial(init);
@@ -177,18 +160,17 @@ export default function AddPlantModal({
               aiBody.lat = Number(base.lat);
               aiBody.lon = Number(base.lon);
             }
-            const ai = await fetch('/api/ai-care', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(aiBody),
-            });
-            if (ai.ok) {
-              const sug: AiCareSuggestion = await ai.json();
-              setInitialSuggest(sug);
-              setNotice(null);
-            } else {
-              setNotice('No suggestions available.');
-            }
+            const sug = await fetchJson<AiCareSuggestion>(
+              '/api/ai-care',
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(aiBody),
+                signal: controller.signal,
+              },
+            );
+            setInitialSuggest(sug);
+            setNotice(null);
           } catch (e) {
             setNotice('No suggestions available.');
           }
@@ -203,6 +185,7 @@ export default function AddPlantModal({
       }
     }
     loadDefaults();
+    return () => controller.abort();
   }, [open, prefillName, defaultRoomId]);
 
   async function handleSubmit(
@@ -224,20 +207,12 @@ export default function AddPlantModal({
         payload.aiVersion = planSource.aiVersion;
       }
     }
-    const r = await fetchWithRetry(
-      '/api/plants',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      },
-      2,
-    );
-    if (!r.ok) {
-      // Throw the full response so callers can inspect status and body
-      throw r;
-    }
-    const created = await r.json();
+    const created = await fetchJson<any>('/api/plants', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      retries: 2,
+    });
     requestIdRef.current = null;
     return created;
   }
@@ -272,37 +247,22 @@ export default function AddPlantModal({
       onCreate({ id: created.id, name: created.name || current.name });
     } catch (e: any) {
       let message = 'Failed to save plant.';
-      let status: number | undefined;
-      let data: any = null;
-      try {
-        status = e?.status ?? e?.response?.status;
-        if (e instanceof Response) {
-          data = await e.json().catch(() => null);
-        } else if (e?.response && typeof e.response.json === 'function') {
-          data = await e.response.json().catch(() => null);
-        } else if (e?.response?.data) {
-          data = e.response.data;
-        }
-        if (status === 401 || /401/.test(e?.message || '')) {
-          message = 'Please log in before adding a plant.';
-        } else if (data?.error) {
-          message = data.error;
-        } else if (data?.message) {
-          message = data.message;
-        } else if (data?.detail) {
-          message = data.detail;
-        } else if (typeof e?.message === 'string') {
-          message = e.message;
-        }
-      } catch (_) {
-        // ignore parse errors
+      const status: number | undefined = e?.status;
+      const data: any = e?.data;
+      if (status === 401) {
+        message = 'Please log in before adding a plant.';
+      } else if (data?.error) {
+        message = data.error;
+      } else if (data?.message) {
+        message = data.message;
+      } else if (data?.detail) {
+        message = data.detail;
+      } else if (typeof e?.message === 'string') {
+        message = e.message;
       }
-      const context: Record<string, unknown> = { error: e };
-      if (status !== undefined) context.status = status;
-      if (data !== null) context.data = data;
-    console.error('Error saving plant', e, context);
-    setToast(message);
-    return;
+      console.error('Error saving plant', e, { status, data });
+      setToast(message);
+      return;
     } finally {
       setSaving(false);
     }
