@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef, useId } from 'react';
 import { Dialog } from '@headlessui/react';
 import { useRouter } from 'next/navigation';
+import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import {
   BasicsFields,
   EnvironmentFields,
@@ -189,7 +190,7 @@ export default function AddPlantModal({
                 aiModel: sug.model,
                 aiVersion: sug.version,
               });
-              setNotice('AI-generated plan…');
+              setNotice(null);
             } else {
               setNotice('No suggestions available.');
               setPlanSource({ type: 'manual' });
@@ -334,8 +335,8 @@ export default function AddPlantModal({
       >
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-white rounded-none sm:rounded-2xl shadow-xl overflow-y-auto sm:max-h-[90vh]">
-            <div className="p-5 border-b">
+          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-md p-6 overflow-y-auto sm:max-h-[90vh]">
+            <div className="mb-6">
               <Dialog.Title
                 id={titleId}
                 className="text-lg font-display font-semibold"
@@ -344,7 +345,7 @@ export default function AddPlantModal({
               </Dialog.Title>
             </div>
             {loading && (
-              <div className="p-5 space-y-4 animate-pulse">
+              <div className="py-6 space-y-4 animate-pulse">
                 <div className="h-6 bg-neutral-200 rounded" />
                 <div className="h-6 bg-neutral-200 rounded" />
                 <div className="h-6 bg-neutral-200 rounded" />
@@ -353,7 +354,7 @@ export default function AddPlantModal({
             {!loading && values && (
               <>
                 {notice && (
-                  <div className="p-5 text-sm text-gray-600">{notice}</div>
+                  <div className="py-6 text-sm text-gray-600">{notice}</div>
                 )}
                 {step === 0 && (
                   <BasicsFields
@@ -373,31 +374,44 @@ export default function AddPlantModal({
                     onPlanModeChange={setPlanSource}
                   />
                 )}
-                <div className="p-5 border-t flex gap-2 justify-end items-center">
+                <div className="pt-6 mt-6 flex gap-2 justify-end items-center">
                   {saveError && step === 2 && (
                     <div className="text-xs text-red-600 mr-auto">{saveError}</div>
                   )}
-                  <button className="btn-secondary" onClick={close}>
+                  <button
+                    className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
+                    onClick={close}
+                  >
+                    <X className="h-4 w-4" />
                     Cancel
                   </button>
                   {step > 0 && (
-                    <button className="btn-secondary" onClick={prevStep}>
+                    <button
+                      className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
+                      onClick={prevStep}
+                    >
+                      <ArrowLeft className="h-4 w-4" />
                       Back
                     </button>
                   )}
                   {step < 2 && (
-                    <button className="btn" onClick={nextStep}>
+                    <button
+                      className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
+                      onClick={nextStep}
+                    >
+                      <ArrowRight className="h-4 w-4" />
                       Next
                     </button>
                   )}
                   {step === 2 && (
                     <button
-                      className="btn"
+                      className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                       onClick={() =>
                         submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual')
                       }
                       disabled={saving || !values.name.trim()}
                     >
+                      <Check className="h-4 w-4" />
                       {saving
                         ? 'Saving…'
                         : saveError

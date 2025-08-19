@@ -41,4 +41,27 @@ describe('GET /api/species-search', () => {
     delete process.env.TREFLE_API_TOKEN;
     (global as any).fetch = oldFetch;
   });
+
+  it('falls back to local species when Trefle fails', async () => {
+    const oldFetch = global.fetch;
+    const mockFetch = jest
+      .fn()
+      .mockResolvedValue({ ok: false, status: 503 } as any);
+    (global as any).fetch = mockFetch;
+    process.env.TREFLE_API_TOKEN = 'token';
+
+    const req = new Request('http://localhost/api/species-search?q=ficus');
+    const res = await GET(req as any);
+    const json = await res.json();
+
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(json)).toBe(true);
+    expect(json.some((s: any) => s.species.toLowerCase().includes('ficus'))).toBe(
+      true
+    );
+
+    delete process.env.TREFLE_API_TOKEN;
+    (global as any).fetch = oldFetch;
+  });
 });

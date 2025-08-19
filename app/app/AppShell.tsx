@@ -4,7 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import TaskRow from "@/components/TaskRow";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
+
 import { createSupabaseClient } from "@/lib/supabase";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+
 import { motion } from "framer-motion";
 import {
   Select,
@@ -626,20 +631,23 @@ export function SettingsView() {
       </header>
       <main className="flex-1 px-4 pb-28">
         <section className="mt-4 grid gap-3">
-          <div className="rounded-xl border bg-white shadow-sm p-4 dark:bg-neutral-800 dark:border-neutral-700">
-            <div className="text-base font-medium">Export / Import</div>
-            <div className="text-sm text-neutral-600 dark:text-neutral-300">
-              Backup JSON / CSV; restore from file
-            </div>
-            <div className="mt-2 flex gap-2">
-              <button className="border rounded px-3 py-2 text-sm">
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="text-base font-medium">Export / Import</div>
+              <div className="text-sm text-neutral-600 dark:text-neutral-300">
+                Backup JSON / CSV; restore from file
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0 flex gap-2">
+              <Button variant="secondary" size="sm">
                 Export JSON
-              </button>
-              <button className="border rounded px-3 py-2 text-sm">
+              </Button>
+              <Button variant="secondary" size="sm">
                 Export CSV
-              </button>
-              <button className="bg-neutral-900 text-white rounded px-3 py-2 text-sm dark:bg-neutral-100 dark:text-neutral-900">
+              </Button>
+              <Button variant="default" size="sm">
                 Import
+
               </button>
             </div>
           </div>
@@ -653,6 +661,17 @@ export function SettingsView() {
           >
             Sign out
           </button>
+
+              </Button>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex items-center justify-between">
+              <div className="text-base font-medium">Theme</div>
+              <ThemeToggle />
+            </CardContent>
+          </Card>
+
         </section>
       </main>
     </div>
