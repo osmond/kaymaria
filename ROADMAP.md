@@ -18,6 +18,7 @@ This document outlines upcoming work for the Kay Maria plant care app.
 
 - [ ] Core pages UX polish
   - [ ] Plants page (`/app/plants`)
+  - [ ] New Plant page styling (`/app/plants/new`)
   - [ ] Today page (`/app/today`)
   - [ ] Timeline page (`/app/timeline`)
   - [ ] Insights page (`/app/insights`)
