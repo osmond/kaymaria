@@ -335,9 +335,9 @@ export default function AddPlantModal({
         initialFocus={firstFieldRef}
         aria-labelledby={titleId}
       >
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/30" />
         <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-card sm:max-h-[90vh] flex flex-col">
+          <Dialog.Panel className="relative z-50 w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-card sm:max-h-[90vh] flex flex-col">
             <header className="sticky top-0 bg-background border-b p-6">
               <Dialog.Title
                 id={titleId}
