@@ -1,7 +1,7 @@
 # Kay Maria Style Guide
 
 _A living spec for design & implementation. Keep this in `/docs/STYLEGUIDE.md` and update alongside UI changes._  
-_Last updated: 2025‑08‑19_
+_Last updated: 2025-08-19_
 
 ---
 
@@ -38,8 +38,8 @@ Use semantic roles so components don’t rely on raw hex values.
 **Headlines:** Cabinet Grotesk  
 **Body & UI:** Inter
 
-| Role | Font | Size | Weight | Line‑height | Tracking |
-|---|---|---|---|---|---|
+| Role | Font | Size | Weight | Line-height | Tracking |
+|------|------|------|--------|-------------|----------|
 | Display | Cabinet | 36–40px | 600 | 1.1 | normal |
 | H1 | Cabinet | 28px | 600 | 1.2 | normal |
 | H2 | Cabinet | 22px | 600 | 1.25 | normal |
@@ -54,7 +54,7 @@ Use semantic roles so components don’t rely on raw hex values.
 
 ## 3) Layout & Spacing
 
-- **Grid:** 4‑pt system (4, 8, 12, 16, 20, 24, 32, 40, 48…)
+- **Grid:** 4pt system (4, 8, 12, 16, 20, 24, 32, 40, 48...)
 - **Gutters:** mobile 16px, tablet 24px, desktop 32–40px
 - **Max Content Width:** 1240px
 - **Cards:** `rounded-2xl bg-surface-1 shadow-card p-4 md:p-6`
@@ -63,192 +63,137 @@ Use semantic roles so components don’t rely on raw hex values.
 
 ## 4) Accessibility & Focus
 
-- Target **WCAG 2.2 AA**: text 4.5:1; large text/non‑text UI 3:1
-- **Focus ring** (all interactive): ring 3px brand + 2px offset on surface
-- Respect `prefers-reduced-motion`: turn off non‑essential animations
+- Target **WCAG 2.2 AA**: text 4.5:1; large text/UI 3:1
+- **Focus ring**: 3px brand + 2px offset
+- Respect `prefers-reduced-motion`
 - Touch targets ≥ 44×44px
 
 ---
 
-## 5) Motion Primitives (Framer Motion)
+## 5) Motion
 
-- **Tap/Hover micro‑interactions**: 120–150ms, `standard`
+- **Tap/Hover micro-interactions**: 120–150ms, `standard`
 - **Page/Section transitions**: 200–320ms, `emphasized`
-- **Success bounce**: scale 1 → 1.04 → 1 (≈120ms)
-- Animate `opacity`/`transform`; avoid layout‑thrashing (height/width) animations.
+- **Success bounce**: scale 1 → 1.04 → 1
+- Animate `opacity`, `transform`; avoid layout-thrashing
 
 ---
 
-## 6) Component Specs
+## 6) Component Specifications
 
-### Buttons (map to shadcn/ui variants)
+### Buttons
 - **Variants:** `primary`, `secondary`, `ghost`, `destructive`
 - **Sizes:** `sm` (28px), `md` (36px), `lg` (44px), `xl` (52px)
-- **Primary:** brand background, white text; hover `shadow-hover`; active `translate-y-[1px]`; disabled 50% opacity
-- **Loading:** spinner replaces leading icon; label unchanged
-- **Focus:** global ring spec
+- **States:** Rest, Hover, Active, Focus, Disabled
 
-**Example:**
 ```html
 <button class="inline-flex items-center justify-center gap-2 rounded-xl px-4 h-11
             bg-brand text-white shadow-card transition duration-base ease-standard
             hover:shadow-hover active:translate-y-[1px]
-            focus:outline-none focus:ring-3 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-surface
+            focus:outline-none focus:ring-3 focus:ring-brand focus:ring-offset-2
             disabled:opacity-50 disabled:pointer-events-none">
   <svg class="h-5 w-5" aria-hidden="true"></svg>
   <span>Add plant</span>
 </button>
 ```
 
-### Card
-- **Anatomy:** header (title/meta), body (content), footer (actions)
-- **Interactive cards:** add `hover:shadow-hover` + subtle lift (`-translate-y-px`)
+### Cards
+- **Structure:** Header (title/meta), Body (content), Footer (actions)
+- **Interactive:** Add `hover:shadow-hover`, `-translate-y-px`
 
 ### Inputs (Text, Select, Textarea)
-- **Base:** `rounded-xl border border-border bg-white px-3 py-2 shadow-inner/0
-           focus:ring-brand-400 focus:border-brand-500`
-- **Error:** border `error`, help‑text `error`
-- **Success:** border `success` (only after validation)
+- **Base:** `rounded-xl border border-border bg-white px-3 py-2`
+- **Focus:** `focus:ring-3 focus:ring-brand-400 focus:border-brand-500`
+- **Validation:** success, error borders and helper text
 
 ### FAB
-- **Size:** 56×56, icon 24px; bottom‑right, 16px from safe area
-- **Shadow:** `shadow-hover`; avoid keyboard overlap
-- **Behavior:** quick tap = primary action; long‑press or expand for `Add Plant` / `Add Room`
+- **Size:** 56×56, icon 24px
+- **Position:** bottom-right, 16px from safe area
+- **Behavior:** Tap for primary, expand for additional actions
 
 ### Chips / Tags
-- 28px height; 12–14px text; selected uses brand outline fill 12%
+- **Height:** 28px
+- **Text Size:** 12–14px
+- **Selected:** outline with brand fill at 12% opacity
 
 ---
 
-## 7) Component States
+## 7) Component States Matrix
 
-Provide all states for interactive components:
-- **Rest** → **Hover** → **Active/Pressed** → **Focus** → **Disabled**
-- **Validation:** `success`, `warning`, `error` (inputs)
-- **Selected** (lists, chips, tabs) with clear affordances
+| State   | Color       | Shadow        | Transform            | Notes                       |
+|---------|-------------|----------------|------------------------|-----------------------------|
+| Rest    | `bg-brand`  | `shadow-card` | None                   | Standard appearance         |
+| Hover   | Darken 5%   | `shadow-hover`| None                   | Adds elevation              |
+| Active  | Darken 10%  | None           | `translate-y-[1px]`    | Simulates button press      |
+| Focus   | Ring-brand  | Ring-3         | Offset + ring          | Visible for keyboard users  |
+| Disabled| 50% opacity | None           | No pointer events      | Grayed out UI               |
 
 ---
 
-## 8) Patterns
+## 8) UI Patterns
 
-- **Empty State:** friendly graphic + action
-  - _“No plants yet. Add your first to start tending 🌿”_
-- **Loading:** use skeletons that preserve layout
-- **Errors:** toast + inline hint + recovery action (e.g., retry)
+- **Empty State:** friendly graphic + action text
+  - _"No plants yet. Add your first to start tending 🌿"_
+- **Loading State:** use skeletons with consistent layout
+- **Error State:** toast + inline hint + retry action
 
 ---
 
 ## 9) Iconography
 
-- **Grid:** 16 / 20 / 24 px
-- **Style:** outline 1.5–2px stroke
-- **Usage:** consistent sizes within a view; keep labels for non‑obvious symbols
+- **Grid Sizes:** 16 / 20 / 24 px
+- **Style:** outline, 1.5–2px stroke
+- **Guideline:** consistent sizes per view; use labels for unclear icons
 
 ---
 
 ## 10) Content & Voice
 
-> Gentle. Reassuring. Encouraging. Avoid “productivity” buzzwords.
+> Gentle. Reassuring. Encouraging. Avoid productivity jargon.
 
-- **Success toast:** “Marked as watered.”  
-- **Undo action:** “Undo”  
-- **Confirm destructive:** “Delete plant? This can’t be undone.”
-- **Tagline examples:** “Tend to what matters.” / “You’re doing great.”
+- **Success:** “Marked as watered.”
+- **Undo:** “Undo”
+- **Destructive:** “Delete plant? This can’t be undone.”
+- **Taglines:** “Tend to what matters.” / “You’re doing great.”
 
 ---
 
 ## 11) Theming (Dark Mode)
 
-Dark tokens should keep the same rhythm:
 - `surface.DEFAULT: #0B0F0E`
 - `text.DEFAULT: #E5E7EB`
 - `border.DEFAULT: #1F2A28`
-- Adjust brand 400/500 for contrast on dark
+- Adjust `brand-400/500` for contrast
+- Use same spacing/elevation rhythm
 
 ---
 
-## 12) Example Usage Cheatsheet
+## 12) Usage Cheatsheet
 
-- Card container: `rounded-2xl bg-surface-1 shadow-card p-4 md:p-6`
-- Primary button: `bg-brand text-white hover:shadow-hover`
-- Input focus: `focus:ring-3 focus:ring-brand-400 focus:ring-offset-2`
-- Muted meta: `text-text-muted`
+- **Card container:** `rounded-2xl bg-surface-1 shadow-card p-4 md:p-6`
+- **Primary button:** `bg-brand text-white hover:shadow-hover`
+- **Input focus:** `focus:ring-3 focus:ring-brand-400 focus:ring-offset-2`
+- **Muted meta:** `text-text-muted`
 
 ---
 
-# tailwind.config.js — Diff to apply
+## 13) Page QA Checklist Template
 
-> Use this unified diff to extend your existing Tailwind config. If your project uses CommonJS, replace `export default` with `module.exports =`.
+Use this to validate each view against the style guide.
 
-```diff
---- a/tailwind.config.js
-+++ b/tailwind.config.js
-@@
--export default {
-+export default {
-   content: [
-     "./index.html",
-     "./src/**/*.{ts,tsx,js,jsx}",
-     "./app/**/*.{ts,tsx,js,jsx}",
-     "./components/**/*.{ts,tsx,js,jsx}",
-   ],
-   theme: {
-     extend: {
-+      fontFamily: {
-+        cabinet: ["Cabinet Grotesk", "ui-sans-serif", "system-ui"],
-+        inter: ["Inter", "ui-sans-serif", "system-ui"],
-+      },
-+      colors: {
-+        brand: {
-+          DEFAULT: "#508C7E",
-+          50:  "#EEF6F4",
-+          100: "#DBEDE8",
-+          200: "#B9DCD3",
-+          300: "#94C9BC",
-+          400: "#6FB5A4",
-+          500: "#508C7E",
-+          600: "#3F7266",
-+          700: "#345C53",
-+          800: "#2A4A44",
-+          900: "#1F3631",
-+        },
-+        surface: { DEFAULT: "#F9F9F9", 1: "#FFFFFF", 2: "#F3F4F6" },
-+        text: { DEFAULT: "#111827", muted: "#9CA3AF", inverse: "#FFFFFF" },
-+        border: { DEFAULT: "#E5E7EB", subtle: "#F1F5F9" },
-+        success: { DEFAULT: "#16A34A" },
-+        warning: { DEFAULT: "#F59E0B" },
-+        error:   { DEFAULT: "#DC2626" },
-+      },
-+      boxShadow: {
-+        card: "0 8px 24px rgba(0,0,0,.08)",
-+        hover: "0 10px 28px rgba(0,0,0,.12)",
-+      },
-+      borderRadius: {
-+        xl: "0.75rem",
-+        "2xl": "1rem",
-+      },
-+      ringWidth: {
-+        3: "3px",
-+      },
-+      transitionDuration: {
-+        fast: "120ms",
-+        base: "200ms",
-+        slow: "320ms",
-+      },
-+      transitionTimingFunction: {
-+        standard: "cubic-bezier(.2,.0,.2,1)",
-+        emphasized: "cubic-bezier(.2,.0,0,1)",
-+      },
-     },
-   },
-   plugins: [],
- }
-```
-
-> **Optional (Next/shadcn projects):** If you use `tailwind.config.ts`, copy the `extend` object above. Keep font imports in your CSS: `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cabinet+Grotesk:wght@500;600&display=swap');` (or self‑host).
+### Example: Today Page
+- [ ] Typography follows Cabinet + Inter specs
+- [ ] All buttons use correct variant/sizing/states
+- [ ] Cards have correct padding, radius, shadow
+- [ ] Layout respects 4pt spacing + responsive gutters
+- [ ] All interactive elements have focus rings
+- [ ] Component states: hover, active, disabled, selected
+- [ ] Empty, loading, and error states are implemented
+- [ ] Icons are sized and labeled correctly
 
 ---
 
 ## Changelog
-- **2025‑08‑19:** Initial explicit spec: tokens, states, motion, focus, components, and Tailwind diff.
+
+- **2025-08-19:** Explicit revision: tokens, components, state matrix, patterns, and dark mode. QA checklist template added.
 
