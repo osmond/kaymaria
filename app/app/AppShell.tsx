@@ -136,7 +136,7 @@ export function TodayView() {
     message: string;
     action?: { label: string; onClick: () => void };
   }>({ visible: false, message: "" });
-  const timer = useRef<number | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // data
   const [tasks, setTasks] = useState<TaskDTO[]>([]);
@@ -234,7 +234,6 @@ export function TodayView() {
   ) => {
     if (timer.current) window.clearTimeout(timer.current);
     setSnackbar({ visible: true, message: m, action });
-    // @ts-ignore
     timer.current = window.setTimeout(
       () => setSnackbar({ visible: false, message: "" }),
       5000,
