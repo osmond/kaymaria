@@ -254,7 +254,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
   };
 
   return (
-    <div className="min-h-[100dvh] bg-neutral-50 text-neutral-900 flex flex-col">
+    <div className="min-h-[100dvh] bg-background text-foreground flex flex-col">
       {/* Header */}
       <header className="px-4 pt-6 pb-2 sticky top-0 bg-white/90 backdrop-blur border-b border-border">
         <div className="flex items-center gap-2">
@@ -268,13 +268,13 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
           <div className="flex items-baseline justify-between w-full">
             <h1 className="text-xl font-display font-semibold tracking-tight">{name}</h1>
             <div className="flex items-center gap-1">
-              <span className="text-sm text-neutral-500">
+              <span className="text-sm text-muted">
                 {new Intl.DateTimeFormat(undefined, { weekday:"short", month:"short", day:"numeric" }).format(new Date())}
               </span>
               <button
                 aria-label="Edit plant"
                 onClick={() => setEditOpen(true)}
-                className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
+            className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
               >
                 <Pencil className="h-5 w-5" />
               </button>
@@ -296,7 +296,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                     </button>
                     <button
                       onClick={() => { setMenuOpen(false); deletePlant(); }}
-                      className="w-full text-left px-3 py-1.5 hover:bg-neutral-100 text-red-600"
+                      className="w-full text-left px-3 py-1.5 hover:bg-neutral-100 text-destructive"
                     >
                       Delete
                     </button>
@@ -312,10 +312,10 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
       <main className="flex-1 px-4 pb-28">
         {/* Hero */}
         <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-card mt-4">
-        <img src={heroPhoto} alt={name} className="w-full aspect-[4/3] object-cover bg-neutral-200" />
+        <img src={heroPhoto} alt={name} className="w-full aspect-[4/3] object-cover bg-border" />
           <div className="p-4">
             <h2 className="text-lg font-display font-semibold">{name}</h2>
-            <div className="text-sm text-neutral-500">
+            <div className="text-sm text-muted">
               {species || "—"}
               {acquired && ` • Acquired ${new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(acquired)}`}
             </div>
@@ -339,25 +339,25 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
           {/* Tabs */}
           <div className="mt-4 grid grid-cols-4 gap-2 text-sm">
           <button
-            className={`py-2 rounded-lg border border-border ${tab === "stats" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            className={`py-2 rounded-lg border border-border ${tab === "stats" ? "bg-white shadow-sm font-medium" : "text-muted"}`}
             onClick={() => setTab("stats")}
           >
             Stats
           </button>
           <button
-            className={`py-2 rounded-lg border border-border ${tab === "timeline" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            className={`py-2 rounded-lg border border-border ${tab === "timeline" ? "bg-white shadow-sm font-medium" : "text-muted"}`}
             onClick={() => setTab("timeline")}
           >
             Timeline
           </button>
           <button
-            className={`py-2 rounded-lg border border-border ${tab === "notes" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            className={`py-2 rounded-lg border border-border ${tab === "notes" ? "bg-white shadow-sm font-medium" : "text-muted"}`}
             onClick={() => setTab("notes")}
           >
             Notes
           </button>
           <button
-            className={`py-2 rounded-lg border border-border ${tab === "photos" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            className={`py-2 rounded-lg border border-border ${tab === "photos" ? "bg-white shadow-sm font-medium" : "text-muted"}`}
             onClick={() => setTab("photos")}
           >
             Photos
@@ -403,7 +403,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
           <section className="mt-4 rounded-2xl border border-border bg-white shadow-card">
             <div className="px-4 py-3 border-b border-border">
               <div className="text-base font-medium">Timeline</div>
-              <div className="text-xs text-neutral-500">Upcoming &amp; recent care</div>
+              <div className="text-xs text-muted">Upcoming &amp; recent care</div>
             </div>
             {undoInfo && (
               <div className="px-4 py-2 text-xs bg-green-50 text-green-800 flex justify-between">
@@ -413,7 +413,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
             )}
             <ul className="text-sm px-4 py-2">
               {err && <li className="py-3 text-red-600">{err}</li>}
-              {!err && plantTasks.length === 0 && <li className="py-3 text-neutral-500">No tasks yet</li>}
+              {!err && plantTasks.length === 0 && <li className="py-3 text-muted">No tasks yet</li>}
               {!err && plantTasks.map(t => (
                 <li key={t.id} className="py-3 border-b border-border last:border-b-0 flex justify-between items-center">
                   <span>
@@ -446,17 +446,17 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                 className="w-full border border-border rounded p-2 text-sm"
               />
               <div className="text-right mt-2">
-                <button type="submit" className="px-3 py-1 rounded bg-neutral-900 text-white text-xs">
+                <button type="submit" className="px-3 py-1 rounded bg-primary text-primary-foreground text-xs">
                   Add Note
                 </button>
               </div>
             </form>
             <ul className="mt-4 space-y-3">
-              {notes.length === 0 && <li className="text-neutral-500">No notes yet</li>}
+              {notes.length === 0 && <li className="text-muted">No notes yet</li>}
               {notes.map((n) => (
                 <li key={n.id} className="border-t border-border pt-2 first:border-t-0 first:pt-0">
                   <div>{n.note}</div>
-                  <div className="text-xs text-neutral-500">
+                  <div className="text-xs text-muted">
                     {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(n.createdAt))}
                   </div>
                 </li>
@@ -484,7 +484,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               />
               <button
                 type="submit"
-                className="px-3 py-2 rounded bg-neutral-900 text-white text-sm"
+                className="px-3 py-2 rounded bg-primary text-primary-foreground text-sm"
                 disabled={!newPhotoFile}
               >
                 Add
@@ -511,7 +511,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                 ))}
               </div>
             ) : (
-              <div className="text-sm text-neutral-500 text-center">No photos yet</div>
+              <div className="text-sm text-muted text-center">No photos yet</div>
             )}
           </section>
         )}
@@ -538,7 +538,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-border bg-white p-3 shadow-card">
-      <div className="text-xs text-neutral-500">{label}</div>
+      <div className="text-xs text-muted">{label}</div>
       <div className="text-base font-medium">{value}</div>
     </div>
   );
