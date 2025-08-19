@@ -4,9 +4,13 @@ import { createRouteHandlerClient } from "@/lib/supabase";
 import { getUserId } from "@/lib/getUserId";
 import { z } from "zod";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const plants = await listPlants();
+    const { searchParams } = new URL(req.url);
+    const name = searchParams.get("name") || undefined;
+    const roomId = searchParams.get("roomId") || undefined;
+    const filter = name || roomId ? { name, roomId } : undefined;
+    const plants = await listPlants(filter);
     return NextResponse.json(plants);
   } catch (e: any) {
     console.error("GET /api/plants failed:", e);
