@@ -76,7 +76,7 @@ export default function RoomSelector({
         <input
           ref={inputRef}
           className="input flex-1"
-          placeholder="Add room"
+          placeholder="e.g., Living Room"
           value={newRoom}
           onChange={(e) => setNewRoom(e.target.value)}
         />

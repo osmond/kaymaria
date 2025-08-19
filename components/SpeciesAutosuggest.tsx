@@ -165,7 +165,7 @@ export default function SpeciesAutosuggest({
           onBlur?.();
           setTimeout(() => setOpen(false), 100);
         }}
-        placeholder="e.g., Monstera deliciosa"
+        placeholder="e.g., Spider Plant"
       />
       {open && (
         <ul
