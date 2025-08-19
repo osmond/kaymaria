@@ -746,6 +746,7 @@ export function TimelineView() {
 
 export function SettingsView() {
   const supabase = useRef(createSupabaseClient());
+  const singleUser = process.env.SINGLE_USER_MODE === "true";
 
   async function handleSignOut() {
     await supabase.current.auth.signOut();
@@ -789,12 +790,14 @@ export function SettingsView() {
             <div className="text-base font-medium">Theme</div>
             <ThemeToggle />
           </div>
-          <button
-            onClick={handleSignOut}
-            className="rounded-2xl border bg-white shadow-card p-4 text-left text-base font-medium dark:bg-neutral-800 dark:border-neutral-700"
-          >
-            Sign out
-          </button>
+          {!singleUser && (
+            <button
+              onClick={handleSignOut}
+              className="rounded-2xl border bg-white shadow-card p-4 text-left text-base font-medium dark:bg-neutral-800 dark:border-neutral-700"
+            >
+              Sign out
+            </button>
+          )}
         </section>
       </main>
     </div>
