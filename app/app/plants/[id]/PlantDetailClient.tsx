@@ -2,7 +2,7 @@
 
 import Link from "next/link";
  import { useEffect, useMemo, useState, useRef } from "react";
- import { useRouter, useSearchParams } from "next/navigation";
+ import { usePathname, useRouter, useSearchParams } from "next/navigation";
  import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil, MoreVertical } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
 import BottomNav from '@/components/BottomNav';
@@ -35,11 +35,14 @@ type PlantExtras = {
   humidity?: string;
 };
 
+type Tab = "stats" | "timeline" | "notes" | "photos";
+
 export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtras }) {
   const [plantState, setPlantState] = useState<Plant & PlantExtras>(plant);
   const id = plantState.id;
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [name, setName] = useState(plant.name);
   const [species, setSpecies] = useState(plant.species || "");
   const [photos, setPhotos] = useState<string[]>(plant.photos ?? []);
@@ -48,8 +51,8 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
   const acquired = plantState.acquiredAt ? new Date(plantState.acquiredAt) : null;
   const [allTasks, setAllTasks] = useState<TaskDTO[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const initialTab = (searchParams.get("tab") as "stats" | "timeline" | "notes" | "photos") || "stats";
-  const [tab, setTab] = useState<"stats" | "timeline" | "notes" | "photos">(initialTab);
+  const initialTab = (searchParams.get("tab") as Tab) || "stats";
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [notes, setNotes] = useState<Note[]>([]);
   const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
@@ -104,6 +107,20 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
     })();
     return () => { alive = false; };
   }, []);
+
+  useEffect(() => {
+    const param = (searchParams.get("tab") as Tab) || "stats";
+    setTab(prev => (prev === param ? prev : param));
+  }, [searchParams]);
+
+  useEffect(() => {
+    const current = searchParams.get("tab") || "stats";
+    if ((tab === "stats" && current === "stats") || tab === current) return;
+    const sp = new URLSearchParams(searchParams.toString());
+    if (tab === "stats") sp.delete("tab"); else sp.set("tab", tab);
+    const qs = sp.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [tab, pathname, router, searchParams]);
 
     useEffect(() => {
       let alive = true;
