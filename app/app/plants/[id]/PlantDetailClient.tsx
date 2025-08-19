@@ -53,7 +53,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
   const [err, setErr] = useState<string | null>(null);
   const initialTab = (searchParams.get("tab") as Tab) || "stats";
   const [tab, setTab] = useState<Tab>(initialTab);
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<Note[] | null>(null);
   const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
   const [editOpen, setEditOpen] = useState(false);
@@ -125,12 +125,14 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
     useEffect(() => {
       let alive = true;
       (async () => {
-        try {
-          const r = await fetch(`/api/plants/${id}/notes`, { cache: "no-store" });
-          if (!r.ok) throw new Error();
-          const data: Note[] = await r.json();
-          if (alive) setNotes(data);
-        } catch {}
+    try {
+      const r = await fetch(`/api/plants/${id}/notes`, { cache: "no-store" });
+      if (!r.ok) throw new Error();
+      const data: Note[] = await r.json();
+      if (alive) setNotes(data);
+    } catch {
+      if (alive) setNotes([]);
+    }
       })();
       return () => { alive = false; };
     }, [id]);
@@ -197,7 +199,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
       });
       if (!r.ok) throw new Error();
       const rec: Note = await r.json();
-      setNotes((n) => [rec, ...n]);
+      setNotes((n) => [rec, ...(n || [])]);
       setNoteText("");
     } catch {}
 
@@ -429,9 +431,19 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               </div>
             )}
             <ul className="text-sm px-4 py-2">
+              {allTasks === null && !err && (
+                <>
+                  {[0, 1, 2].map(i => (
+                    <li key={i} className="py-3 border-b border-border last:border-b-0 flex justify-between items-center animate-pulse">
+                      <span className="h-4 w-1/2 bg-border rounded" />
+                      <span className="h-4 w-10 bg-border rounded" />
+                    </li>
+                  ))}
+                </>
+              )}
               {err && <li className="py-3 text-red-600">{err}</li>}
-              {!err && plantTasks.length === 0 && <li className="py-3 text-muted">No tasks yet</li>}
-              {!err && plantTasks.map(t => (
+              {!err && allTasks !== null && plantTasks.length === 0 && <li className="py-3 text-muted">No tasks yet</li>}
+              {!err && allTasks !== null && plantTasks.map(t => (
                 <li key={t.id} className="py-3 border-b border-border last:border-b-0 flex justify-between items-center">
                   <span>
                     {iconFor(t.type)} {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} — {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
@@ -469,8 +481,9 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               </div>
             </form>
             <ul className="mt-4 space-y-3">
-              {notes.length === 0 && <li className="text-muted">No notes yet</li>}
-              {notes.map((n) => (
+              {notes === null && <li className="h-4 bg-border rounded animate-pulse" />}
+              {notes !== null && notes.length === 0 && <li className="text-muted">No notes yet</li>}
+              {notes?.map((n) => (
                 <li key={n.id} className="border-t border-border pt-2 first:border-t-0 first:pt-0">
                   <div>{n.note}</div>
                   <div className="text-xs text-muted">
