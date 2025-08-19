@@ -53,6 +53,7 @@ After pulling new changes:
 
 ## Testing
 - Unit tests: `npm test`
+- Includes a smoke test for the Add Plant modal
 - Manual scenarios live in [docs/manual-test-cases.md](./docs/manual-test-cases.md)
 - End-to-end tests: `npm run test:e2e`
 
