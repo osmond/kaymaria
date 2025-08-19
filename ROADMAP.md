@@ -6,7 +6,7 @@ This document outlines upcoming work for the Kay Maria plant care app.
 
 - [ ] Multi-device sync
   - [x] Supabase Auth setup ([#90](https://github.com/osmond/kaymaria/issues/90))
-  - [ ] Real-time data sync across devices
+  - [x] Real-time data sync across devices
 - [ ] Regression tests
   - [ ] End-to-end test suite
   - [ ] Continuous integration pipeline
