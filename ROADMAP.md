@@ -34,7 +34,7 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
 - [ ] Plant Detail Page
   - [x] UI styling
   - [x] Navigation improvements
-  - [ ] Loading states
+  - [x] Loading states
   - [ ] Smoke tests
   - [ ] Visual alignment with style guide
 
