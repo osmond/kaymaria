@@ -6,6 +6,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
 
 import { createSupabaseClient } from "@/lib/supabase";
+import { subscribeToTaskChanges } from "@/lib/realtime";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -195,6 +196,11 @@ export function TodayView() {
   useEffect(() => {
     refresh(taskWindow);
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToTaskChanges(() => refresh(taskWindow));
+    return () => unsubscribe();
+  }, [taskWindow]);
 
   useEffect(() => {
     if (

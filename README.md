@@ -1,6 +1,6 @@
 # Kay Maria – Developer Guide
 
-This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion. The goal of this README is to give contributors (like me) a fast reference for building, testing and exploring the project.
+This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion with real-time task syncing across devices. The goal of this README is to give contributors (like me) a fast reference for building, testing and exploring the project.
 
 ## Quick Start
 1. Install dependencies
