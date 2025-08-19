@@ -114,8 +114,12 @@ export default function SpeciesAutosuggest({
           setLoading(false);
           setError(false);
         }
-      } catch (e) {
-        if ((e as any).name !== 'AbortError' && controllers.get(query) === controller) {
+      } catch (e: unknown) {
+        if (
+          e instanceof Error &&
+          e.name !== 'AbortError' &&
+          controllers.get(query) === controller
+        ) {
           console.error('species search failed', e);
           setSuggestions(staticSuggestions);
           setError(true);
