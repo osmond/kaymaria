@@ -6,16 +6,13 @@ import {
   deletePlant,
 } from "@/lib/prisma/plants";
 
-type Params = { params: { id: string } };
+type Params = { params: Promise<{ id: string }> };
 
-// In Next 15, params may be a Promise — await it.
-export async function GET(
-  _req: Request,
-  ctx: Params | Promise<Params>
-) {
+// In Next 15, `params` is a Promise — await it.
+export async function GET(_req: Request, { params }: Params) {
   try {
-    const { params } = await ctx;
-    const plant = await getPlant(params.id);
+    const { id } = await params;
+    const plant = await getPlant(id);
     if (!plant) return NextResponse.json({ error: "Not found" }, { status: 404 });
     const water = await getComputedWaterInfo(plant);
     return NextResponse.json({ ...plant, water });
@@ -25,15 +22,12 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  req: Request,
-  ctx: Params | Promise<Params>
-) {
+export async function PATCH(req: Request, { params }: Params) {
   try {
-    const { params } = await ctx;
+    const { id } = await params;
     const body = await req.json().catch(() => ({}));
     const { rules, ...rest } = body;
-    const updated = await updatePlant(params.id, {
+    const updated = await updatePlant(id, {
       ...rest,
       ...(rules ? { carePlan: rules } : {}),
     });
@@ -45,13 +39,10 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  _req: Request,
-  ctx: Params | Promise<Params>
-) {
+export async function DELETE(_req: Request, { params }: Params) {
   try {
-    const { params } = await ctx;
-    const ok = await deletePlant(params.id);
+    const { id } = await params;
+    const ok = await deletePlant(id);
     if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ ok: true });
   } catch (e: any) {
