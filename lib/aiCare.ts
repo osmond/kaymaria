@@ -4,6 +4,7 @@ export type AiCareParams = {
   name?: string;
   species?: string;
   potSize?: string;
+  potHeight?: string;
   potMaterial?: string;
   light?: string;
   indoor?: boolean;
@@ -27,6 +28,7 @@ export async function suggestCare({
   name = 'Plant',
   species = '',
   potSize = '',
+  potHeight = '',
   potMaterial = '',
   light = '',
   indoor,
@@ -46,6 +48,7 @@ export async function suggestCare({
     `Name: ${name}`,
     `Species: ${species}`,
     `Pot size: ${potSize}`,
+    `Pot height: ${potHeight}`,
     `Pot material: ${potMaterial}`,
   ];
   if (light) parts.push(`Light: ${light}`);

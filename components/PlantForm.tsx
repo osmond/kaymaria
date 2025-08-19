@@ -18,6 +18,7 @@ export type PlantFormValues = {
   roomId: string;
   species: string;
   pot: string;
+  potHeight: string;
   potMaterial: string;
   light: string;
   indoor: 'Indoor' | 'Outdoor';
@@ -39,6 +40,7 @@ export type PlantFormSubmit = {
   roomId: string;
   species?: string;
   potSize: string;
+  potHeight: string;
   potMaterial: string;
   lightLevel: string;
   indoor: boolean;
@@ -68,6 +70,7 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
     roomId: s.roomId,
     species: s.species || undefined,
     potSize: s.pot,
+    potHeight: s.potHeight,
     potMaterial: s.potMaterial,
     lightLevel: s.light,
     indoor: s.indoor === 'Indoor',
@@ -259,7 +262,7 @@ export function BasicsFields({
         <p className="hint">Stored locally in Settings → Defaults.</p>
       </Field>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <Field label="Pot size" defaulted={defaults?.pot === state.pot}>
           <div className="flex items-center gap-2">
             <Stepper
@@ -281,6 +284,18 @@ export function BasicsFields({
             </button>
           )}
           <p className="hint">Larger pots stay moist longer.</p>
+        </Field>
+        <Field label="Pot height">
+          <div className="flex items-center gap-2">
+            <Stepper
+              value={state.potHeight.replace(' in', '')}
+              onChange={(v) =>
+                setState({ ...state, potHeight: v ? `${v} in` : '' })
+              }
+              min={1}
+            />
+            <span className="text-sm">in</span>
+          </div>
         </Field>
         <Field
           label="Pot material"
@@ -615,7 +630,7 @@ export function CarePlanFields({
 
   useEffect(() => {
     if (!showSuggest) return;
-    if (!state.species || !state.pot) return;
+    if (!state.species || !state.pot || !state.potHeight) return;
 
     const handle = setTimeout(async () => {
       setSuggestError(null);
@@ -625,6 +640,7 @@ export function CarePlanFields({
           name: state.name,
           species: state.species,
           potSize: state.pot,
+          potHeight: state.potHeight,
           potMaterial: state.potMaterial,
           light: state.light,
           indoor: state.indoor === 'Indoor',
@@ -668,6 +684,7 @@ export function CarePlanFields({
   }, [
     state.species,
     state.pot,
+    state.potHeight,
     state.potMaterial,
     state.light,
     state.indoor,
