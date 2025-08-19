@@ -26,4 +26,12 @@ describe('PlantsView', () => {
     expect(screen.queryByTestId('plants-skeleton')).toBeNull();
     expect(screen.getByText('Fern')).toBeInTheDocument();
   });
+
+  it('shows empty state when no plants', () => {
+    mockUsePlants.mockReturnValue({ plants: [], error: null, isLoading: false });
+    render(<PlantsView />);
+    expect(
+      screen.getByText('No plants yet. Add your first to start tending 🌿')
+    ).toBeInTheDocument();
+  });
 });
