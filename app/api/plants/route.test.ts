@@ -32,7 +32,7 @@ describe('GET/POST /api/plants', () => {
     ];
     (listPlants as jest.Mock).mockResolvedValue(plants);
 
-    const res = await GET();
+    const res = await GET(new Request('http://localhost/api/plants') as any);
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toEqual([
@@ -43,7 +43,16 @@ describe('GET/POST /api/plants', () => {
         lastFertilizedAt: '2024-01-02T00:00:00.000Z',
       },
     ]);
-    expect(listPlants).toHaveBeenCalled();
+    expect(listPlants).toHaveBeenCalledWith(undefined);
+  });
+
+  it('filters by name and room', async () => {
+    (listPlants as jest.Mock).mockResolvedValue([]);
+    const res = await GET(
+      new Request('http://localhost/api/plants?name=Fiddle&roomId=r1') as any,
+    );
+    expect(res.status).toBe(200);
+    expect(listPlants).toHaveBeenCalledWith({ name: 'Fiddle', roomId: 'r1' });
   });
 
   it('creates plant', async () => {

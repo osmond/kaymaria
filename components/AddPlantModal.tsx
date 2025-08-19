@@ -68,6 +68,12 @@ export default function AddPlantModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [recognizing, setRecognizing] = useState(false);
   const [recognizeError, setRecognizeError] = useState<string | null>(null);
+  const [duplicate, setDuplicate] = useState<
+    { id: string; name: string; roomId?: string; species?: string } | null
+  >(null);
+  const [pendingSubmit, setPendingSubmit] = useState<
+    { values: PlantFormValues; source: 'ai' | 'manual' } | null
+  >(null);
   const validationId = useId();
   const saveErrorId = useId();
   const canSubmit = values ? plantFormSchema.safeParse(values).success : false;
@@ -366,6 +372,7 @@ export default function AddPlantModal({
   async function submitCurrent(
     source: 'ai' | 'manual' = 'manual',
     override?: PlantFormValues,
+    skipCheck = false,
   ) {
     if (!values) return;
     const current = override ?? values;
@@ -374,6 +381,20 @@ export default function AddPlantModal({
     setSaving(true);
     setSaveError(null);
     try {
+      if (!skipCheck) {
+        const matches = await fetchJson<
+          { id: string; name: string; roomId?: string; species?: string }[]
+        >(
+          `/api/plants?name=${encodeURIComponent(
+            current.name.trim(),
+          )}&roomId=${encodeURIComponent(current.roomId)}`,
+        );
+        if (matches && matches.length > 0) {
+          setDuplicate(matches[0]);
+          setPendingSubmit({ values: current, source });
+          return;
+        }
+      }
       const created = await handleSubmit(
         plantValuesToSubmit(current),
         source,
@@ -611,6 +632,58 @@ export default function AddPlantModal({
           </Dialog.Panel>
         </div>
       </Dialog>
+      {duplicate && pendingSubmit && (
+        <Dialog
+          open={true}
+          onClose={() => {
+            setDuplicate(null);
+            setPendingSubmit(null);
+          }}
+          className="relative z-50"
+        >
+          <DialogBackdrop className="fixed inset-0 bg-black/30" />
+          <div className="fixed inset-0 flex items-end sm:items-center justify-center p-4">
+            <Dialog.Panel className="w-full sm:max-w-sm bg-background rounded-2xl shadow-card p-6 space-y-4">
+              <Dialog.Title className="text-lg font-display font-semibold">
+                Plant already exists
+              </Dialog.Title>
+              <p>
+                A plant named "{duplicate.name}" already exists in this room.
+              </p>
+              {duplicate.species && (
+                <p className="text-sm text-neutral-600">
+                  Species: {duplicate.species}
+                </p>
+              )}
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  className="btn-secondary"
+                  onClick={() => {
+                    setDuplicate(null);
+                    setPendingSubmit(null);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    if (pendingSubmit) {
+                      setDuplicate(null);
+                      const { values, source } = pendingSubmit;
+                      submitCurrent(source, values, true);
+                      setPendingSubmit(null);
+                    }
+                  }}
+                  disabled={saving}
+                >
+                  {saving ? 'Saving…' : 'Create anyway'}
+                </button>
+              </div>
+            </Dialog.Panel>
+          </div>
+        </Dialog>
+      )}
       {toast && (
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-sm px-4 py-2 rounded-full shadow-lg">
           {toast}

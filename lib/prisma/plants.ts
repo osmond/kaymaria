@@ -22,8 +22,17 @@ type PlantData = {
   lastFertilizedAt?: string | null;
 };
 
-export async function listPlants(): Promise<Plant[]> {
-  return prisma.plant.findMany({ orderBy: { name: "asc" } });
+export async function listPlants(filter?: {
+  name?: string;
+  roomId?: string;
+}): Promise<Plant[]> {
+  return prisma.plant.findMany({
+    where: {
+      ...(filter?.name ? { name: filter.name } : {}),
+      ...(filter?.roomId ? { roomId: filter.roomId } : {}),
+    },
+    orderBy: { name: "asc" },
+  });
 }
 
 export async function getPlant(id: string): Promise<Plant | null> {
