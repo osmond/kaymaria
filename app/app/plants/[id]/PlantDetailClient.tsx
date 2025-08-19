@@ -18,7 +18,7 @@ type TaskDTO = {
   lastEventAt?: string;
 };
 
-type Note = { id: string; text: string; at: string };
+type Note = { id: string; note: string; createdAt: string };
 
 export default function PlantDetailClient({ plant }: { plant: {
   id: string;
@@ -163,7 +163,7 @@ export default function PlantDetailClient({ plant }: { plant: {
       const r = await fetch(`/api/plants/${id}/notes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ note: text }),
       });
       if (!r.ok) throw new Error();
       const rec: Note = await r.json();
@@ -412,9 +412,9 @@ export default function PlantDetailClient({ plant }: { plant: {
               {notes.length === 0 && <li className="text-neutral-500">No notes yet</li>}
               {notes.map((n) => (
                 <li key={n.id} className="border-t pt-2 first:border-t-0 first:pt-0">
-                  <div>{n.text}</div>
+                  <div>{n.note}</div>
                   <div className="text-xs text-neutral-500">
-                    {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(n.at))}
+                    {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(n.createdAt))}
                   </div>
                 </li>
               ))}
