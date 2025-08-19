@@ -296,104 +296,116 @@ export default function AddPlantModal({
       >
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-md p-6 overflow-y-auto sm:max-h-[90vh]">
-            <div className="mb-6">
+          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-md sm:max-h-[90vh] flex flex-col">
+            <header className="sticky top-0 bg-background border-b p-6">
               <Dialog.Title
                 id={titleId}
                 className="text-lg font-display font-semibold"
               >
                 Add Plant
               </Dialog.Title>
-            </div>
-            {loading && (
-              <div className="py-6 space-y-4 animate-pulse">
-                <div className="h-6 bg-neutral-200 rounded" />
-                <div className="h-6 bg-neutral-200 rounded" />
-                <div className="h-6 bg-neutral-200 rounded" />
+              <div className="mt-4 flex gap-2">
+                {[0, 1, 2].map((n) => (
+                  <div
+                    key={n}
+                    className={`h-1 flex-1 rounded ${step >= n ? 'bg-primary' : 'bg-neutral-200'}`}
+                  />
+                ))}
               </div>
-            )}
-            {!loading && values && (
-              <>
-                {notice && (
-                  <div className="py-6 text-sm text-gray-600">{notice}</div>
-                )}
-                {step === 0 && (
-                  <BasicsFields
-                    state={values}
-                    setState={setValues}
-                    defaults={defaults || undefined}
-                    nameInputRef={firstFieldRef}
-                    onSaveDefault={saveDefault}
-                  />
-                )}
-                {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
-                {step === 2 && (
-                  <CarePlanFields
-                    state={values}
-                    setState={setValues}
-                    initialSuggest={initialSuggest}
-                    onPlanModeChange={(v) => setPlanSource(v)}
-                  />
-                )}
-                <div className="mt-6 flex flex-wrap gap-2 text-xs">
-                  <span className="rounded-full border bg-white px-3 py-1 shadow-sm">
-                    {`Water every ${values.waterEvery}d · ${values.waterAmount} ml • Fertilize every ${values.fertEvery}d`}
-                  </span>
-                  {planSource && planSource.type !== 'manual' && (
-                    <span className="rounded-full border bg-white px-3 py-1 shadow-sm">
-                      {planSource.type === 'ai' ? 'AI plan' : 'Preset plan'}
-                    </span>
-                  )}
+            </header>
+            <div className="flex-1 overflow-y-auto p-6">
+              {loading && (
+                <div className="py-6 space-y-4 animate-pulse">
+                  <div className="h-6 bg-neutral-200 rounded" />
+                  <div className="h-6 bg-neutral-200 rounded" />
+                  <div className="h-6 bg-neutral-200 rounded" />
                 </div>
-                <div className="pt-6 mt-6 flex gap-2 justify-end items-center">
+              )}
+              {!loading && values && (
+                <>
+                  {notice && (
+                    <div className="py-6 text-sm text-gray-600">{notice}</div>
+                  )}
+                  {step === 0 && (
+                    <BasicsFields
+                      state={values}
+                      setState={setValues}
+                      defaults={defaults || undefined}
+                      nameInputRef={firstFieldRef}
+                      onSaveDefault={saveDefault}
+                    />
+                  )}
+                  {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
+                  {step === 2 && (
+                    <CarePlanFields
+                      state={values}
+                      setState={setValues}
+                      initialSuggest={initialSuggest}
+                      onPlanModeChange={(v) => setPlanSource(v)}
+                    />
+                  )}
+                  <div className="mt-6 flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full border bg-white px-3 py-1 shadow-sm">
+                      {`Water every ${values.waterEvery}d · ${values.waterAmount} ml • Fertilize every ${values.fertEvery}d`}
+                    </span>
+                    {planSource && planSource.type !== 'manual' && (
+                      <span className="rounded-full border bg-white px-3 py-1 shadow-sm">
+                        {planSource.type === 'ai' ? 'AI plan' : 'Preset plan'}
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            {!loading && values && (
+              <footer className="sticky bottom-0 border-t bg-background p-6 flex gap-2 justify-end items-center">
+                <button
+                  className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
+                  onClick={close}
+                >
+                  <X className="h-4 w-4" />
+                  Cancel
+                </button>
+                {step > 0 && (
                   <button
                     className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
-                    onClick={close}
+                    onClick={prevStep}
                   >
-                    <X className="h-4 w-4" />
-                    Cancel
+                    <ArrowLeft className="h-4 w-4" />
+                    Back
                   </button>
-                  {step > 0 && (
-                    <button
-                      className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
-                      onClick={prevStep}
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Back
-                    </button>
-                  )}
-                  {step < 2 && (
-                    <button
-                      className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
-                      onClick={nextStep}
-                      disabled={step === 0 && !basicsValid}
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                      Next
-                    </button>
-                  )}
-                  {step === 2 && (
-                    <button
-                      className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
-                      onClick={() =>
-                        submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual')
-                      }
-                      disabled={saving || !canSubmit}
-                    >
-                      <Check className="h-4 w-4" />
-                      {saving
-                        ? 'Saving…'
-                        : planSource?.type === 'ai'
-                        ? 'Create with Suggested Plan'
-                        : planSource?.type === 'preset'
-                        ? 'Create with Preset Plan'
-                        : 'Create Plant (Manual)'}
-                    </button>
-                  )}
-                </div>
-                <FormStyles />
-              </>
+                )}
+                {step < 2 && (
+                  <button
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
+                    onClick={nextStep}
+                    disabled={step === 0 && !basicsValid}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                    Next
+                  </button>
+                )}
+                {step === 2 && (
+                  <button
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
+                    onClick={() =>
+                      submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual')
+                    }
+                    disabled={saving || !canSubmit}
+                  >
+                    <Check className="h-4 w-4" />
+                    {saving
+                      ? 'Saving…'
+                      : planSource?.type === 'ai'
+                      ? 'Create with Suggested Plan'
+                      : planSource?.type === 'preset'
+                      ? 'Create with Preset Plan'
+                      : 'Create Plant (Manual)'}
+                  </button>
+                )}
+              </footer>
             )}
+            {!loading && values && <FormStyles />}
           </Dialog.Panel>
         </div>
       </Dialog>
