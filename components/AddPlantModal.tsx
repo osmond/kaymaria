@@ -20,6 +20,7 @@ import {
 import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { fetchJson, FetchJsonError } from '@/lib/fetchJson';
+import useCareTips from './useCareTips';
 
 export function todayLocalYYYYMMDD(): string {
   const d = new Date();
@@ -69,6 +70,8 @@ export default function AddPlantModal({
     ? plantFieldSchemas.name.safeParse(values.name).success &&
       plantFieldSchemas.roomId.safeParse(values.roomId).success
     : false;
+
+  const careTips = useCareTips(values);
 
   const validationMessage =
     step === 0 && !basicsValid
@@ -384,6 +387,7 @@ export default function AddPlantModal({
                       defaults={defaults || undefined}
                       nameInputRef={firstFieldRef}
                       onSaveDefault={saveDefault}
+                      careTips={careTips}
                     />
                   )}
                   {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
