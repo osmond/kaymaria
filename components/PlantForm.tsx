@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { z } from 'zod';
@@ -128,7 +128,7 @@ const emptyValidation: Validation = {
   markTouched: () => {},
 };
 
-function ChipSelect({
+export function ChipSelect({
   options,
   value,
   onChange,
@@ -137,18 +137,36 @@ function ChipSelect({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const refs = useRef<HTMLButtonElement[]>([]);
   return (
-    <div className="flex gap-2">
-      {options.map((opt) => (
+    <div className="flex gap-2" role="radiogroup" aria-label="Options">
+      {options.map((opt, i) => (
         <button
           key={opt}
+          ref={(el) => (refs.current[i] = el!)}
           type="button"
+          role="radio"
+          aria-checked={value === opt}
+          aria-label={opt}
+          tabIndex={value === opt ? 0 : -1}
           className={`min-w-11 min-h-11 px-3 py-2 rounded-full border text-sm flex items-center justify-center ${
             value === opt
               ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
               : 'bg-white text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
           }`}
           onClick={() => onChange(opt)}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+              e.preventDefault();
+              refs.current[(i + 1) % options.length]?.focus();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+              e.preventDefault();
+              refs.current[(i - 1 + options.length) % options.length]?.focus();
+            } else if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              onChange(opt);
+            }
+          }}
         >
           {opt}
         </button>
