@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import TaskRow from "@/components/TaskRow";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
@@ -536,22 +536,59 @@ export function TimelineView() {
   const [eventsErr, setEventsErr] = useState<string | null>(null);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [eventTypeFilter, setEventTypeFilter] = useState("");
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 20;
 
-  useEffect(() => {
-    (async () => {
+  const loadPage = useCallback(
+    async (p: number) => {
       try {
         setEventsLoading(true);
         setEventsErr(null);
-        const r = await fetch(`/api/events?window=30d`, { cache: "no-store" });
+        const r = await fetch(
+          `/api/events?offset=${p * limit}&limit=${limit}`,
+          { cache: "no-store" },
+        );
         if (!r.ok) throw new Error("HTTP " + r.status);
-        setEvents(await r.json());
+        const newEvents: EventDTO[] = await r.json();
+        setEvents((prev) => {
+          const existing = new Set(prev.map((e) => e.id));
+          const deduped = newEvents.filter((e) => !existing.has(e.id));
+          return p === 0 ? deduped : [...prev, ...deduped];
+        });
+        setPage(p);
+        if (newEvents.length < limit) setHasMore(false);
       } catch (e: any) {
         setEventsErr(e?.message || "Failed to load");
       } finally {
         setEventsLoading(false);
       }
-    })();
-  }, []);
+    },
+    [limit],
+  );
+
+  useEffect(() => {
+    loadPage(0);
+  }, [loadPage]);
+
+  const loadMore = useCallback(() => {
+    if (!eventsLoading && hasMore) {
+      loadPage(page + 1);
+    }
+  }, [eventsLoading, hasMore, page, loadPage]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 100
+      ) {
+        loadMore();
+      }
+    };
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [loadMore]);
 
   const filteredEvents = useMemo(
     () =>
@@ -626,7 +663,7 @@ export function TimelineView() {
           </div>
           <div className="text-sm px-4 py-2">
             {eventsErr && <div className="py-3 text-red-600">{eventsErr}</div>}
-            {!eventsErr && eventsLoading && (
+            {!eventsErr && events.length === 0 && eventsLoading && (
               <div className="py-3 text-neutral-500">Loading…</div>
             )}
             {!eventsErr && !eventsLoading && dayBuckets.length === 0 && (
@@ -659,6 +696,20 @@ export function TimelineView() {
                   </ul>
                 </div>
               ))}
+            {!eventsErr && hasMore && (
+              <div className="py-3 text-center">
+                {eventsLoading ? (
+                  <div className="text-neutral-500">Loading…</div>
+                ) : (
+                  <button
+                    onClick={loadMore}
+                    className="underline text-blue-600"
+                  >
+                    Load more
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </section>
       </main>
