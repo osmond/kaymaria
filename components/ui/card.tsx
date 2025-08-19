@@ -14,7 +14,7 @@ export function Card({ className = "", ...props }: DivProps) {
   );
 }
 export function CardHeader({ className = "", ...props }: DivProps) {
-  return <div className={`p-4 ${className}`} {...props} />;
+  return <div className={`p-4 md:p-6 ${className}`} {...props} />;
 }
 export function CardTitle({ className = "", ...props }: HProps) {
   return <h3 className={`text-base font-medium ${className}`} {...props} />;
@@ -23,5 +23,5 @@ export function CardDescription({ className = "", ...props }: PProps) {
   return <p className={`text-sm text-muted dark:text-neutral-400 ${className}`} {...props} />;
 }
 export function CardContent({ className = "", ...props }: DivProps) {
-  return <div className={`p-4 ${className}`} {...props} />;
+  return <div className={`p-4 md:p-6 ${className}`} {...props} />;
 }

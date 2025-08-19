@@ -6,6 +6,7 @@ import Link from "next/link";
  import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil, MoreVertical } from "lucide-react";
 import BottomNav from '@/components/BottomNav';
 import CareSummary from '@/components/CareSummary';
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Plant } from '@prisma/client';
 
 type CareType = "water" | "fertilize" | "repot";
@@ -335,16 +336,16 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
       {/* Content */}
       <main className="flex-1 px-4 pb-28">
         {/* Hero */}
-        <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-card mt-4">
-        <img src={heroPhoto} alt={name} className="w-full aspect-[4/3] object-cover bg-border" />
-          <div className="p-4">
+        <Card className="overflow-hidden mt-4">
+          <img src={heroPhoto} alt={name} className="w-full aspect-[4/3] object-cover bg-border" />
+          <CardContent>
             <h2 className="text-lg font-display font-semibold">{name}</h2>
             <div className="text-sm text-muted">
               {species || "—"}
               {acquired && ` • Acquired ${new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(acquired)}`}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
           {careTips.length > 0 && (
             <div className="mt-4 rounded-lg border border-warning/20 bg-warning/10 p-3 text-sm text-warning">
               {careTips.map((t, i) => (
@@ -424,131 +425,141 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
         )}
 
         {tab === "timeline" && (
-          <section className="mt-4 rounded-2xl border border-border bg-white shadow-card">
-            <div className="px-4 py-3 border-b border-border">
-              <div className="text-base font-medium">Timeline</div>
-              <div className="text-xs text-muted">Upcoming &amp; recent care</div>
-            </div>
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle>Timeline</CardTitle>
+              <CardDescription>Upcoming &amp; recent care</CardDescription>
+            </CardHeader>
             {undoInfo && (
-              <div className="px-4 py-2 text-xs bg-success/10 text-success flex justify-between">
+
+              <div className="px-4 md:px-6 py-2 text-xs bg-green-50 text-green-800 flex justify-between">
+
                 <span>Task completed.</span>
                 <button onClick={undoTimeline} className="underline">Undo</button>
               </div>
             )}
-            <ul className="text-sm px-4 py-2">
-              {allTasks === null && !err && (
-                <>
-                  {[0, 1, 2].map(i => (
-                    <li key={i} className="py-3 border-b border-border last:border-b-0 flex justify-between items-center animate-pulse">
-                      <span className="h-4 w-1/2 bg-border rounded" />
-                      <span className="h-4 w-10 bg-border rounded" />
-                    </li>
-                  ))}
-                </>
-              )}
-              {err && <li className="py-3 text-red-600">{err}</li>}
-              {!err && allTasks !== null && plantTasks.length === 0 && <li className="py-3 text-muted">No tasks yet</li>}
-              {!err && allTasks !== null && plantTasks.map(t => (
-                <li key={t.id} className="py-3 border-b border-border last:border-b-0 flex justify-between items-center">
-                  <span>
-                    {iconFor(t.type)} {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} — {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
-                    {(() => {
-                      const d = new Date(t.dueAt); const today = new Date();
-                      const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime())/86400000);
-                      return diff > 0 ? ` (In ${diff}d)` : diff === 0 ? " (Today)" : "";
-                    })()}
-                  </span>
-                  <button onClick={() => markTimelineDone(t)} className="text-xs text-accent hover:underline">Done</button>
-                </li>
-              ))}
-            </ul>
-          </section>
+
+            <CardContent className="pt-2">
+              <ul className="text-sm">
+                {allTasks === null && !err && (
+                  <>
+                    {[0, 1, 2].map(i => (
+                      <li key={i} className="py-3 border-b border-border last:border-b-0 flex justify-between items-center animate-pulse">
+                        <span className="h-4 w-1/2 bg-border rounded" />
+                        <span className="h-4 w-10 bg-border rounded" />
+                      </li>
+                    ))}
+                  </>
+                )}
+                {err && <li className="py-3 text-red-600">{err}</li>}
+                {!err && allTasks !== null && plantTasks.length === 0 && <li className="py-3 text-muted">No tasks yet</li>}
+                {!err && allTasks !== null && plantTasks.map(t => (
+                  <li key={t.id} className="py-3 border-b border-border last:border-b-0 flex justify-between items-center">
+                    <span>
+                      {iconFor(t.type)} {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} — {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
+                      {(() => {
+                        const d = new Date(t.dueAt); const today = new Date();
+                        const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime())/86400000);
+                        return diff > 0 ? ` (In ${diff}d)` : diff === 0 ? " (Today)" : "";
+                      })()}
+                    </span>
+                    <button onClick={() => markTimelineDone(t)} className="text-xs text-blue-600">Done</button>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+
         )}
 
         {tab === "notes" && (
-          <section className="mt-4 rounded-2xl border border-border bg-white shadow-card p-4 text-sm">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                addNote();
-              }}
-            >
-              <textarea
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-                placeholder="Write a note..."
-                className="w-full border border-border rounded p-2 text-sm"
-              />
-              <div className="text-right mt-2">
-                <button type="submit" className="px-3 py-1 rounded bg-primary text-primary-foreground text-xs">
-                  Add Note
-                </button>
-              </div>
-            </form>
-            <ul className="mt-4 space-y-3">
-              {notes === null && <li className="h-4 bg-border rounded animate-pulse" />}
-              {notes !== null && notes.length === 0 && <li className="text-muted">No notes yet</li>}
-              {notes?.map((n) => (
-                <li key={n.id} className="border-t border-border pt-2 first:border-t-0 first:pt-0">
-                  <div>{n.note}</div>
-                  <div className="text-xs text-muted">
-                    {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(n.createdAt))}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <Card className="mt-4 text-sm">
+            <CardContent>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  addNote();
+                }}
+              >
+                <textarea
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Write a note..."
+                  className="w-full border border-border rounded p-2 text-sm"
+                />
+                <div className="text-right mt-2">
+                  <button type="submit" className="px-3 py-1 rounded bg-primary text-primary-foreground text-xs">
+                    Add Note
+                  </button>
+                </div>
+              </form>
+              <ul className="mt-4 space-y-3">
+                {notes === null && <li className="h-4 bg-border rounded animate-pulse" />}
+                {notes !== null && notes.length === 0 && <li className="text-muted">No notes yet</li>}
+                {notes?.map((n) => (
+                  <li key={n.id} className="border-t border-border pt-2 first:border-t-0 first:pt-0">
+                    <div>{n.note}</div>
+                    <div className="text-xs text-muted">
+                      {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(n.createdAt))}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
         )}
 
         {tab === "photos" && (
-          <section className="mt-4 rounded-2xl border border-border bg-white shadow-card p-4">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                addPhotoFile();
-                e.currentTarget.reset();
-              }}
-              className="flex gap-2 mb-4"
-            >
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={(e) => setNewPhotoFile(e.target.files?.[0] || null)}
-                className="flex-1 border border-border rounded p-2 text-sm"
-              />
-              <button
-                type="submit"
-                className="px-3 py-2 rounded bg-primary text-primary-foreground text-sm"
-                disabled={!newPhotoFile}
+          <Card className="mt-4">
+            <CardContent>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  addPhotoFile();
+                  e.currentTarget.reset();
+                }}
+                className="flex gap-2 mb-4"
               >
-                Add
-              </button>
-            </form>
-            {photos.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2">
-                {photos.map((src, i) => (
-                  <div key={i} className="relative">
-                    <img
-                      src={src}
-                      alt={`${plantState.name} photo ${i + 1}`}
-                      className="w-full h-24 object-cover rounded"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removePhotoUrl(src)}
-                      className="absolute top-1 right-1 text-xs bg-white/80 rounded-full px-1"
-                      aria-label="Remove photo"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-sm text-muted text-center">No photos yet</div>
-            )}
-          </section>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={(e) => setNewPhotoFile(e.target.files?.[0] || null)}
+                  className="flex-1 border border-border rounded p-2 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="px-3 py-2 rounded bg-primary text-primary-foreground text-sm"
+                  disabled={!newPhotoFile}
+                >
+                  Add
+                </button>
+              </form>
+              {photos.length > 0 ? (
+                <div className="grid grid-cols-3 gap-2">
+                  {photos.map((src, i) => (
+                    <div key={i} className="relative">
+                      <img
+                        src={src}
+                        alt={`${plantState.name} photo ${i + 1}`}
+                        className="w-full h-24 object-cover rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhotoUrl(src)}
+                        className="absolute top-1 right-1 text-xs bg-white/80 rounded-full px-1"
+                        aria-label="Remove photo"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-muted text-center">No photos yet</div>
+              )}
+            </CardContent>
+          </Card>
         )}
 
         <div className="h-16" />
@@ -562,9 +573,11 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-white p-3 shadow-card">
-      <div className="text-xs text-muted">{label}</div>
-      <div className="text-base font-medium">{value}</div>
-    </div>
+    <Card>
+      <CardContent>
+        <div className="text-xs text-muted">{label}</div>
+        <div className="text-base font-medium">{value}</div>
+      </CardContent>
+    </Card>
   );
 }
