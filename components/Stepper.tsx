@@ -1,5 +1,7 @@
 'use client';
 
+import { Minus, Plus } from 'lucide-react';
+
 export default function Stepper({
   value,
   onChange,
@@ -42,11 +44,11 @@ export default function Stepper({
     <div className="flex items-center gap-2">
       <button
         type="button"
-        className="w-11 h-11 flex items-center justify-center border rounded bg-white text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100"
+        className="w-11 h-11 flex items-center justify-center border rounded-2xl shadow-md bg-white text-neutral-900 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary transition-colors dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
         onClick={dec}
         aria-label="Decrease value"
       >
-        -
+        <Minus className="w-4 h-4 text-primary" />
       </button>
       <input
         type="number"
@@ -59,11 +61,11 @@ export default function Stepper({
       />
       <button
         type="button"
-        className="w-11 h-11 flex items-center justify-center border rounded bg-white text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100"
+        className="w-11 h-11 flex items-center justify-center border rounded-2xl shadow-md bg-white text-neutral-900 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary transition-colors dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
         onClick={inc}
         aria-label="Increase value"
       >
-        +
+        <Plus className="w-4 h-4 text-primary" />
       </button>
     </div>
   );
