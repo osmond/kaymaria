@@ -311,9 +311,9 @@ export default function AddPlantModal({
       const context: Record<string, unknown> = { error: e };
       if (status !== undefined) context.status = status;
       if (data !== null) context.data = data;
-      console.error('Error saving plant', context);
-      setToast(message);
-      return;
+    console.error('Error saving plant', e, context);
+    setToast(message);
+    return;
     } finally {
       setSaving(false);
     }
