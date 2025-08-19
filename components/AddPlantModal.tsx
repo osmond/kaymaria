@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef, useId } from 'react';
 import { Dialog } from '@headlessui/react';
 import { useRouter } from 'next/navigation';
+import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import {
   BasicsFields,
   EnvironmentFields,
@@ -377,27 +378,40 @@ export default function AddPlantModal({
                   {saveError && step === 2 && (
                     <div className="text-xs text-red-600 mr-auto">{saveError}</div>
                   )}
-                  <button className="btn-secondary" onClick={close}>
+                  <button
+                    className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
+                    onClick={close}
+                  >
+                    <X className="h-4 w-4" />
                     Cancel
                   </button>
                   {step > 0 && (
-                    <button className="btn-secondary" onClick={prevStep}>
+                    <button
+                      className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
+                      onClick={prevStep}
+                    >
+                      <ArrowLeft className="h-4 w-4" />
                       Back
                     </button>
                   )}
                   {step < 2 && (
-                    <button className="btn" onClick={nextStep}>
+                    <button
+                      className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
+                      onClick={nextStep}
+                    >
+                      <ArrowRight className="h-4 w-4" />
                       Next
                     </button>
                   )}
                   {step === 2 && (
                     <button
-                      className="btn"
+                      className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                       onClick={() =>
                         submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual')
                       }
                       disabled={saving || !values.name.trim()}
                     >
+                      <Check className="h-4 w-4" />
                       {saving
                         ? 'Saving…'
                         : saveError
