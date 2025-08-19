@@ -64,6 +64,7 @@ export default function AddPlantModal({
   } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [locationTag, setLocationTag] = useState<string | null>(null);
   const validationId = useId();
   const saveErrorId = useId();
   const canSubmit = values ? plantFormSchema.safeParse(values).success : false;
@@ -128,6 +129,7 @@ export default function AddPlantModal({
       setNotice(null);
       setStep(0);
       setPlanSource({ type: 'manual' });
+      setLocationTag(null);
       let stored: any = {};
       try {
         stored = JSON.parse(localStorage.getItem('plantDefaults') || '{}');
@@ -153,6 +155,16 @@ export default function AddPlantModal({
         lastWatered: todayLocalYYYYMMDD(),
         lastFertilized: todayLocalYYYYMMDD(),
       };
+      if ('geolocation' in navigator) {
+        try {
+          const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject)
+          );
+          base.lat = pos.coords.latitude.toFixed(6);
+          base.lon = pos.coords.longitude.toFixed(6);
+          setLocationTag('Current location');
+        } catch {}
+      }
       setDefaults({
         pot: base.pot,
         potMaterial: base.potMaterial,
@@ -393,7 +405,15 @@ export default function AddPlantModal({
                       careTips={careTips}
                     />
                   )}
-                  {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
+                  {step === 1 && (
+                    <EnvironmentFields
+                      state={values}
+                      setState={setValues}
+                      locationTag={locationTag}
+                      onLocationEdit={() => setLocationTag(null)}
+                      onUseCurrentLocation={() => setLocationTag('Current location')}
+                    />
+                  )}
                   {step === 2 && (
                     <CarePlanFields
                       state={values}

@@ -318,7 +318,15 @@ export function EnvironmentFields({
   state,
   setState,
   validation = emptyValidation,
-}: SectionProps & { validation?: Validation }) {
+  locationTag,
+  onLocationEdit,
+  onUseCurrentLocation,
+}: SectionProps & {
+  validation?: Validation;
+  locationTag?: string | null;
+  onLocationEdit?: () => void;
+  onUseCurrentLocation?: () => void;
+}) {
   const { errors, touched, validate, markTouched } = validation;
   const [showMore, setShowMore] = useState(false);
   const [address, setAddress] = useState('');
@@ -336,6 +344,7 @@ export function EnvironmentFields({
         validate('lat', lat);
         validate('lon', lon);
         setGeoError(null);
+        onUseCurrentLocation?.();
       },
       (err) => {
         if (err.code === err.PERMISSION_DENIED) {
@@ -362,6 +371,7 @@ export function EnvironmentFields({
         markTouched('lon');
         validate('lat', lat);
         validate('lon', lon);
+        onLocationEdit?.();
       }
     } catch {}
   }
@@ -416,23 +426,37 @@ export function EnvironmentFields({
 
       <Field label="Location (for weather)">
         <div className="grid gap-2">
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={useCurrentLocation}
-            title="We’ll tailor watering to local weather."
-          >
-            Use current location
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={useCurrentLocation}
+              title="We’ll tailor watering to local weather."
+            >
+              Use current location
+            </button>
+            {locationTag && (
+              <span className="rounded-full border bg-white px-2 py-1 text-xs shadow-sm">
+                {locationTag}
+              </span>
+            )}
+          </div>
           {geoError && <p className="text-xs text-red-600">{geoError}</p>}
           <div className="flex gap-2">
             <input
               className="input flex-1"
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e) => {
+                setAddress(e.target.value);
+                onLocationEdit?.();
+              }}
               placeholder="Search address"
             />
-            <button type="button" className="btn-secondary" onClick={lookupAddress}>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={lookupAddress}
+            >
               Search
             </button>
           </div>
@@ -447,6 +471,7 @@ export function EnvironmentFields({
                     setState({ ...state, lat: v });
                     markTouched('lat');
                     validate('lat', v);
+                    onLocationEdit?.();
                   }}
                   onBlur={() => {
                     markTouched('lat');
@@ -471,6 +496,7 @@ export function EnvironmentFields({
                     setState({ ...state, lon: v });
                     markTouched('lon');
                     validate('lon', v);
+                    onLocationEdit?.();
                   }}
                   onBlur={() => {
                     markTouched('lon');
