@@ -20,7 +20,8 @@ export function createSupabaseClient(): SupabaseClient<Database> {
 // Authenticated client helper for Route Handlers
 export async function createRouteHandlerClient(): Promise<SupabaseClient<Database>> {
   const { url, anonKey } = getSupabaseEnv();
-  const cookieStore = cookies();
+  // `cookies()` is now asynchronous in Next 15 and must be awaited
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("sb-access-token")?.value;
   return createClient<Database>(url, anonKey, {
     global: {
