@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { subscribeToPlantChanges } from '@/lib/realtime';
 
 export type Plant = { id: string; name: string; room?: string; species?: string };
 
@@ -27,6 +28,11 @@ export default function usePlants() {
 
   useEffect(() => {
     fetchPlants();
+  }, [fetchPlants]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToPlantChanges(fetchPlants);
+    return () => unsubscribe();
   }, [fetchPlants]);
 
   return { plants, error, isLoading, mutate: fetchPlants };
