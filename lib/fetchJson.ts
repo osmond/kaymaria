@@ -6,9 +6,19 @@ export interface FetchJsonError<T = unknown> {
 
 export async function fetchJson<T, E = unknown>(
   input: RequestInfo | URL,
-  init: (RequestInit & { retries?: number }) = {},
+  init: (RequestInit & {
+    retries?: number;
+    retryDelay?: number;
+    retryMultiplier?: number;
+  }) = {},
 ): Promise<T> {
-  const { retries = 0, signal: externalSignal, ...rest } = init;
+  const {
+    retries = 0,
+    retryDelay = 500,
+    retryMultiplier = 2,
+    signal: externalSignal,
+    ...rest
+  } = init;
   const controller = new AbortController();
   if (externalSignal) {
     if (externalSignal.aborted) {
@@ -22,7 +32,7 @@ export async function fetchJson<T, E = unknown>(
     }
   }
   let attempt = 0;
-  let delay = 500;
+  let delay = retryDelay;
   while (true) {
     try {
       const res = await fetch(input, { ...rest, signal: controller.signal });
@@ -42,7 +52,7 @@ export async function fetchJson<T, E = unknown>(
       if (attempt >= retries) throw err;
       await new Promise((r) => setTimeout(r, delay));
       attempt++;
-      delay *= 2;
+      delay *= retryMultiplier;
     }
   }
 }
