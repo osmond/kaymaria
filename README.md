@@ -4,7 +4,7 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
 
 The Add Plant form uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Form fields include validation for required entries and numeric values. Submitting the form now persists the plant to the backend and pre-creates care tasks.
 
-The Plant detail page shows a skeleton screen while loading to provide a smoother experience and includes a back link to the Plants list for smoother navigation.
+The Plant detail page shows a skeleton screen while loading, includes a back link to the Plants list for smoother navigation, and now displays its hero photo with a consistent aspect ratio for a more polished layout.
 
 ## Quick Start
 Kay Maria is intended to run in single-user mode by default.
