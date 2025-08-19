@@ -14,6 +14,7 @@ import {
   plantValuesToSubmit,
 } from './PlantForm';
 import type { AiCareSuggestion } from '@/lib/aiCare';
+import { normalizeSpecies } from '@/lib/species';
 
 type PlanSource =
   | { type: 'preset'; presetId?: string }
@@ -116,7 +117,7 @@ export default function AddPlantModal({
       const base: PlantFormValues = {
         name: prefillName || '',
         roomId: defaultRoomId,
-        species: prefillName || '',
+        species: normalizeSpecies(prefillName || ''),
         pot: stored.pot || '6 in',
         potMaterial: stored.potMaterial || 'Plastic',
         light: stored.light || 'Medium',
@@ -140,7 +141,9 @@ export default function AddPlantModal({
       });
       try {
         const r = await fetchWithRetry(
-          `/api/species-care?species=${encodeURIComponent(prefillName || '')}`,
+          `/api/species-care?species=${encodeURIComponent(
+            normalizeSpecies(prefillName || ''),
+          )}`,
           {},
           2,
         );

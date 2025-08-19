@@ -1,4 +1,5 @@
 import data from './usda-care.json';
+import { normalizeSpecies } from './species';
 
 export type CareSuggest = {
   version: string;
@@ -24,7 +25,7 @@ export async function fetchCareRules(
   lat: number,
   lon: number
 ): Promise<CareSuggest> {
-  const key = species.trim().toLowerCase();
+  const key = normalizeSpecies(species);
   const info = CARE_DATA[key] || CARE_DATA['default'];
 
   let interval = info.waterInterval;

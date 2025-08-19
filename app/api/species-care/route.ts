@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCareDefaults } from '@/lib/species-care';
+import { normalizeSpecies } from '@/lib/species';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const species = searchParams.get('species') || '';
-    const key = species.trim().toLowerCase();
+    const key = normalizeSpecies(species);
     const defaults = await getCareDefaults(species);
     if (!defaults) {
       return NextResponse.json({ presets: null });

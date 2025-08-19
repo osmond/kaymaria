@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { listPlants, createPlant } from "@/lib/prisma/plants";
 import { createRouteHandlerClient } from "@/lib/supabase";
 import { getUserId } from "@/lib/getUserId";
+import { plantServerSchema } from "@/lib/plantFormSchema";
 
 const missingEnv = () =>
   !process.env.DATABASE_URL ||
@@ -50,12 +51,25 @@ export async function POST(req: NextRequest) {
     const { userId } = userRes;
 
     const body = await req.json().catch(() => ({}));
-    const { lastWateredAt, lastFertilizedAt, ...rest } = body;
-    const plant = await createPlant(userId, {
-      ...rest,
-      ...(lastWateredAt ? { lastWateredAt } : {}),
-      ...(lastFertilizedAt ? { lastFertilizedAt } : {}),
-    });
+    const parsed = plantServerSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "validation", details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+    const data = parsed.data;
+    const { data: room } = await supabase
+      .from("rooms")
+      .select("id")
+      .eq("id", data.roomId)
+      .eq("user_id", userId)
+      .single();
+    if (!room) {
+      return NextResponse.json({ error: "invalid room" }, { status: 403 });
+    }
+    const { rules, ...rest } = data;
+    const plant = await createPlant(userId, rest);
     return NextResponse.json(plant, { status: 201 });
   } catch (e: any) {
     console.error("POST /api/plants failed:", e);

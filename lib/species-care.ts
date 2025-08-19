@@ -19,8 +19,10 @@ export type SpeciesCareDefaults = {
   fertFormula: string;
 };
 
+import { normalizeSpecies } from './species';
+
 const DEFAULTS: Record<string, SpeciesCareDefaults> = {
-  'ficus lyrata': {
+  'ficus-lyrata': {
     pot: '12 in',
     potMaterial: 'Ceramic',
     light: 'Bright indirect',
@@ -32,7 +34,7 @@ const DEFAULTS: Record<string, SpeciesCareDefaults> = {
     fertEvery: '30',
     fertFormula: '10-10-10 @ 1/2 strength',
   },
-  'monstera deliciosa': {
+  'monstera-deliciosa': {
     pot: '10 in',
     potMaterial: 'Plastic',
     light: 'Medium',
@@ -44,7 +46,7 @@ const DEFAULTS: Record<string, SpeciesCareDefaults> = {
     fertEvery: '30',
     fertFormula: '10-10-10 @ 1/2 strength',
   },
-  'zamioculcas zamiifolia': {
+  'zamioculcas-zamiifolia': {
     pot: '8 in',
     potMaterial: 'Plastic',
     light: 'Low to bright indirect',
@@ -56,7 +58,7 @@ const DEFAULTS: Record<string, SpeciesCareDefaults> = {
     fertEvery: '60',
     fertFormula: '10-10-10 @ 1/2 strength',
   },
-  'epipremnum aureum': {
+  'epipremnum-aureum': {
     pot: '6 in',
     potMaterial: 'Plastic',
     light: 'Low to medium',
@@ -68,7 +70,7 @@ const DEFAULTS: Record<string, SpeciesCareDefaults> = {
     fertEvery: '30',
     fertFormula: '10-10-10 @ 1/2 strength',
   },
-  'sansevieria trifasciata': {
+  'sansevieria-trifasciata': {
     pot: '8 in',
     potMaterial: 'Terra cotta',
     light: 'Low to bright indirect',
@@ -85,6 +87,6 @@ const DEFAULTS: Record<string, SpeciesCareDefaults> = {
 export async function getCareDefaults(
   species: string,
 ): Promise<SpeciesCareDefaults | null> {
-  const key = species.trim().toLowerCase();
+  const key = normalizeSpecies(species);
   return DEFAULTS[key] ?? null;
 }

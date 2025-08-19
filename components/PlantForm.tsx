@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { z } from 'zod';
 import { plantFieldSchemas, plantFormSchema } from '@/lib/plantFormSchema';
+import { normalizeSpecies, ALLOWED_SPECIES } from '@/lib/species';
 
 
 import SpeciesAutosuggest from './SpeciesAutosuggest';
@@ -57,10 +58,17 @@ export type PlantFormSubmit = {
 };
 
 export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
+  const speciesSlug = s.species ? normalizeSpecies(s.species) : undefined;
+  const waterEvery = Number(s.waterEvery);
+  const waterAmount = Number(s.waterAmount);
+  const fertEvery = Number(s.fertEvery);
+
   const base: PlantFormSubmit = {
     name: s.name.trim(),
     roomId: s.roomId,
-    species: s.species || undefined,
+    ...(speciesSlug && ALLOWED_SPECIES.includes(speciesSlug)
+      ? { species: speciesSlug }
+      : {}),
     potSize: s.pot,
     potMaterial: s.potMaterial,
     lightLevel: s.light,
@@ -70,12 +78,17 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
     rules: [
       {
         type: 'water',
-        intervalDays: Number(s.waterEvery || 7),
-        amountMl: Number(s.waterAmount || 500),
+        intervalDays:
+          Number.isFinite(waterEvery) && waterEvery >= 1 ? waterEvery : 1,
+        amountMl:
+          Number.isFinite(waterAmount) && waterAmount >= 10
+            ? waterAmount
+            : 10,
       },
       {
         type: 'fertilize',
-        intervalDays: Number(s.fertEvery || 30),
+        intervalDays:
+          Number.isFinite(fertEvery) && fertEvery >= 1 ? fertEvery : 1,
         formula: s.fertFormula || undefined,
       },
     ],
@@ -86,9 +99,18 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
   if (s.lastFertilized) {
     base.lastFertilizedAt = new Date(s.lastFertilized).toISOString();
   }
-  if (s.lat && s.lon && !isNaN(Number(s.lat)) && !isNaN(Number(s.lon))) {
-    base.lat = Number(s.lat);
-    base.lon = Number(s.lon);
+  const latNum = Number(s.lat);
+  const lonNum = Number(s.lon);
+  if (
+    Number.isFinite(latNum) &&
+    Number.isFinite(lonNum) &&
+    latNum >= -90 &&
+    latNum <= 90 &&
+    lonNum >= -180 &&
+    lonNum <= 180
+  ) {
+    base.lat = latNum;
+    base.lon = lonNum;
   }
   return base;
 }
@@ -827,21 +849,7 @@ export default function PlantForm({
   const [state, setState] = useState<PlantFormValues>(initial);
   const [errors, setErrors] = useState<Validation['errors']>({});
   const [touched, setTouched] = useState<Validation['touched']>({});
-  const fieldSchemas: Record<FieldName, z.ZodTypeAny> = {
-    ...plantFieldSchemas,
-    lat: z
-      .string()
-      .optional()
-      .refine((v) => !v || !isNaN(Number(v)), {
-        message: 'Latitude must be a number',
-      }),
-    lon: z
-      .string()
-      .optional()
-      .refine((v) => !v || !isNaN(Number(v)), {
-        message: 'Longitude must be a number',
-      }),
-  };
+  const fieldSchemas: Record<FieldName, z.ZodTypeAny> = plantFieldSchemas as any;
 
   const validate: Validation['validate'] = (field, value) => {
     const schema = fieldSchemas[field];

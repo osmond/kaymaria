@@ -15,3 +15,18 @@ export const SPECIES: SpeciesRecord[] = [
   { name: 'Pothos', species: 'Epipremnum aureum' },
   { name: 'Rubber Plant', species: 'Ficus elastica' },
 ];
+
+export function normalizeSpecies(species: string): string {
+  return species
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+export const ALLOWED_SPECIES = [
+  ...SPECIES.map((s) => normalizeSpecies(s.species)),
+  'unknown',
+  'custom',
+];
+

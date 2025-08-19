@@ -21,6 +21,20 @@ describe('GET/POST /api/plants', () => {
     delete process.env.SINGLE_USER_ID;
   });
 
+  function setupSupabase() {
+    const mockSingle = jest.fn().mockResolvedValue({ data: { id: 'r1' }, error: null });
+    const mockEq2 = jest.fn().mockReturnValue({ single: mockSingle });
+    const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+    const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+    const mockFrom = jest.fn().mockReturnValue({ select: mockSelect });
+    const supabase: any = {
+      auth: { getUser: jest.fn() },
+      from: mockFrom,
+    };
+    supabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(supabase);
+  }
+
   it('returns plants', async () => {
     const plants = [{ id: 'p1', name: 'Fiddle' }];
     (listPlants as jest.Mock).mockResolvedValue(plants);
@@ -33,23 +47,21 @@ describe('GET/POST /api/plants', () => {
   });
 
   it('creates plant', async () => {
-    const newPlant = { id: 'p_new', name: 'New Plant' };
+    const newPlant = { id: 'p_new', name: 'New Plant', roomId: 'r1' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
-    const mockSupabase = { auth: { getUser: jest.fn() } };
-    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+    setupSupabase();
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
-      body: JSON.stringify({ name: 'New Plant' }),
+      body: JSON.stringify({ name: 'New Plant', roomId: 'r1' }),
     });
 
     const res = await POST(req as any);
     expect(res.status).toBe(201);
     const json = await res.json();
     expect(json).toEqual(newPlant);
-    expect(createPlant).toHaveBeenCalledWith('user-1', { name: 'New Plant' });
+    expect(createPlant).toHaveBeenCalledWith('user-1', { name: 'New Plant', roomId: 'r1' });
     expect(createRouteHandlerClient).toHaveBeenCalled();
   });
 
@@ -57,14 +69,13 @@ describe('GET/POST /api/plants', () => {
     const newPlant = { id: 'p_new', name: 'New Plant' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
-    const mockSupabase = { auth: { getUser: jest.fn() } };
-    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+    setupSupabase();
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
       body: JSON.stringify({
         name: 'New Plant',
+        roomId: 'r1',
         carePlanSource: 'ai',
         aiModel: 'gpt',
         aiVersion: '1',
@@ -76,6 +87,7 @@ describe('GET/POST /api/plants', () => {
     await res.json();
     expect(createPlant).toHaveBeenCalledWith('user-1', {
       name: 'New Plant',
+      roomId: 'r1',
       carePlanSource: 'ai',
       aiModel: 'gpt',
       aiVersion: '1',
@@ -86,14 +98,13 @@ describe('GET/POST /api/plants', () => {
     const newPlant = { id: 'p_new', name: 'New Plant' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
-    const mockSupabase = { auth: { getUser: jest.fn() } };
-    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+    setupSupabase();
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
       body: JSON.stringify({
         name: 'New Plant',
+        roomId: 'r1',
         lastWateredAt: '2024-01-01T00:00:00.000Z',
         lastFertilizedAt: '2024-01-02T00:00:00.000Z',
       }),
@@ -104,6 +115,7 @@ describe('GET/POST /api/plants', () => {
     await res.json();
     expect(createPlant).toHaveBeenCalledWith('user-1', {
       name: 'New Plant',
+      roomId: 'r1',
       lastWateredAt: '2024-01-01T00:00:00.000Z',
       lastFertilizedAt: '2024-01-02T00:00:00.000Z',
     });
@@ -127,7 +139,7 @@ describe('GET/POST /api/plants', () => {
     delete process.env.SINGLE_USER_ID;
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
-      body: JSON.stringify({ name: 'Test' }),
+      body: JSON.stringify({ name: 'Test', roomId: 'r1' }),
     });
     const res = await POST(req as any);
     expect(res.status).toBe(500);

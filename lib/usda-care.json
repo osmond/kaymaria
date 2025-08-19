@@ -5,13 +5,13 @@
     "fertInterval": 30,
     "fertFormula": "10-10-10 @ 1/2 strength"
   },
-  "monstera deliciosa": {
+  "monstera-deliciosa": {
     "waterInterval": 7,
     "waterAmount": 500,
     "fertInterval": 30,
     "fertFormula": "20-20-20 @ 1/2 strength"
   },
-  "ficus lyrata": {
+  "ficus-lyrata": {
     "waterInterval": 5,
     "waterAmount": 400,
     "fertInterval": 45,

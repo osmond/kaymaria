@@ -46,4 +46,35 @@ describe('plantFormSchema', () => {
     });
     expect(res.success).toBe(true);
   });
+
+  it('normalizes species and enforces allowed enums', () => {
+    const res = plantFormSchema.safeParse({
+      name: 'A',
+      roomId: 'r1',
+      species: 'Ficus Lyrata',
+      waterEvery: '1',
+      waterAmount: '10',
+      fertEvery: '1',
+      lastWatered: '2024-01-01',
+      lastFertilized: '2024-01-01',
+    });
+    expect(res.success).toBe(true);
+    expect((res as any).data.species).toBe('ficus-lyrata');
+  });
+
+  it('rejects invalid latitude', () => {
+    const res = plantFormSchema.safeParse({
+      name: 'A',
+      roomId: 'r1',
+      lat: '200',
+      waterEvery: '1',
+      waterAmount: '10',
+      fertEvery: '1',
+      lastWatered: '2024-01-01',
+      lastFertilized: '2024-01-01',
+    });
+    expect(res.success).toBe(false);
+    const errors = (res as any).error.flatten().fieldErrors;
+    expect(errors.lat).toBeDefined();
+  });
 });
