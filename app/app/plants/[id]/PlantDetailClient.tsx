@@ -4,7 +4,6 @@ import Link from "next/link";
  import { useEffect, useMemo, useState, useRef } from "react";
  import { usePathname, useRouter, useSearchParams } from "next/navigation";
  import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil, MoreVertical } from "lucide-react";
-import EditPlantModal from '@/components/EditPlantModal';
 import BottomNav from '@/components/BottomNav';
 import CareSummary from '@/components/CareSummary';
 import type { Plant } from '@prisma/client';
@@ -38,13 +37,13 @@ type PlantExtras = {
 type Tab = "stats" | "timeline" | "notes" | "photos";
 
 export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtras }) {
-  const [plantState, setPlantState] = useState<Plant & PlantExtras>(plant);
+  const plantState = plant;
   const id = plantState.id;
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [name, setName] = useState(plant.name);
-  const [species, setSpecies] = useState(plant.species || "");
+  const name = plant.name;
+  const species = plant.species || "";
   const [photos, setPhotos] = useState<string[]>(plant.photos ?? []);
   const [newPhotoFile, setNewPhotoFile] = useState<File | null>(null);
   const heroPhoto = photos[0] || "https://placehold.co/600x400?text=Plant";
@@ -56,7 +55,6 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
   const [notes, setNotes] = useState<Note[] | null>(null);
   const [noteText, setNoteText] = useState("");
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -290,13 +288,13 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               <span className="text-sm text-muted">
                 {new Intl.DateTimeFormat(undefined, { weekday:"short", month:"short", day:"numeric" }).format(new Date())}
               </span>
-              <button
+              <Link
+                href={`/app/plants/${id}/edit`}
                 aria-label="Edit plant"
-                onClick={() => setEditOpen(true)}
-            className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
+                className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
               >
                 <Pencil className="h-5 w-5" />
-              </button>
+              </Link>
               <div ref={menuRef} className="relative">
                 <button
                   aria-label="More options"
@@ -307,12 +305,13 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                 </button>
                 {menuOpen && (
                   <div className="absolute right-0 z-10 mt-1 w-28 rounded-md border border-border bg-white shadow-card py-1 text-sm">
-                    <button
-                      onClick={() => { setEditOpen(true); setMenuOpen(false); }}
-                      className="w-full text-left px-3 py-1.5 hover:bg-neutral-100"
+                    <Link
+                      href={`/app/plants/${id}/edit`}
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full text-left px-3 py-1.5 hover:bg-neutral-100"
                     >
                       Edit
-                    </button>
+                    </Link>
                     <button
                       onClick={() => { setMenuOpen(false); deletePlant(); }}
                       className="w-full text-left px-3 py-1.5 hover:bg-neutral-100 text-destructive"
@@ -551,16 +550,6 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
 
       {/* Bottom nav */}
       <BottomNav value="plants" />
-      <EditPlantModal
-        open={editOpen}
-        onOpenChange={setEditOpen}
-        plant={plantState}
-        onUpdated={(p) => {
-          setPlantState(p);
-          setName(p.name);
-          setSpecies(p.species || "");
-        }}
-      />
     </div>
   );
 }

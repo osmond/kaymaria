@@ -11,7 +11,6 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
   usePathname: () => '/app/plants/1',
 }));
-jest.mock('@/components/EditPlantModal', () => () => null);
 jest.mock('@/components/BottomNav', () => () => null);
 jest.mock('@/components/CareSummary', () => () => <div>CareSummary</div>);
 
