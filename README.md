@@ -10,7 +10,7 @@ The Add Plant form uses a labeled stepper to guide users through Basics, Setup a
 
 The Plant detail page shows a skeleton screen while loading, includes a back link to the Plants list for smoother navigation, and now displays its hero photo with a consistent aspect ratio for a more polished layout. Basic smoke tests verify the page renders successfully.
 
-The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically.
+The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically and now shows skeleton cards while plant data loads.
 
 ## Quick Start
 Kay Maria is intended to run in single-user mode by default.
