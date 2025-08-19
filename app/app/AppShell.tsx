@@ -29,6 +29,7 @@ import {
   X,
   Filter as FilterIcon,
 } from "lucide-react";
+import TimelineSkeleton from "./timeline/TimelineSkeleton";
 
 const DEFAULT_TASK_WINDOW_DAYS = (() => {
   const parsed = parseInt(
@@ -664,7 +665,7 @@ export function TimelineView() {
           <div className="text-sm px-4 py-2">
             {eventsErr && <div className="py-3 text-red-600">{eventsErr}</div>}
             {!eventsErr && events.length === 0 && eventsLoading && (
-              <div className="py-3 text-neutral-500">Loading…</div>
+              <TimelineSkeleton />
             )}
             {!eventsErr && !eventsLoading && dayBuckets.length === 0 && (
               <div className="py-3 text-neutral-500">No events</div>
@@ -699,7 +700,7 @@ export function TimelineView() {
             {!eventsErr && hasMore && (
               <div className="py-3 text-center">
                 {eventsLoading ? (
-                  <div className="text-neutral-500">Loading…</div>
+                  <TimelineSkeleton />
                 ) : (
                   <button
                     onClick={loadMore}
