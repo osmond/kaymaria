@@ -65,8 +65,8 @@ export async function PATCH(req: NextRequest, ctx: any) {
             "id, plant_id, type, due_at, plant:plants(id, name, room_id)",
           )
           .eq("user_id", userId)
-          .eq("plant_id", plantId)
-          .eq("type", type)
+          .eq("plant_id", plantId as string)
+          .eq("type", type as string)
           .single();
 
     if (fetchError || !existing)
@@ -87,7 +87,7 @@ export async function PATCH(req: NextRequest, ctx: any) {
       }
       const rec = {
         id: data.id,
-        plantId: data.plant?.id ?? data.plant_id,
+        plantId: data.plant?.id ?? (data as any).plant_id,
         plantName: data.plant?.name ?? "",
         roomId: data.plant?.room_id ?? "",
         type: data.type,

@@ -4,11 +4,13 @@ import { getUserId } from "@/lib/getUserId";
 
 export async function GET(req: NextRequest) {
   const supabase = await createRouteHandlerClient();
-  const { userId, error: userIdError } = await getUserId(supabase);
-  if (userIdError === "unauthorized")
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  if (userIdError)
+  const userRes = await getUserId(supabase);
+  if ("error" in userRes) {
+    if (userRes.error === "unauthorized")
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
+  }
+  const { userId } = userRes;
 
   const url = new URL(req.url);
   const win = url.searchParams.get("window") || "7d";
@@ -43,11 +45,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const supabase = await createRouteHandlerClient();
-  const { userId, error: userIdError } = await getUserId(supabase);
-  if (userIdError === "unauthorized")
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  if (userIdError)
+  const userRes = await getUserId(supabase);
+  if ("error" in userRes) {
+    if (userRes.error === "unauthorized")
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
+  }
+  const { userId } = userRes;
 
   const body = await req.json().catch(() => ({}));
   const action = String(body.action || "Water").toLowerCase();

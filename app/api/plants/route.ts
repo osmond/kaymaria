@@ -41,18 +41,17 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = await createRouteHandlerClient();
-    const { userId, error } = await getUserId(supabase);
-    if (error === "unauthorized")
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    if (error)
-      return NextResponse.json(
-        { error: "misconfigured server" },
-        { status: 500 }
-      );
+    const userRes = await getUserId(supabase);
+    if ("error" in userRes) {
+      if (userRes.error === "unauthorized")
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
+    }
+    const { userId } = userRes;
 
     const body = await req.json().catch(() => ({}));
     const { lastWateredAt, lastFertilizedAt, ...rest } = body;
-    const plant = await createPlant(userId!, {
+    const plant = await createPlant(userId, {
       ...rest,
       ...(lastWateredAt ? { lastWateredAt } : {}),
       ...(lastFertilizedAt ? { lastFertilizedAt } : {}),
