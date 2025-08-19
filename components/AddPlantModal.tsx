@@ -17,6 +17,13 @@ import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { fetchJson } from '@/lib/fetchJson';
 
+export function todayLocalYYYYMMDD(): string {
+  const d = new Date();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${month}-${day}`;
+}
+
 export default function AddPlantModal({
   open,
   onOpenChange,
@@ -112,8 +119,8 @@ export default function AddPlantModal({
         waterAmount: '500',
         fertEvery: '30',
         fertFormula: stored.fertFormula || '10-10-10 @ 1/2 strength',
-        lastWatered: new Date().toISOString().slice(0, 10),
-        lastFertilized: new Date().toISOString().slice(0, 10),
+        lastWatered: todayLocalYYYYMMDD(),
+        lastFertilized: todayLocalYYYYMMDD(),
       };
       setDefaults({
         pot: base.pot,
