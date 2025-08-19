@@ -102,11 +102,4 @@ For **each page**, ensure:
 
 ---
 
-## Done & Verified (Previously Completed, Now Re-reviewing)
 
-These items were previously marked complete, but developers should **double-check** for style guide alignment:
-
-- [ ] Add Plant form
-- [ ] Plant detail page basic layout
-- [ ] Supabase auth and data sync
-- [ ] Initial E2E test suite
