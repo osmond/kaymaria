@@ -13,23 +13,30 @@ export async function GET(req: NextRequest) {
     const token = process.env.TREFLE_API_TOKEN;
 
     if (token) {
-      try {
-        const res = await fetch(
-          `https://trefle.io/api/v1/plants/search?q=${encodeURIComponent(q)}&token=${token}`
-        );
-        if (res.ok) {
-          const json = await res.json();
-          results = (json.data || [])
-            .slice(0, 10)
-            .map((p: any) => ({
-              name: p.common_name || p.scientific_name,
-              species: p.scientific_name,
-            }));
-        } else {
-          console.error('Trefle API error', res.status);
+      const url = `https://trefle.io/api/v1/plants/search?q=${encodeURIComponent(
+        q
+      )}&token=${token}`;
+      for (let attempt = 0; attempt < 3 && !results.length; attempt++) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const json = await res.json();
+            results = (json.data || [])
+              .slice(0, 10)
+              .map((p: any) => ({
+                name: p.common_name || p.scientific_name,
+                species: p.scientific_name,
+              }));
+          } else {
+            console.error('Trefle API error', res.status);
+          }
+        } catch (err) {
+          console.error('Trefle API request failed', err);
         }
-      } catch (err) {
-        console.error('Trefle API request failed', err);
+
+        if (!results.length && attempt < 2) {
+          await new Promise((r) => setTimeout(r, 200 * (attempt + 1)));
+        }
       }
     }
 
