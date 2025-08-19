@@ -109,6 +109,31 @@ describe('GET/POST /api/plants', () => {
     });
   });
 
+  it('passes care plan when rules provided', async () => {
+    const newPlant = { id: 'p_new', name: 'New Plant' };
+    (createPlant as jest.Mock).mockResolvedValue(newPlant);
+
+    const mockSupabase = { auth: { getUser: jest.fn() } };
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+
+    const req = new Request('http://localhost/api/plants', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'New Plant',
+        rules: [{ type: 'water', intervalDays: 7 }],
+      }),
+    });
+
+    const res = await POST(req as any);
+    expect(res.status).toBe(201);
+    await res.json();
+    expect(createPlant).toHaveBeenCalledWith('user-1', {
+      name: 'New Plant',
+      carePlan: [{ type: 'water', intervalDays: 7 }],
+    });
+  });
+
   it('returns 503 when env vars missing', async () => {
     delete process.env.DATABASE_URL;
     const res = await GET();

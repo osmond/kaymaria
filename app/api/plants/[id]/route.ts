@@ -30,7 +30,11 @@ export async function PATCH(
   try {
     const params = await (ctx as any).params;
     const body = await req.json().catch(() => ({}));
-    const updated = await updatePlant(params.id, body);
+    const { rules, ...rest } = body;
+    const updated = await updatePlant(params.id, {
+      ...rest,
+      ...(rules ? { carePlan: rules } : {}),
+    });
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(updated);
   } catch (e: any) {

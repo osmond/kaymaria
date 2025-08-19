@@ -50,9 +50,10 @@ export async function POST(req: NextRequest) {
     const { userId } = userRes;
 
     const body = await req.json().catch(() => ({}));
-    const { lastWateredAt, lastFertilizedAt, ...rest } = body;
+    const { lastWateredAt, lastFertilizedAt, rules, ...rest } = body;
     const plant = await createPlant(userId, {
       ...rest,
+      ...(rules ? { carePlan: rules } : {}),
       ...(lastWateredAt ? { lastWateredAt } : {}),
       ...(lastFertilizedAt ? { lastFertilizedAt } : {}),
     });

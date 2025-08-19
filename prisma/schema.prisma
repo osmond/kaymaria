@@ -17,9 +17,13 @@ model Plant {
   potSize     String?  @map("pot_size")
   potMaterial String?  @map("pot_material")
   soilType    String?  @map("soil_type")
+  lightLevel  String?  @map("light_level")
+  indoor      Boolean?
+  drainage    String?
   latitude    Float?  @db.DoublePrecision
   longitude   Float?  @db.DoublePrecision
   carePlanSource String? @map("care_plan_source")
+  carePlan    Json?    @map("care_plan") @db.Json
   presetId   String?  @map("preset_id")
   aiModel    String?  @map("ai_model")
   aiVersion  String?  @map("ai_version")
