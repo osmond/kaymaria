@@ -50,9 +50,12 @@ describe('GET/POST /api/plants', () => {
     const newPlant = { id: 'p_new', name: 'New Plant' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
-    const mockSupabase = { auth: { getUser: jest.fn() } };
+    const mockSupabase = { auth: { getUser: jest.fn() } } as any;
     (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    });
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
@@ -71,9 +74,12 @@ describe('GET/POST /api/plants', () => {
     const newPlant = { id: 'p_new', name: 'New Plant' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
-    const mockSupabase = { auth: { getUser: jest.fn() } };
+    const mockSupabase = { auth: { getUser: jest.fn() } } as any;
     (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    });
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
@@ -105,9 +111,12 @@ describe('GET/POST /api/plants', () => {
     };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
-    const mockSupabase = { auth: { getUser: jest.fn() } };
+    const mockSupabase = { auth: { getUser: jest.fn() } } as any;
     (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    });
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
@@ -130,19 +139,22 @@ describe('GET/POST /api/plants', () => {
     expect(json.lastFertilizedAt).toBe('2024-01-02T00:00:00.000Z');
   });
 
-  it('passes care plan when rules provided', async () => {
+  it('passes care plan when plan provided', async () => {
     const newPlant = { id: 'p_new', name: 'New Plant' };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
-    const mockSupabase = { auth: { getUser: jest.fn() } };
+    const mockSupabase = { auth: { getUser: jest.fn() } } as any;
     (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    });
 
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
       body: JSON.stringify({
         name: 'New Plant',
-        rules: [{ type: 'water', intervalDays: 7 }],
+        plan: [{ type: 'water', intervalDays: 7 }],
       }),
     });
 
@@ -153,6 +165,62 @@ describe('GET/POST /api/plants', () => {
       name: 'New Plant',
       carePlan: [{ type: 'water', intervalDays: 7 }],
     });
+  });
+
+  it('returns 400 for invalid payload', async () => {
+    const mockSupabase = { auth: { getUser: jest.fn() } } as any;
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    });
+
+    const req = new Request('http://localhost/api/plants', {
+      method: 'POST',
+      body: JSON.stringify({ species: 'Ficus' }),
+    });
+
+    const res = await POST(req as any);
+    expect(res.status).toBe(400);
+    expect(createPlant).not.toHaveBeenCalled();
+  });
+
+  it('pre-creates tasks when requested', async () => {
+    const newPlant = { id: 'p_new', name: 'New Plant' };
+    (createPlant as jest.Mock).mockResolvedValue(newPlant);
+
+    const insert = jest.fn().mockResolvedValue({ data: null, error: null });
+    const mockSupabase = {
+      auth: { getUser: jest.fn() },
+      from: jest.fn().mockReturnValue({ insert }),
+    } as any;
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    });
+
+    const req = new Request('http://localhost/api/plants', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'New Plant',
+        plan: [{ type: 'water', intervalDays: 3 }],
+        lastWateredAt: '2024-01-01T00:00:00.000Z',
+        createTasks: true,
+      }),
+    });
+
+    const res = await POST(req as any);
+    expect(res.status).toBe(201);
+    await res.json();
+    expect(insert).toHaveBeenCalledWith([
+      {
+        user_id: 'user-1',
+        plant_id: 'p_new',
+        type: 'water',
+        due_at: '2024-01-04T00:00:00.000Z',
+      },
+    ]);
   });
 
   it('returns 503 when env vars missing', async () => {
