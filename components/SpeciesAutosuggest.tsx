@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 
 type Suggestion = {
   name: string;
@@ -8,6 +8,10 @@ type Suggestion = {
   thumbnail?: string;
   info?: string;
 };
+
+const CACHE_MS = 10 * 60 * 1000;
+const cache = new Map<string, { ts: number; data: Suggestion[] }>();
+const controllers = new Map<string, AbortController>();
 
 export default function SpeciesAutosuggest({
   value,
@@ -26,7 +30,6 @@ export default function SpeciesAutosuggest({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const requestId = useRef(0);
   const listId = useId();
 
   useEffect(() => {
@@ -44,12 +47,43 @@ export default function SpeciesAutosuggest({
 
   useEffect(() => {
     if (!query.trim()) {
+      controllers.forEach((c) => c.abort());
+      controllers.clear();
+      setLoading(false);
       setSuggestions(staticSuggestions);
       setOpen(false);
       return;
     }
+
+    // Abort any other in-flight requests
+    controllers.forEach((c, q) => {
+      if (q !== query) {
+        c.abort();
+        controllers.delete(q);
+      }
+    });
+
+    const cached = cache.get(query);
+    if (cached && Date.now() - cached.ts < CACHE_MS) {
+      if (cached.data.length === 0) {
+        setSuggestions([
+          {
+            name: 'No matches. Add as custom plant.',
+            species: 'custom',
+            thumbnail: 'https://via.placeholder.com/40?text=%2B',
+          },
+          ...staticSuggestions,
+        ]);
+      } else {
+        setSuggestions([...cached.data, ...staticSuggestions]);
+      }
+      setOpen(true);
+      setLoading(false);
+      return;
+    }
+
     const controller = new AbortController();
-    const id = ++requestId.current;
+    controllers.set(query, controller);
     setLoading(true);
     setOpen(true);
     const handle = setTimeout(async () => {
@@ -59,7 +93,8 @@ export default function SpeciesAutosuggest({
         });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const json = await r.json();
-        if (requestId.current === id) {
+        cache.set(query, { ts: Date.now(), data: json });
+        if (controllers.get(query) === controller) {
           if (json.length === 0) {
             setSuggestions([
               {
@@ -75,14 +110,17 @@ export default function SpeciesAutosuggest({
           setLoading(false);
         }
       } catch (e) {
-        if (requestId.current === id && (e as any).name !== 'AbortError') {
+        if ((e as any).name !== 'AbortError' && controllers.get(query) === controller) {
           console.error('species search failed', e);
           setLoading(false);
         }
+      } finally {
+        controllers.delete(query);
       }
     }, 250);
     return () => {
       controller.abort();
+      controllers.delete(query);
       clearTimeout(handle);
     };
   }, [query]);
