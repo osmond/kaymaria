@@ -14,6 +14,8 @@ The `/app/plants/new` page now applies the card layout and typography defined in
 The Plant detail page shows a skeleton screen while loading, includes a back link to the Plants list for smoother navigation, and now displays its hero photo with a consistent aspect ratio for a more polished layout. It also uses semantic design tokens for background and text colors to stay aligned with the style guide, and all sections now use the shared Card component to keep spacing and styling consistent. The active tab is synced to the URL so deep links open to the correct section and the browser back button restores the previous tab. Timeline and Notes sections display lightweight placeholders while data loads, and basic smoke tests verify the page renders successfully.
 
 
+The Today page lists all care tasks due today, grouped by plant with filters for room, task type, and status. Tasks can be completed or deferred using buttons or keyboard shortcuts.
+
 The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically, shows skeleton cards while plant data loads, and displays a friendly empty state when you haven't added any plants yet.
 
 Authenticated sessions also use a Supabase-backed `/api/sync` endpoint to persist and fetch user data across devices.
