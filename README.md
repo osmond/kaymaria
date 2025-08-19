@@ -4,7 +4,7 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
 
 All pages should follow the [style guide](./docs/style-guide.md) to ensure a consistent look and feel across the app.
 
-The Add Plant form uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Form fields include validation for required entries, numeric values, and latitude/longitude ranges. Submitting the form now persists the plant to the backend and pre-creates care tasks. A basic smoke test ensures the Add Plant page renders.
+The Add Plant form uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Inputs and buttons are styled to match the shared design system, and form fields include validation for required entries, numeric values, and latitude/longitude ranges. Submitting the form now persists the plant to the backend and pre-creates care tasks. A basic smoke test ensures the Add Plant page renders.
 
 
 The Plant detail page shows a skeleton screen while loading, includes a back link to the Plants list for smoother navigation, and now displays its hero photo with a consistent aspect ratio for a more polished layout. Basic smoke tests verify the page renders successfully.

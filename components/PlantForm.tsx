@@ -1018,9 +1018,9 @@ export default function PlantForm({
 export function FormStyles() {
   return (
     <style jsx>{`
-      .input { @apply w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-300; }
-      .btn { @apply inline-flex items-center justify-center rounded-lg bg-neutral-900 text-white text-sm px-4 py-3 min-h-11 min-w-11 disabled:opacity-70 dark:bg-neutral-100 dark:text-neutral-900; }
-      .btn-secondary { @apply inline-flex items-center justify-center rounded-lg border border-neutral-300 text-sm px-4 py-3 bg-white text-neutral-900 min-h-11 min-w-11 dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-700; }
+      .input { @apply w-full rounded-xl border border-border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2; }
+      .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 h-11 bg-primary text-primary-foreground shadow-card transition active:translate-y-px focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50; }
+      .btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 h-11 bg-white text-foreground shadow-card transition active:translate-y-px focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50; }
       .hint { @apply text-xs text-neutral-500 mt-1; }
     `}</style>
   );
