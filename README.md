@@ -73,6 +73,7 @@ Useful when running locally without authentication.
 ```
 SINGLE_USER_MODE=true
 SINGLE_USER_ID=<supabase user uuid>
+# requires SUPABASE_SERVICE_ROLE_KEY for database access
 ```
 Restart the dev server after changing these values.
 
