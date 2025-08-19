@@ -5,10 +5,10 @@ See [roadmap v1](./docs/roadmaps/roadmap-v1.md) for previous phases. Additional 
 This document outlines upcoming work for the Kay Maria plant care app.
 
 - [ ] Add Plant form polish
-  - [ ] UI styling
-  - [ ] Form validation
-  - [ ] Backend persistence
-  - [ ] Smoke tests
+   - [x] UI styling
+   - [ ] Form validation
+   - [ ] Backend persistence
+   - [ ] Smoke tests
 
 - [ ] Plant detail page UX polish
   - [ ] UI styling

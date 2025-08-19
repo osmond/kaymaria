@@ -57,6 +57,7 @@ export default function AddPlantModal({
   );
   const [saving, setSaving] = useState(false);
   const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
+  const stepTitles = ['Basics', 'Setup', 'Care plan', 'Summary'];
   const [planSource, setPlanSource] = useState<PlanSource | null>(null);
   const [defaults, setDefaults] = useState<{
     pot: string;
@@ -479,6 +480,16 @@ export default function AddPlantModal({
                     key={n}
                     className={`h-1 flex-1 rounded ${step >= n ? 'bg-primary' : 'bg-neutral-200'}`}
                   />
+                ))}
+              </div>
+              <div className="mt-2 flex justify-between text-xs text-neutral-600">
+                {stepTitles.map((title, n) => (
+                  <span
+                    key={title}
+                    className={step === n ? 'text-primary font-medium' : undefined}
+                  >
+                    {title}
+                  </span>
                 ))}
               </div>
             </header>
