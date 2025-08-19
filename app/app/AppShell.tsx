@@ -537,6 +537,7 @@ export function TimelineView() {
   const [eventsErr, setEventsErr] = useState<string | null>(null);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [eventTypeFilter, setEventTypeFilter] = useState("");
+  const [plantFilter, setPlantFilter] = useState("");
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const limit = 20;
@@ -591,12 +592,20 @@ export function TimelineView() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [loadMore]);
 
+  const plantNames = useMemo(() => {
+    const set = new Set<string>();
+    events.forEach((e) => set.add(e.plantName));
+    return Array.from(set).sort();
+  }, [events]);
+
   const filteredEvents = useMemo(
     () =>
-      eventTypeFilter
-        ? events.filter((e) => e.type === eventTypeFilter)
-        : events,
-    [events, eventTypeFilter],
+      events.filter(
+        (e) =>
+          (!eventTypeFilter || e.type === eventTypeFilter) &&
+          (!plantFilter || e.plantName === plantFilter),
+      ),
+    [events, eventTypeFilter, plantFilter],
   );
 
   function bucketEventsByDay(events: EventDTO[]) {
@@ -645,7 +654,24 @@ export function TimelineView() {
             <div className="text-base font-medium">Timeline</div>
             <div className="text-xs text-neutral-500">Recent care events</div>
           </div>
-          <div className="px-4 py-2 border-b">
+          <div className="px-4 py-2 border-b flex flex-col gap-2">
+            <Select
+              value={plantFilter || undefined}
+              onValueChange={(v) => setPlantFilter(v)}
+            >
+              <SelectTrigger className="flex h-9 w-full items-center gap-2 rounded border px-3 text-sm">
+                <PottedPlant className="h-4 w-4 text-neutral-500" />
+                <SelectValue placeholder="Plant" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All plants</SelectItem>
+                {plantNames.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {p}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Select
               value={eventTypeFilter || undefined}
               onValueChange={(v) => setEventTypeFilter(v)}
