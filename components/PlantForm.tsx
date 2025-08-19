@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 
 import type { AiCareSuggestion } from '@/lib/aiCare';
+import { z } from 'zod';
+import { plantFieldSchemas, plantFormSchema } from '@/lib/plantFormSchema';
 
 
 import SpeciesAutosuggest from './SpeciesAutosuggest';
@@ -80,7 +82,14 @@ type SectionProps = {
   setState: React.Dispatch<React.SetStateAction<PlantFormValues>>;
 };
 
-type FieldName = 'name' | 'lat' | 'lon';
+type FieldName =
+  | 'name'
+  | 'roomId'
+  | 'waterEvery'
+  | 'waterAmount'
+  | 'fertEvery'
+  | 'lat'
+  | 'lon';
 
 type Validation = {
   errors: Partial<Record<FieldName, string>>;
@@ -170,8 +179,19 @@ export function BasicsFields({
       <Field label="Room">
         <RoomSelector
           value={state.roomId}
-          onChange={(id) => setState({ ...state, roomId: id })}
+          onChange={(id) => {
+            setState({ ...state, roomId: id });
+            markTouched('roomId');
+            validate('roomId', id);
+          }}
         />
+        {touched.roomId && (
+          errors.roomId ? (
+            <span className="text-xs text-red-600">{errors.roomId}</span>
+          ) : (
+            <span className="text-xs text-green-600">Looks good!</span>
+          )
+        )}
         <p className="hint">Stored locally in Settings → Defaults.</p>
       </Field>
 
@@ -380,6 +400,7 @@ type CarePlanProps = SectionProps & {
   onSuggestChange?: (s: AiCareSuggestion | null) => void;
   showSuggest?: boolean;
   onPlanModeChange?: (mode: 'ai' | 'manual') => void;
+  validation?: Validation;
 };
 
 export function CarePlanFields({
@@ -389,7 +410,9 @@ export function CarePlanFields({
   onSuggestChange,
   showSuggest = true,
   onPlanModeChange,
+  validation = emptyValidation,
 }: CarePlanProps) {
+  const { errors, touched, validate, markTouched } = validation;
   const [suggest, setSuggest] = useState<AiCareSuggestion | null>(null);
   const [prevManual, setPrevManual] = useState<{
     waterEvery: string;
@@ -552,18 +575,40 @@ export function CarePlanFields({
         <Field label="Water every (days)">
           <Stepper
             value={state.waterEvery}
-            onChange={(v) => setState({ ...state, waterEvery: v })}
+            onChange={(v) => {
+              setState({ ...state, waterEvery: v });
+              markTouched('waterEvery');
+              validate('waterEvery', v);
+            }}
             min={1}
           />
+          {touched.waterEvery && (
+            errors.waterEvery ? (
+              <span className="text-xs text-red-600">{errors.waterEvery}</span>
+            ) : (
+              <span className="text-xs text-green-600">Looks good!</span>
+            )
+          )}
           {nextWater && <p className="hint">Next watering: {fmtDate(nextWater)}</p>}
         </Field>
         <Field label="Water amount (ml)">
           <Stepper
             value={state.waterAmount}
-            onChange={(v) => setState({ ...state, waterAmount: v })}
-            min={50}
+            onChange={(v) => {
+              setState({ ...state, waterAmount: v });
+              markTouched('waterAmount');
+              validate('waterAmount', v);
+            }}
+            min={10}
             step={10}
           />
+          {touched.waterAmount && (
+            errors.waterAmount ? (
+              <span className="text-xs text-red-600">{errors.waterAmount}</span>
+            ) : (
+              <span className="text-xs text-green-600">Looks good!</span>
+            )
+          )}
         </Field>
       </div>
 
@@ -572,9 +617,20 @@ export function CarePlanFields({
         <Field label="Fertilize every (days)">
           <Stepper
             value={state.fertEvery}
-            onChange={(v) => setState({ ...state, fertEvery: v })}
-            min={7}
+            onChange={(v) => {
+              setState({ ...state, fertEvery: v });
+              markTouched('fertEvery');
+              validate('fertEvery', v);
+            }}
+            min={1}
           />
+          {touched.fertEvery && (
+            errors.fertEvery ? (
+              <span className="text-xs text-red-600">{errors.fertEvery}</span>
+            ) : (
+              <span className="text-xs text-green-600">Looks good!</span>
+            )
+          )}
           {nextFertilize && (
             <p className="hint">Next fertilizing: {fmtDate(nextFertilize)}</p>
           )}
@@ -619,22 +675,33 @@ export default function PlantForm({
   const [state, setState] = useState<PlantFormValues>(initial);
   const [errors, setErrors] = useState<Validation['errors']>({});
   const [touched, setTouched] = useState<Validation['touched']>({});
+  const fieldSchemas: Record<FieldName, z.ZodTypeAny> = {
+    ...plantFieldSchemas,
+    lat: z
+      .string()
+      .optional()
+      .refine((v) => !v || !isNaN(Number(v)), {
+        message: 'Latitude must be a number',
+      }),
+    lon: z
+      .string()
+      .optional()
+      .refine((v) => !v || !isNaN(Number(v)), {
+        message: 'Longitude must be a number',
+      }),
+  };
+
   const validate: Validation['validate'] = (field, value) => {
-    let error: string | undefined;
-    if (field === 'name') {
-      error = value && value.trim() ? undefined : 'Name is required';
-    } else if (field === 'lat') {
-      if (value && isNaN(Number(value))) error = 'Latitude must be a number';
-    } else if (field === 'lon') {
-      if (value && isNaN(Number(value))) error = 'Longitude must be a number';
-    }
-    setErrors((e) => ({ ...e, [field]: error }));
+    const schema = fieldSchemas[field];
+    if (!schema) return;
+    const res = schema.safeParse(value);
+    setErrors((e) => ({ ...e, [field]: res.success ? undefined : res.error.errors[0]?.message }));
   };
   const markTouched: Validation['markTouched'] = (field) => {
     setTouched((t) => ({ ...t, [field]: true }));
   };
   const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState(false);
   const hasSpecies = Boolean(state.species);
   const [planSource, setPlanSource] = useState<'ai' | 'manual' | null>(
     initialSuggest ? 'ai' : null,
@@ -650,14 +717,12 @@ export default function PlantForm({
     const current = override ?? state;
     if (!current.name.trim()) return;
     setSaving(true);
-    setSaveError(null);
+    setSaveError(false);
     try {
       await onSubmit(plantValuesToSubmit(current), source);
     } catch (e: any) {
       console.error('Error saving plant', e);
-      let message = 'Failed to save plant.';
       try {
-        const status = e?.status ?? e?.response?.status;
         let data: any = null;
         if (e instanceof Response) {
           data = await e.json().catch(() => null);
@@ -666,27 +731,24 @@ export default function PlantForm({
         } else if (e?.response?.data) {
           data = e.response.data;
         }
-        if (status === 401 || /401/.test(e?.message || '')) {
-          message = 'Please log in before adding a plant.';
-        } else if (data?.error) {
-          message = data.error;
-        } else if (data?.message) {
-          message = data.message;
-        } else if (data?.detail) {
-          message = data.detail;
-        } else if (typeof e?.message === 'string') {
-          message = e.message;
+        const field = data?.field as FieldName | undefined;
+        if (field && fieldSchemas[field]) {
+          const msg = data?.message || data?.error || 'Invalid value';
+          setErrors((err) => ({ ...err, [field]: msg }));
+          setTouched((t) => ({ ...t, [field]: true }));
+        } else {
+          setSaveError(true);
         }
       } catch (_) {
-        // ignore parse errors
+        setSaveError(true);
       }
-      setSaveError(message);
       return;
     } finally {
       setSaving(false);
     }
   }
 
+  const canSubmit = plantFormSchema.safeParse(state).success;
   const validation = { errors, touched, validate, markTouched };
 
   return (
@@ -706,19 +768,34 @@ export default function PlantForm({
         initialSuggest={initialSuggest}
         showSuggest={hasSpecies}
         onPlanModeChange={setPlanSource}
+        validation={validation}
       />
-      {saveError && <div className="p-5 text-xs text-red-600">{saveError}</div>}
-      <div className="p-5 border-t flex gap-2 justify-end">
+      <div className="p-5 border-t flex gap-2 justify-end items-center">
         <button className="btn-secondary" onClick={onCancel}>
           Cancel
         </button>
-        <button
-          className="btn"
-          onClick={() => handleSubmit(planSource === 'ai' ? 'ai' : 'manual')}
-          disabled={saving || !state.name.trim()}
-        >
-          {saving ? 'Saving…' : submitLabel}
-        </button>
+        {saveError ? (
+          <>
+            <span className="text-sm text-red-600 mr-auto">
+              Couldn’t save — please try again.
+            </span>
+            <button
+              className="btn"
+              onClick={() => handleSubmit(planSource === 'ai' ? 'ai' : 'manual')}
+              disabled={saving}
+            >
+              Retry
+            </button>
+          </>
+        ) : (
+          <button
+            className="btn"
+            onClick={() => handleSubmit(planSource === 'ai' ? 'ai' : 'manual')}
+            disabled={saving || !canSubmit}
+          >
+            {saving ? 'Saving…' : submitLabel}
+          </button>
+        )}
       </div>
       <FormStyles />
     </>
