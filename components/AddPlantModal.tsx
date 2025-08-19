@@ -22,6 +22,7 @@ import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { fetchJson, FetchJsonError } from '@/lib/fetchJson';
 import useCareTips from './useCareTips';
+import { useRouter } from 'next/navigation';
 
 export function todayLocalYYYYMMDD(): string {
   const d = new Date();
@@ -77,6 +78,7 @@ export default function AddPlantModal({
     : false;
 
   const careTips = useCareTips(values);
+  const router = useRouter();
 
   const validationMessage =
     step === 0 && !basicsValid
@@ -393,6 +395,7 @@ export default function AddPlantModal({
       } catch {}
       onCreate({ id: created.id, name: created.name || current.name });
       close();
+      router.push(`/app/plants/${created.id}/created`);
     } catch (e: unknown) {
       const err = e as FetchJsonError<{
         error?: string;
