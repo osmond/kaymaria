@@ -10,8 +10,8 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
 
 - [ ] Supabase Auth setup ([#90](https://github.com/osmond/kaymaria/issues/90))
 - [x] Real-time data sync across devices
-- [ ] Backend persistence for plant data
-- [ ] End-to-end test suite
+- [x] Backend persistence for plant data
+- [x] End-to-end test suite
 
 ---
 
@@ -22,7 +22,7 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
 - [ ] Add Plant Form Polish
   - [x] UI styling
   - [x] Validation
-  - [ ] Persistence
+  - [x] Persistence
   - [x] Smoke tests
 
 - [ ] Revisit New Plant Page (`/app/plants/new`)
