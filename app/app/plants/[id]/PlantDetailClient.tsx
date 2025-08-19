@@ -312,7 +312,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
       <main className="flex-1 px-4 pb-28">
         {/* Hero */}
         <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-card mt-4">
-        <img src={heroPhoto} alt={name} className="h-40 w-full object-cover bg-neutral-200" />
+        <img src={heroPhoto} alt={name} className="w-full aspect-[4/3] object-cover bg-neutral-200" />
           <div className="p-4">
             <h2 className="text-lg font-display font-semibold">{name}</h2>
             <div className="text-sm text-neutral-500">
