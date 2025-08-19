@@ -292,10 +292,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               <Link
                 href={`/app/plants/${id}/edit`}
                 aria-label="Edit plant"
-
-                onClick={() => setEditOpen(true)}
-            className="h-9 w-9 rounded-lg grid place-items-center hover:bg-secondary"
-
+                className="h-9 w-9 rounded-lg grid place-items-center hover:bg-secondary"
               >
                 <Pencil className="h-5 w-5" />
               </Link>
@@ -310,15 +307,13 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                 {menuOpen && (
                   <div className="absolute right-0 z-10 mt-1 w-28 rounded-md border border-border bg-white shadow-card py-1 text-sm">
 
-                    <button
-                      onClick={() => {
-                        setEditOpen(true);
-                        setMenuOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-1.5 hover:bg-secondary"
+                    <Link
+                      href={`/app/plants/${id}/edit`}
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full text-left px-3 py-1.5 hover:bg-secondary"
                     >
                       Edit
-                    </button>
+                    </Link>
                     <button
                       onClick={() => { setMenuOpen(false); deletePlant(); }}
                       className="w-full text-left px-3 py-1.5 hover:bg-secondary text-destructive"
