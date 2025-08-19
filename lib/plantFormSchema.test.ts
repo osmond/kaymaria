@@ -8,8 +8,8 @@ describe('plantFormSchema', () => {
       waterEvery: '1',
       waterAmount: '10',
       fertEvery: '1',
-      lastWatered: '2024-01-01',
-      lastFertilized: '2024-01-01',
+      lastWatered: '',
+      lastFertilized: '',
     });
     expect(res.success).toBe(false);
     const errors = (res as any).error.flatten().fieldErrors;
@@ -24,8 +24,8 @@ describe('plantFormSchema', () => {
       waterEvery: '0',
       waterAmount: '9',
       fertEvery: '0',
-      lastWatered: '2024-01-01',
-      lastFertilized: '2024-01-01',
+      lastWatered: '',
+      lastFertilized: '',
     });
     expect(res.success).toBe(false);
     const errors = (res as any).error.flatten().fieldErrors;
@@ -43,6 +43,19 @@ describe('plantFormSchema', () => {
       fertEvery: '1',
       lastWatered: '2024-01-01',
       lastFertilized: '2024-01-01',
+    });
+    expect(res.success).toBe(true);
+  });
+
+  it('allows empty date fields', () => {
+    const res = plantFormSchema.safeParse({
+      name: 'A',
+      roomId: 'r1',
+      waterEvery: '1',
+      waterAmount: '10',
+      fertEvery: '1',
+      lastWatered: '',
+      lastFertilized: '',
     });
     expect(res.success).toBe(true);
   });

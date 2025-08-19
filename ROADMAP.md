@@ -6,7 +6,7 @@ This document outlines upcoming work for the Kay Maria plant care app.
 
 - [ ] Add Plant form polish
    - [x] UI styling
-   - [ ] Form validation
+   - [x] Form validation
    - [ ] Backend persistence
    - [ ] Smoke tests
 

@@ -2,7 +2,7 @@
 
 This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion with real-time task syncing across devices. The goal of this README is to give contributors (like me) a fast reference for building, testing and exploring the project.
 
-The Add Plant modal uses a labeled stepper to guide users through Basics, Setup and Care plan sections.
+The Add Plant modal uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Form fields include validation for required entries and numeric values.
 
 ## Quick Start
 Kay Maria is intended to run in single-user mode by default.
