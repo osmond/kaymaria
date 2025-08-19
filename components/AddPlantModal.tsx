@@ -229,7 +229,9 @@ export default function AddPlantModal({
     data: PlantFormSubmit,
     source: 'ai' | 'manual' = 'manual',
   ) {
-    console.log('Creating plant via', source, 'plan source', planSource);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Creating plant via', source, 'plan source', planSource);
+    }
     const payload: any = { ...data };
     if (!requestIdRef.current) {
       requestIdRef.current = crypto.randomUUID();
