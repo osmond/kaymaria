@@ -3,6 +3,7 @@
  */
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import PlantDetailClient from '../[id]/PlantDetailClient';
 
 jest.mock('next/link', () => ({ __esModule: true, default: ({ children }: any) => <>{children}</> }));
@@ -42,6 +43,26 @@ describe('PlantDetailClient', () => {
     await waitFor(() =>
       expect(screen.getByRole('heading', { level: 1, name: 'Fern' })).toBeInTheDocument()
     );
+  });
+
+  it('closes menu when Escape is pressed', async () => {
+    render(
+      <PlantDetailClient
+        plant={{ id: '1', userId: 'u1', name: 'Fern', species: 'Pteridophyta' } as any}
+      />
+    );
+
+    const user = userEvent.setup();
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'More options' })).toBeInTheDocument()
+    );
+
+    await user.click(screen.getByRole('button', { name: 'More options' }));
+    expect(screen.getByText('Edit')).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByText('Edit')).not.toBeInTheDocument());
   });
 });
 
