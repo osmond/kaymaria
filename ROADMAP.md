@@ -98,7 +98,7 @@ For **each page**, ensure:
 
 - [ ] PWA shell setup
 - [ ] Offline caching with local persistence
-- [ ] App store deployment planning (iOS/Android)
+
 
 ---
 
