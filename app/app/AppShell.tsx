@@ -226,6 +226,7 @@ export function TodayView() {
         body: JSON.stringify({ status: "done" }),
       });
       if (!r.ok) throw new Error();
+      const data = await r.json();
       trigger();
       const time = new Date().toLocaleTimeString([], {
         hour: "numeric",
@@ -233,7 +234,15 @@ export function TodayView() {
       });
       toast(`${pastTenseLabel(t.type)}! ${time}`, {
         label: "Undo",
-        onClick: () => setTasks((prev) => [t, ...prev]),
+        onClick: async () => {
+          setTasks((prev) => [t, ...prev]);
+          await fetch(`/api/tasks/${encodeURIComponent(t.id)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ undo: true, task: t, eventAt: data.eventAt }),
+          });
+          refresh();
+        },
       });
       refresh();
     } catch {
