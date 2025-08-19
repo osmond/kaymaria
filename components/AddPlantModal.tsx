@@ -189,7 +189,7 @@ export default function AddPlantModal({
                 aiModel: sug.model,
                 aiVersion: sug.version,
               });
-              setNotice('AI-generated plan…');
+              setNotice(null);
             } else {
               setNotice('No suggestions available.');
               setPlanSource({ type: 'manual' });
