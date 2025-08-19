@@ -13,6 +13,19 @@ export function ensureSupabaseEnv() {
 // Factory for an unauthenticated client
 export function createSupabaseClient(): SupabaseClient<Database> {
   const { url, anonKey } = ensureSupabaseEnv();
+  const singleUserMode = process.env.SINGLE_USER_MODE === "true";
+  if (singleUserMode) {
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceKey) {
+      throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
+    }
+    return createClient<Database>(url, serviceKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
+  }
   return createClient<Database>(url, anonKey);
 }
 
