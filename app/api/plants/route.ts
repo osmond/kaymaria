@@ -4,28 +4,8 @@ import { createRouteHandlerClient } from "@/lib/supabase";
 import { getUserId } from "@/lib/getUserId";
 import { z } from "zod";
 
-const missingEnv = () =>
-  !process.env.DATABASE_URL ||
-  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-const envErrorResponse = () =>
-  NextResponse.json(
-    {
-      error: "misconfigured server",
-      message:
-        "Set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and DATABASE_URL, or enable SINGLE_USER_MODE",
-    },
-    { status: 503 }
-  );
-
 export async function GET() {
   try {
-    if (missingEnv()) {
-      console.error("Missing Supabase or database environment variables");
-      return envErrorResponse();
-    }
-
     const plants = await listPlants();
     return NextResponse.json(plants);
   } catch (e: any) {
@@ -36,11 +16,6 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    if (missingEnv()) {
-      console.error("Missing Supabase or database environment variables");
-      return envErrorResponse();
-    }
-
     const supabase = await createRouteHandlerClient();
     const userRes = await getUserId(supabase);
     if ("error" in userRes) {

@@ -61,15 +61,6 @@ describe('GET/POST /api/rooms', () => {
     expect(mockFrom).toHaveBeenCalledWith('rooms');
   });
 
-  it('returns 500 when env vars missing', async () => {
-    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const res = await GET();
-    expect(res.status).toBe(500);
-    const json = await res.json();
-    expect(json).toEqual({ error: 'misconfigured server' });
-    expect(createRouteHandlerClient).not.toHaveBeenCalled();
-  });
-
   it('returns 500 when SINGLE_USER_ID missing in single-user mode', async () => {
     process.env.SINGLE_USER_MODE = 'true';
     delete process.env.SINGLE_USER_ID;
