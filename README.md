@@ -2,7 +2,7 @@
 
 This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion with real-time task syncing across devices. The goal of this README is to give contributors (like me) a fast reference for building, testing and exploring the project.
 
-The Add Plant modal uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Form fields include validation for required entries and numeric values. Submitting the form now persists the plant to the backend and pre-creates care tasks.
+The Add Plant modal uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Form fields include validation for required entries and numeric values. Submitting the form now persists the plant to the backend and pre-creates care tasks. A smoke test exercises the full add flow to guard against regressions.
 
 ## Quick Start
 Kay Maria is intended to run in single-user mode by default.
@@ -53,6 +53,7 @@ After pulling new changes:
 
 ## Testing
 - Unit tests: `npm test`
+- Add Plant form smoke test: [`components/AddPlantModal.test.tsx`](./components/AddPlantModal.test.tsx)
 - Manual scenarios live in [docs/manual-test-cases.md](./docs/manual-test-cases.md)
 - End-to-end tests: `npm run test:e2e`
 
