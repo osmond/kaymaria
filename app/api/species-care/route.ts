@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     if (!defaults) {
       return NextResponse.json({ presets: null });
     }
-    return NextResponse.json({ presets: defaults });
+    return NextResponse.json({ presets: defaults, updated: new Date().toISOString() });
   } catch (e: any) {
     console.error('GET /api/species-care failed:', e);
     return NextResponse.json({ error: 'server' }, { status: 500 });
