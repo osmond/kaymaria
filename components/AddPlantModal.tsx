@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useId } from 'react';
-import { Dialog } from '@headlessui/react';
+import {
+  Dialog,
+  DialogBackdrop,
+  // (optional) DialogPanel, DialogTitle
+} from '@headlessui/react';
 import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import {
   BasicsFields,
@@ -335,7 +339,7 @@ export default function AddPlantModal({
         initialFocus={firstFieldRef}
         aria-labelledby={titleId}
       >
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/30" />
+        <DialogBackdrop className="fixed inset-0 z-40 bg-black/30" />
         <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <Dialog.Panel className="relative z-50 w-full h-full sm:h-auto sm:max-w-lg bg-background rounded-2xl shadow-card sm:max-h-[90vh] flex flex-col">
             <header className="sticky top-0 bg-background border-b p-6">
