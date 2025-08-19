@@ -1,19 +1,12 @@
 "use client";
-import { useRef, useState } from "react";
 import Link from "next/link";
 import Fab from "@/components/Fab";
-import AddPlantModal from "@/components/AddPlantModal";
+import { useRouter } from "next/navigation";
 import usePlants from "./usePlants";
 
 export default function PlantsView() {
-  const { plants: items, error: err, isLoading, mutate } = usePlants();
-  const [addOpen, setAddOpen] = useState(false);
-  const [snackbar, setSnackbar] = useState<{
-    visible: boolean;
-    message: string;
-    action?: { label: string; onClick: () => void };
-  }>({ visible: false, message: "" });
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { plants: items, error: err, isLoading } = usePlants();
+  const router = useRouter();
   const sortedItems =
     items?.slice().sort((a, b) => {
       const roomA = a.room || "";
@@ -62,43 +55,7 @@ export default function PlantsView() {
           )}
         </div>
       </section>
-      <Fab onClick={() => setAddOpen(true)} />
-      <AddPlantModal
-        open={addOpen}
-        onOpenChange={setAddOpen}
-        defaultRoomId="room-1"
-        onCreate={(p) => {
-          setAddOpen(false);
-          mutate();
-          if (timer.current) window.clearTimeout(timer.current);
-          setSnackbar({
-            visible: true,
-            message: `${p.name} added`,
-            action: {
-              label: "Undo",
-              onClick: async () => {
-                setSnackbar({ visible: false, message: "" });
-                await fetch(`/api/plants/${p.id}`, { method: "DELETE" });
-                mutate();
-              },
-            },
-          });
-          timer.current = window.setTimeout(
-            () => setSnackbar({ visible: false, message: "" }),
-            5000,
-          );
-        }}
-      />
-      {snackbar.visible && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-sm px-4 py-2 rounded-full shadow-lg flex items-center gap-3">
-          <span>{snackbar.message}</span>
-          {snackbar.action && (
-            <button className="underline" onClick={snackbar.action.onClick}>
-              {snackbar.action.label}
-            </button>
-          )}
-        </div>
-      )}
+      <Fab onClick={() => router.push("/app/plants/new")} />
     </>
   );
 }
