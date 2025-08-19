@@ -9,6 +9,7 @@ jest.mock('next/link', () => ({ __esModule: true, default: ({ children }: any) =
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
   useSearchParams: () => new URLSearchParams(),
+  usePathname: () => '/app/plants/1',
 }));
 jest.mock('@/components/EditPlantModal', () => () => null);
 jest.mock('@/components/BottomNav', () => () => null);
