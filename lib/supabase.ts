@@ -18,8 +18,22 @@ export function createSupabaseClient(): SupabaseClient<Database> {
 
 // Authenticated client helper for Route Handlers
 export async function createRouteHandlerClient(): Promise<SupabaseClient<Database>> {
-  const { cookies } = await import("next/headers");
+  const singleUser = process.env.SINGLE_USER_MODE === "true";
   const { url, anonKey } = ensureSupabaseEnv();
+
+  if (singleUser) {
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceKey) {
+      throw new Error(
+        "SUPABASE_SERVICE_ROLE_KEY required in SINGLE_USER_MODE",
+      );
+    }
+    return createClient<Database>(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+  }
+
+  const { cookies } = await import("next/headers");
   // `cookies()` is now asynchronous in Next 15 and must be awaited
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("sb-access-token")?.value;
