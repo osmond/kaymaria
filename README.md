@@ -16,7 +16,13 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
    - `TREFLE_API_TOKEN` *(optional, enables [Trefle](https://trefle.io) species search)*
    - `NEXT_PUBLIC_TASK_WINDOW_DAYS` *(defaults to `7`)*
    - `SINGLE_USER_MODE` and `SINGLE_USER_ID` for skipping Supabase auth
-3. Prepare the database and start the app
+3. Sync Prisma schema and client
+   ```bash
+   npx prisma db pull
+   npx prisma generate
+   ```
+   These commands keep the Prisma schema and generated client up to date.
+4. Prepare the database and start the app
    ```bash
    npm run db:migrate
    npm run dev
@@ -31,6 +37,8 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
 | `npm run build` | create production build |
 | `npm run db:migrate` | run Prisma migrations |
 | `npm run db:seed` | clear `task` and `plant` tables |
+| `npx prisma db pull` | sync schema from DB |
+| `npx prisma generate` | generate Prisma client |
 
 ## Testing
 - Unit tests: `npm test`
