@@ -244,7 +244,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
   return (
     <div className="min-h-[100dvh] bg-neutral-50 text-neutral-900 flex flex-col">
       {/* Header */}
-      <header className="px-4 pt-6 pb-2 sticky top-0 bg-white/90 backdrop-blur border-b">
+      <header className="px-4 pt-6 pb-2 sticky top-0 bg-white/90 backdrop-blur border-b border-border">
         <div className="flex items-center gap-2">
           <Link href="/app" aria-label="Back" className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100">
             <ArrowLeft className="h-5 w-5" />
@@ -270,7 +270,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
       {/* Content */}
       <main className="flex-1 px-4 pb-28">
         {/* Hero */}
-        <div className="rounded-2xl overflow-hidden border bg-white shadow-card mt-4">
+        <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-card mt-4">
         <img src={heroPhoto} alt={name} className="h-40 w-full object-cover bg-neutral-200" />
           <div className="p-4">
             <h2 className="text-lg font-display font-semibold">{name}</h2>
@@ -298,25 +298,25 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
           {/* Tabs */}
           <div className="mt-4 grid grid-cols-4 gap-2 text-sm">
           <button
-            className={`py-2 rounded-lg border ${tab === "stats" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            className={`py-2 rounded-lg border border-border ${tab === "stats" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
             onClick={() => setTab("stats")}
           >
             Stats
           </button>
           <button
-            className={`py-2 rounded-lg border ${tab === "timeline" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            className={`py-2 rounded-lg border border-border ${tab === "timeline" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
             onClick={() => setTab("timeline")}
           >
             Timeline
           </button>
           <button
-            className={`py-2 rounded-lg border ${tab === "notes" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            className={`py-2 rounded-lg border border-border ${tab === "notes" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
             onClick={() => setTab("notes")}
           >
             Notes
           </button>
           <button
-            className={`py-2 rounded-lg border ${tab === "photos" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
+            className={`py-2 rounded-lg border border-border ${tab === "photos" ? "bg-white shadow-sm font-medium" : "text-neutral-600"}`}
             onClick={() => setTab("photos")}
           >
             Photos
@@ -359,8 +359,8 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
         )}
 
         {tab === "timeline" && (
-          <section className="mt-4 rounded-2xl border bg-white shadow-card">
-            <div className="px-4 py-3 border-b">
+          <section className="mt-4 rounded-2xl border border-border bg-white shadow-card">
+            <div className="px-4 py-3 border-b border-border">
               <div className="text-base font-medium">Timeline</div>
               <div className="text-xs text-neutral-500">Upcoming &amp; recent care</div>
             </div>
@@ -374,7 +374,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               {err && <li className="py-3 text-red-600">{err}</li>}
               {!err && plantTasks.length === 0 && <li className="py-3 text-neutral-500">No tasks yet</li>}
               {!err && plantTasks.map(t => (
-                <li key={t.id} className="py-3 border-b last:border-b-0 flex justify-between items-center">
+                <li key={t.id} className="py-3 border-b border-border last:border-b-0 flex justify-between items-center">
                   <span>
                     {iconFor(t.type)} {t.type === "water" ? "Water" : t.type === "fertilize" ? "Fertilize" : "Repot"} — {new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric" }).format(new Date(t.dueAt))}
                     {(() => {
@@ -391,7 +391,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
         )}
 
         {tab === "notes" && (
-          <section className="mt-4 rounded-2xl border bg-white shadow-card p-4 text-sm">
+          <section className="mt-4 rounded-2xl border border-border bg-white shadow-card p-4 text-sm">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -402,7 +402,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 placeholder="Write a note..."
-                className="w-full border rounded p-2 text-sm"
+                className="w-full border border-border rounded p-2 text-sm"
               />
               <div className="text-right mt-2">
                 <button type="submit" className="px-3 py-1 rounded bg-neutral-900 text-white text-xs">
@@ -413,7 +413,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
             <ul className="mt-4 space-y-3">
               {notes.length === 0 && <li className="text-neutral-500">No notes yet</li>}
               {notes.map((n) => (
-                <li key={n.id} className="border-t pt-2 first:border-t-0 first:pt-0">
+                <li key={n.id} className="border-t border-border pt-2 first:border-t-0 first:pt-0">
                   <div>{n.note}</div>
                   <div className="text-xs text-neutral-500">
                     {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(n.createdAt))}
@@ -425,7 +425,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
         )}
 
         {tab === "photos" && (
-          <section className="mt-4 rounded-2xl border bg-white shadow-card p-4">
+          <section className="mt-4 rounded-2xl border border-border bg-white shadow-card p-4">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -439,7 +439,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                 accept="image/*"
                 capture="environment"
                 onChange={(e) => setNewPhotoFile(e.target.files?.[0] || null)}
-                className="flex-1 border rounded p-2 text-sm"
+                className="flex-1 border border-border rounded p-2 text-sm"
               />
               <button
                 type="submit"
@@ -502,7 +502,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border bg-white p-3 shadow-card">
+    <div className="rounded-2xl border border-border bg-white p-3 shadow-card">
       <div className="text-xs text-neutral-500">{label}</div>
       <div className="text-base font-medium">{value}</div>
     </div>

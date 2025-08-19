@@ -9,6 +9,7 @@
     --secondary: 164 42% 88%;
     --secondary-foreground: 221 39% 11%;
     --muted: 218 11% 65%;
+    --border: 221 14% 90%;
   }
   .dark {
     --background: 221 39% 11%;
@@ -18,6 +19,7 @@
     --secondary: 164 42% 20%;
     --secondary-foreground: 0 0% 98%;
     --muted: 218 11% 65%;
+    --border: 221 14% 30%;
   }
   body {
     background-color: hsl(var(--background));
