@@ -43,7 +43,7 @@ Kay Maria is intended to run in single-user mode by default.
    # open http://localhost:3000/app
    ```
    The `npm run db:seed` script only clears the `task` and `plant` tables and doesn’t insert mock data. Run it only if you need to wipe existing data.
-   Log in at `http://localhost:3000/login` with a Supabase email/password account. Use the Settings page to sign out.
+   Routes under `/app` now require authentication and redirect to `/login` when no session is present. Log in at `http://localhost:3000/login` with a Supabase email/password account. Use the Settings page to sign out.
 
 ## Post-merge workflow
 After pulling new changes:
