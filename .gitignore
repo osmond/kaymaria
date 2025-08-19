@@ -6,3 +6,5 @@ node_modules
 .env.local
 fine-tune-data.jsonl
 .vercel
+test-results
+playwright-report
