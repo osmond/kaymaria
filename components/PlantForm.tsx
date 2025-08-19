@@ -130,9 +130,11 @@ export function BasicsFields({
   setState,
   validation = emptyValidation,
   defaults,
+  saveDefault,
 }: SectionProps & {
   validation?: Validation;
   defaults?: { pot: string; potMaterial: string; light: string };
+  saveDefault?: (field: 'pot' | 'potMaterial' | 'light', value: string) => void;
 }) {
   const { errors, touched, validate, markTouched } = validation;
   return (
@@ -182,6 +184,15 @@ export function BasicsFields({
             value={state.pot}
             onChange={(v) => setState({ ...state, pot: v })}
           />
+          {defaults && defaults.pot !== state.pot && (
+            <button
+              type="button"
+              className="text-xs underline"
+              onClick={() => saveDefault?.('pot', state.pot)}
+            >
+              Save as new default
+            </button>
+          )}
           <p className="hint">Larger pots stay moist longer.</p>
         </Field>
         <Field label="Pot material" defaulted={defaults?.potMaterial === state.potMaterial}>
@@ -190,6 +201,15 @@ export function BasicsFields({
             value={state.potMaterial}
             onChange={(v) => setState({ ...state, potMaterial: v })}
           />
+          {defaults && defaults.potMaterial !== state.potMaterial && (
+            <button
+              type="button"
+              className="text-xs underline"
+              onClick={() => saveDefault?.('potMaterial', state.potMaterial)}
+            >
+              Save as new default
+            </button>
+          )}
           {state.pot && (
             <p className="hint">
               {state.pot}{' '}
@@ -207,6 +227,15 @@ export function BasicsFields({
             value={state.light}
             onChange={(v) => setState({ ...state, light: v })}
           />
+          {defaults && defaults.light !== state.light && (
+            <button
+              type="button"
+              className="text-xs underline"
+              onClick={() => saveDefault?.('light', state.light)}
+            >
+              Save as new default
+            </button>
+          )}
         </Field>
       </div>
     </div>
@@ -282,15 +311,18 @@ export function EnvironmentFields({
             <option value="great">Great drainage</option>
           </select>
         </div>
-        {showMore && (
+      </Field>
+
+      {showMore && (
+        <Field label="Soil type">
           <input
-            className="input mt-2"
+            className="input"
             value={state.soil}
             onChange={(e) => setState({ ...state, soil: e.target.value })}
-            placeholder="Soil type (e.g., Aroid mix)"
+            placeholder="e.g., cactus mix"
           />
-        )}
-      </Field>
+        </Field>
+      )}
 
       <Field label="Location (for weather)">
         <div className="grid gap-2">
@@ -298,12 +330,15 @@ export function EnvironmentFields({
             Use current location
           </button>
           <div className="flex gap-2">
-            <input
-              className="input flex-1"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Search address"
-            />
+            <div className="flex-1 grid gap-1">
+              <label className="text-xs text-neutral-700">Search address</label>
+              <input
+                className="input"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="e.g., 123 Main St"
+              />
+            </div>
             <button type="button" className="btn-secondary" onClick={lookupAddress}>
               Search
             </button>
@@ -311,6 +346,7 @@ export function EnvironmentFields({
           {showMore && (
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-1">
+                <label className="text-xs text-neutral-700">Latitude</label>
                 <input
                   className="input"
                   value={state.lat ?? ''}
@@ -324,7 +360,7 @@ export function EnvironmentFields({
                     markTouched('lat');
                     validate('lat', state.lat);
                   }}
-                  placeholder="Latitude"
+                  placeholder="e.g., 40.7128"
                 />
                 {touched.lat && (
                   errors.lat ? (
@@ -335,6 +371,7 @@ export function EnvironmentFields({
                 )}
               </div>
               <div className="grid gap-1">
+                <label className="text-xs text-neutral-700">Longitude</label>
                 <input
                   className="input"
                   value={state.lon ?? ''}
@@ -348,7 +385,7 @@ export function EnvironmentFields({
                     markTouched('lon');
                     validate('lon', state.lon);
                   }}
-                  placeholder="Longitude"
+                  placeholder="e.g., -74.0060"
                 />
                 {touched.lon && (
                   errors.lon ? (
@@ -555,15 +592,17 @@ export function CarePlanFields({
             onChange={(v) => setState({ ...state, waterEvery: v })}
             min={1}
           />
+          <p className="hint">Use arrows or type a number.</p>
           {nextWater && <p className="hint">Next watering: {fmtDate(nextWater)}</p>}
         </Field>
         <Field label="Water amount (ml)">
           <Stepper
             value={state.waterAmount}
             onChange={(v) => setState({ ...state, waterAmount: v })}
-            min={50}
+            min={10}
             step={10}
           />
+          <p className="hint">Use arrows or type a number.</p>
         </Field>
       </div>
 
@@ -573,8 +612,9 @@ export function CarePlanFields({
           <Stepper
             value={state.fertEvery}
             onChange={(v) => setState({ ...state, fertEvery: v })}
-            min={7}
+            min={1}
           />
+          <p className="hint">Use arrows or type a number.</p>
           {nextFertilize && (
             <p className="hint">Next fertilizing: {fmtDate(nextFertilize)}</p>
           )}
@@ -754,8 +794,8 @@ function Field({
       <label className="text-sm font-medium text-neutral-700 flex items-center gap-2">
         {label}
         {defaulted && (
-          <span className="text-[10px] uppercase text-neutral-500 border px-1 rounded">
-            Default
+          <span className="text-[10px] text-neutral-500 border px-1 rounded">
+            Using your default
           </span>
         )}
       </label>

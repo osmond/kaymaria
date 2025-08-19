@@ -99,7 +99,7 @@ export default function SpeciesAutosuggest({
           onBlur?.();
           setTimeout(() => setOpen(false), 100);
         }}
-        placeholder="e.g., Monstera"
+        placeholder="e.g., Monstera deliciosa"
       />
       {open && suggestions.length > 0 && (
         <ul

@@ -1,5 +1,14 @@
 'use client';
 
+export function clampValue(n: number, min: number, step: number) {
+  if (Number.isNaN(n)) return min;
+  n = Math.max(min, n);
+  if (step > 1) {
+    n = Math.round(n / step) * step;
+  }
+  return n;
+}
+
 export default function Stepper({
   value,
   onChange,
@@ -12,14 +21,9 @@ export default function Stepper({
   step?: number;
 }) {
   const num = Number(value) || 0;
-  const dec = () => {
-    const next = num - step;
-    onChange(String(next < min ? min : next));
-  };
-  const inc = () => {
-    const next = num + step;
-    onChange(String(next));
-  };
+  const set = (v: number) => onChange(String(clampValue(v, min, step)));
+  const dec = () => set(num - step);
+  const inc = () => set(num + step);
   return (
     <div className="flex items-center gap-2">
       <button
@@ -30,9 +34,27 @@ export default function Stepper({
         -
       </button>
       <input
+        type="number"
         className="input w-16 text-center"
         value={value}
-        onChange={(e) => onChange(e.target.value.replace(/[^0-9]/g, ''))}
+        onChange={(e) => {
+          const v = Number(e.target.value);
+          if (e.target.value === '') {
+            onChange('');
+          } else {
+            set(v);
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            set(num + 1);
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            set(num - 1);
+          }
+        }}
+        min={min}
       />
       <button
         type="button"

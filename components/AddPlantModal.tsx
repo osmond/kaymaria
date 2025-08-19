@@ -50,10 +50,16 @@ export default function AddPlantModal({
     potMaterial: string;
     light: string;
   } | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   function close() {
     onOpenChange(false);
   }
+
+  const showToast = (m: string) => {
+    setToast(m);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -154,6 +160,17 @@ export default function AddPlantModal({
     }
     loadDefaults();
   }, [open, prefillName, defaultRoomId]);
+
+  function updateDefaults(field: 'pot' | 'potMaterial' | 'light', value: string) {
+    const next = { ...(defaults || { pot: '', potMaterial: '', light: '' }), [field]: value };
+    setDefaults(next);
+    try {
+      const stored = JSON.parse(localStorage.getItem('plantDefaults') || '{}');
+      stored[field] = value;
+      localStorage.setItem('plantDefaults', JSON.stringify(stored));
+    } catch {}
+    showToast('Defaults saved.');
+  }
 
   async function handleSubmit(
     data: PlantFormSubmit,
@@ -280,6 +297,7 @@ export default function AddPlantModal({
                   state={values}
                   setState={setValues}
                   defaults={defaults || undefined}
+                  saveDefault={updateDefaults}
                 />
               )}
               {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
@@ -325,6 +343,11 @@ export default function AddPlantModal({
           )}
         </Dialog.Panel>
       </div>
+      {toast && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-sm px-4 py-2 rounded-full shadow-lg">
+          {toast}
+        </div>
+      )}
     </Dialog>
   );
 }
