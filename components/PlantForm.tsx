@@ -195,16 +195,10 @@ export function BasicsFields({
   state,
   setState,
   validation = emptyValidation,
-  defaults,
   nameInputRef,
-  onSaveDefault,
-  careTips,
 }: SectionProps & {
   validation?: Validation;
-  defaults?: { pot: string; potMaterial: string; light: string };
   nameInputRef?: React.RefObject<HTMLInputElement>;
-  onSaveDefault?: (field: 'pot' | 'potMaterial' | 'light', value: string) => void;
-  careTips?: { potMaterial?: string; light?: string };
 }) {
   const { errors, touched, validate, markTouched } = validation;
   return (
@@ -261,83 +255,6 @@ export function BasicsFields({
         )}
         <p className="hint">Stored locally in Settings → Defaults.</p>
       </Field>
-
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Field label="Pot size" defaulted={defaults?.pot === state.pot}>
-          <div className="flex items-center gap-2">
-            <Stepper
-              value={state.pot.replace(' in', '')}
-              onChange={(v) =>
-                setState({ ...state, pot: v ? `${v} in` : '' })
-              }
-              min={1}
-            />
-            <span className="text-sm">in</span>
-          </div>
-          {defaults && defaults.pot !== state.pot && onSaveDefault && (
-            <button
-              type="button"
-              className="text-xs underline text-left"
-              onClick={() => onSaveDefault('pot', state.pot)}
-            >
-              Save as new default
-            </button>
-          )}
-          <p className="hint">Larger pots stay moist longer.</p>
-        </Field>
-        <Field label="Pot height">
-          <div className="flex items-center gap-2">
-            <Stepper
-              value={state.potHeight.replace(' in', '')}
-              onChange={(v) =>
-                setState({ ...state, potHeight: v ? `${v} in` : '' })
-              }
-              min={1}
-            />
-            <span className="text-sm">in</span>
-          </div>
-        </Field>
-        <Field
-          label="Pot material"
-          defaulted={defaults?.potMaterial === state.potMaterial}
-        >
-          <ChipSelect
-            options={["Plastic", "Terracotta", "Ceramic"]}
-            value={state.potMaterial}
-            onChange={(v) => setState({ ...state, potMaterial: v })}
-          />
-          {defaults && defaults.potMaterial !== state.potMaterial &&
-            onSaveDefault && (
-              <button
-                type="button"
-                className="text-xs underline text-left"
-                onClick={() => onSaveDefault('potMaterial', state.potMaterial)}
-              >
-                Save as new default
-              </button>
-            )}
-          {careTips?.potMaterial && (
-            <p className="hint">{careTips.potMaterial}</p>
-          )}
-        </Field>
-        <Field label="Light" defaulted={defaults?.light === state.light}>
-          <ChipSelect
-            options={["Low", "Medium", "Bright"]}
-            value={state.light}
-            onChange={(v) => setState({ ...state, light: v })}
-          />
-          {defaults && defaults.light !== state.light && onSaveDefault && (
-            <button
-              type="button"
-              className="text-xs underline text-left"
-              onClick={() => onSaveDefault('light', state.light)}
-            >
-              Save as new default
-            </button>
-          )}
-          {careTips?.light && <p className="hint">{careTips.light}</p>}
-        </Field>
-      </div>
     </div>
   );
 }
@@ -406,6 +323,48 @@ export function EnvironmentFields({
 
   return (
     <div className="p-0 space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <Field label="Pot size">
+          <div className="flex items-center gap-2">
+            <Stepper
+              value={state.pot.replace(' in', '')}
+              onChange={(v) =>
+                setState({ ...state, pot: v ? `${v} in` : '' })
+              }
+              min={1}
+            />
+            <span className="text-sm">in</span>
+          </div>
+          <p className="hint">Larger pots stay moist longer.</p>
+        </Field>
+        <Field label="Pot height">
+          <div className="flex items-center gap-2">
+            <Stepper
+              value={state.potHeight.replace(' in', '')}
+              onChange={(v) =>
+                setState({ ...state, potHeight: v ? `${v} in` : '' })
+              }
+              min={1}
+            />
+            <span className="text-sm">in</span>
+          </div>
+        </Field>
+        <Field label="Material">
+          <ChipSelect
+            options={["Plastic", "Terracotta", "Ceramic"]}
+            value={state.potMaterial}
+            onChange={(v) => setState({ ...state, potMaterial: v })}
+          />
+        </Field>
+        <Field label="Light level">
+          <ChipSelect
+            options={["Low", "Medium", "Bright"]}
+            value={state.light}
+            onChange={(v) => setState({ ...state, light: v })}
+          />
+        </Field>
+      </div>
+
       <Field label="Environment">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <select
@@ -544,9 +503,13 @@ export function EnvironmentFields({
           )}
         </div>
         {state.lat && state.lon ? (
-          <span className="text-xs text-neutral-600">Using your location to adjust watering schedule</span>
+          <span className="text-xs text-neutral-600">
+            Using your current location for weather-aware care tips
+          </span>
         ) : (
-          <span className="text-xs text-neutral-600">Location not available. Set manually?</span>
+          <span className="text-xs text-neutral-600">
+            Location not available. You can enter manually.
+          </span>
         )}
         <p className="hint">
           Used to tailor intervals based on local conditions. Without a location we'll use standard intervals.
@@ -738,14 +701,16 @@ export function CarePlanFields({
         <section className="bg-neutral-50 rounded-2xl border p-4">
           <h2 className="text-xl font-medium mb-2">Smart Care Plan</h2>
           {loadingSuggest && (
-            <p className="text-sm text-neutral-600">🌤 Generating personalized care plan…</p>
+            <p className="text-sm text-neutral-600">
+              We’re generating personalized care tips based on your plant’s needs and local weather...
+            </p>
           )}
           {suggestError && (
             <div className="text-xs text-red-600 mb-2">{suggestError}</div>
           )}
           {!suggest && !loadingSuggest && !suggestError && (
             <p className="text-sm text-neutral-600">
-              We’re building a care plan based on your plant’s needs and local weather…
+              We’re generating personalized care tips based on your plant’s needs and local weather...
             </p>
           )}
           {suggest && !loadingSuggest && (
@@ -764,14 +729,12 @@ export function CarePlanFields({
                 <button className="btn" onClick={applySuggest}>Apply Suggestions</button>
                 <button className="btn-secondary" onClick={customizePlan}>Reset to defaults</button>
               </div>
-              {suggest.et0 && (
-                <details className="text-xs text-neutral-600 mt-2">
-                  <summary className="cursor-pointer">Why this plan?</summary>
-                  <p className="mt-1">
-                    Your plant's ET₀ is {suggest.et0.toFixed(1)} mm/day in your climate. Pot size and species needs suggest {suggest.waterAmount} ml every {suggest.waterEvery} days.
-                  </p>
-                </details>
-              )}
+              <details className="text-xs text-neutral-600 mt-2">
+                <summary className="cursor-pointer">Why this plan?</summary>
+                <p className="mt-1">
+                  Based on ET₀ data, species, light, and pot size.
+                </p>
+              </details>
             </>
           )}
         </section>
@@ -790,7 +753,7 @@ export function CarePlanFields({
               min={1}
             />
             {aiWaterEvery && (
-              <span className="text-[10px] px-1 rounded bg-brand text-white">AI</span>
+              <span className="text-[10px] px-1 rounded bg-brand text-white">✨ AI</span>
             )}
           </div>
           {touched.waterEvery && (
@@ -816,7 +779,7 @@ export function CarePlanFields({
               step={10}
             />
             {aiWaterAmount && (
-              <span className="text-[10px] px-1 rounded bg-brand text-white">AI</span>
+              <span className="text-[10px] px-1 rounded bg-brand text-white">✨ AI</span>
             )}
           </div>
           {touched.waterAmount && (
@@ -864,7 +827,7 @@ export function CarePlanFields({
               min={1}
             />
             {aiFertEvery && (
-              <span className="text-[10px] px-1 rounded bg-brand text-white">AI</span>
+              <span className="text-[10px] px-1 rounded bg-brand text-white">✨ AI</span>
             )}
           </div>
           {touched.fertEvery && (
@@ -908,7 +871,7 @@ export function CarePlanFields({
                 placeholder="e.g., 10-10-10 @ 1/2 strength"
               />
               {aiFertFormula && (
-                <span className="text-[10px] px-1 rounded bg-brand text-white">AI</span>
+                <span className="text-[10px] px-1 rounded bg-brand text-white">✨ AI</span>
               )}
             </div>
           </Field>
@@ -931,14 +894,12 @@ export default function PlantForm({
   onSubmit,
   onCancel,
   initialSuggest,
-  defaults,
 }: {
   initial: PlantFormValues;
   submitLabel: string;
   onSubmit: (data: PlantFormSubmit, source?: 'ai' | 'manual') => Promise<void>;
   onCancel: () => void;
   initialSuggest?: AiCareSuggestion | null;
-  defaults?: { pot: string; potMaterial: string; light: string };
 }) {
   const [state, setState] = useState<PlantFormValues>(initial);
   const [errors, setErrors] = useState<Validation['errors']>({});
@@ -1008,30 +969,36 @@ export default function PlantForm({
 
   return (
     <>
-      <BasicsFields
-        state={state}
-        setState={setState}
-        validation={validation}
-        defaults={defaults}
-      />
-      {hasSpecies && (
+      <section className="mb-6">
+        <h2 className="text-xl font-medium mb-2">About the Plant</h2>
+        <BasicsFields
+          state={state}
+          setState={setState}
+          validation={validation}
+        />
+      </section>
+      <section className="mb-6">
+        <h2 className="text-xl font-medium mb-2">Pot & Environment</h2>
         <EnvironmentFields state={state} setState={setState} validation={validation} />
-      )}
-      <CarePlanFields
-        state={state}
-        setState={setState}
-        initialSuggest={initialSuggest}
-        showSuggest={hasSpecies}
-        onPlanModeChange={setPlanSource}
-        validation={validation}
-        onSuggestChange={setAiMeta}
-      />
-      {planSource.type === 'ai' && aiMeta && (
-        <p className="mt-4 text-center text-xs text-neutral-500">
-          AI-generated care plan • {aiMeta.model} • {aiMeta.weatherSource || 'Open-Meteo'} •{' '}
-          {aiMeta.fetchedAt ? new Date(aiMeta.fetchedAt).toLocaleDateString() : ''}
-        </p>
-      )}
+      </section>
+      <section className="mb-6">
+        <h2 className="text-xl font-medium mb-2">Care Plan</h2>
+        <CarePlanFields
+          state={state}
+          setState={setState}
+          initialSuggest={initialSuggest}
+          showSuggest={hasSpecies}
+          onPlanModeChange={setPlanSource}
+          validation={validation}
+          onSuggestChange={setAiMeta}
+        />
+        {planSource.type === 'ai' && aiMeta && (
+          <p className="mt-4 text-center text-xs text-neutral-500">
+            AI-generated care plan • {aiMeta.model} • {aiMeta.weatherSource || 'Open-Meteo'} •{' '}
+            {aiMeta.fetchedAt ? new Date(aiMeta.fetchedAt).toLocaleDateString() : ''}
+          </p>
+        )}
+      </section>
       <div className="p-5 border-t flex gap-2 justify-end items-center">
         <button className="btn-secondary" onClick={onCancel}>
           Cancel
