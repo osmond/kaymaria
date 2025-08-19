@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { z } from 'zod';
@@ -128,7 +128,7 @@ const emptyValidation: Validation = {
   markTouched: () => {},
 };
 
-function ChipSelect({
+export function ChipSelect({
   options,
   value,
   onChange,
@@ -137,18 +137,36 @@ function ChipSelect({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const refs = useRef<HTMLButtonElement[]>([]);
   return (
-    <div className="flex gap-2">
-      {options.map((opt) => (
+    <div className="flex gap-2" role="radiogroup" aria-label="Options">
+      {options.map((opt, i) => (
         <button
           key={opt}
+          ref={(el) => (refs.current[i] = el!)}
           type="button"
+          role="radio"
+          aria-checked={value === opt}
+          aria-label={opt}
+          tabIndex={value === opt ? 0 : -1}
           className={`min-w-11 min-h-11 px-3 py-2 rounded-full border text-sm flex items-center justify-center ${
             value === opt
               ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
               : 'bg-white text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
           }`}
           onClick={() => onChange(opt)}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+              e.preventDefault();
+              refs.current[(i + 1) % options.length]?.focus();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+              e.preventDefault();
+              refs.current[(i - 1 + options.length) % options.length]?.focus();
+            } else if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              onChange(opt);
+            }
+          }}
         >
           {opt}
         </button>
@@ -164,11 +182,13 @@ export function BasicsFields({
   defaults,
   nameInputRef,
   onSaveDefault,
+  careTips,
 }: SectionProps & {
   validation?: Validation;
   defaults?: { pot: string; potMaterial: string; light: string };
   nameInputRef?: React.RefObject<HTMLInputElement>;
   onSaveDefault?: (field: 'pot' | 'potMaterial' | 'light', value: string) => void;
+  careTips?: { potMaterial?: string; light?: string };
 }) {
   const { errors, touched, validate, markTouched } = validation;
   return (
@@ -268,15 +288,8 @@ export function BasicsFields({
                 Save as new default
               </button>
             )}
-          {state.pot && (
-            <p className="hint">
-              {state.pot}{' '}
-              {state.potMaterial === 'Terracotta'
-                ? 'terracotta dries faster than plastic.'
-                : state.potMaterial === 'Plastic'
-                ? 'plastic retains moisture longer.'
-                : 'ceramic balances moisture.'}
-            </p>
+          {careTips?.potMaterial && (
+            <p className="hint">{careTips.potMaterial}</p>
           )}
         </Field>
         <Field label="Light" defaulted={defaults?.light === state.light}>
@@ -294,6 +307,7 @@ export function BasicsFields({
               Save as new default
             </button>
           )}
+          {careTips?.light && <p className="hint">{careTips.light}</p>}
         </Field>
       </div>
     </div>
@@ -304,7 +318,15 @@ export function EnvironmentFields({
   state,
   setState,
   validation = emptyValidation,
-}: SectionProps & { validation?: Validation }) {
+  locationTag,
+  onLocationEdit,
+  onUseCurrentLocation,
+}: SectionProps & {
+  validation?: Validation;
+  locationTag?: string | null;
+  onLocationEdit?: () => void;
+  onUseCurrentLocation?: () => void;
+}) {
   const { errors, touched, validate, markTouched } = validation;
   const [showMore, setShowMore] = useState(false);
   const [address, setAddress] = useState('');
@@ -322,6 +344,7 @@ export function EnvironmentFields({
         validate('lat', lat);
         validate('lon', lon);
         setGeoError(null);
+        onUseCurrentLocation?.();
       },
       (err) => {
         if (err.code === err.PERMISSION_DENIED) {
@@ -348,6 +371,7 @@ export function EnvironmentFields({
         markTouched('lon');
         validate('lat', lat);
         validate('lon', lon);
+        onLocationEdit?.();
       }
     } catch {}
   }
@@ -402,23 +426,37 @@ export function EnvironmentFields({
 
       <Field label="Location (for weather)">
         <div className="grid gap-2">
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={useCurrentLocation}
-            title="We’ll tailor watering to local weather."
-          >
-            Use current location
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={useCurrentLocation}
+              title="We’ll tailor watering to local weather."
+            >
+              Use current location
+            </button>
+            {locationTag && (
+              <span className="rounded-full border bg-white px-2 py-1 text-xs shadow-sm">
+                {locationTag}
+              </span>
+            )}
+          </div>
           {geoError && <p className="text-xs text-red-600">{geoError}</p>}
           <div className="flex gap-2">
             <input
               className="input flex-1"
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e) => {
+                setAddress(e.target.value);
+                onLocationEdit?.();
+              }}
               placeholder="Search address"
             />
-            <button type="button" className="btn-secondary" onClick={lookupAddress}>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={lookupAddress}
+            >
               Search
             </button>
           </div>
@@ -433,6 +471,7 @@ export function EnvironmentFields({
                     setState({ ...state, lat: v });
                     markTouched('lat');
                     validate('lat', v);
+                    onLocationEdit?.();
                   }}
                   onBlur={() => {
                     markTouched('lat');
@@ -457,6 +496,7 @@ export function EnvironmentFields({
                     setState({ ...state, lon: v });
                     markTouched('lon');
                     validate('lon', v);
+                    onLocationEdit?.();
                   }}
                   onBlur={() => {
                     markTouched('lon');

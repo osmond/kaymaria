@@ -17,9 +17,11 @@ import {
   plantValuesToSubmit,
   PlanSource,
 } from './PlantForm';
+import PlanSummary from './PlanSummary';
 import { plantFormSchema, plantFieldSchemas } from '@/lib/plantFormSchema';
 import type { AiCareSuggestion } from '@/lib/aiCare';
 import { fetchJson, FetchJsonError } from '@/lib/fetchJson';
+import useCareTips from './useCareTips';
 
 export function todayLocalYYYYMMDD(): string {
   const d = new Date();
@@ -53,7 +55,7 @@ export default function AddPlantModal({
     null,
   );
   const [saving, setSaving] = useState(false);
-  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [planSource, setPlanSource] = useState<PlanSource | null>(null);
   const [defaults, setDefaults] = useState<{
     pot: string;
@@ -62,6 +64,10 @@ export default function AddPlantModal({
   } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [locationTag, setLocationTag] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [recognizing, setRecognizing] = useState(false);
+  const [recognizeError, setRecognizeError] = useState<string | null>(null);
   const validationId = useId();
   const saveErrorId = useId();
   const canSubmit = values ? plantFormSchema.safeParse(values).success : false;
@@ -70,10 +76,14 @@ export default function AddPlantModal({
       plantFieldSchemas.roomId.safeParse(values.roomId).success
     : false;
 
+  const careTips = useCareTips(values);
+
   const validationMessage =
     step === 0 && !basicsValid
       ? 'Name and room are required to continue.'
       : step === 2 && !canSubmit
+      ? 'Please fill out all required fields to continue.'
+      : step === 3 && !canSubmit
       ? 'Please fill out all required fields before submitting.'
       : null;
   const submitDescribedBy = [
@@ -113,6 +123,85 @@ export default function AddPlantModal({
     prevFocus.current?.focus();
   }
 
+  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setRecognizing(true);
+    setRecognizeError(null);
+    try {
+      const form = new FormData();
+      form.append('image', file);
+      const r = await fetch('/api/species-identify', {
+        method: 'POST',
+        body: form,
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const json = await r.json();
+      const suggestion = json?.suggestions?.[0] || json;
+      const identifiedName =
+        suggestion?.plant_name || suggestion?.name || suggestion?.common_name;
+      const identifiedSpecies =
+        suggestion?.plant_details?.scientific_name ||
+        suggestion?.species ||
+        suggestion?.slug;
+      if (identifiedName) {
+        try {
+          if (identifiedSpecies) {
+            const care = await fetchJson<{
+              presets?: Partial<PlantFormValues>;
+              presetId?: string;
+              updated?: string;
+            }>(
+              `/api/species-care?species=${encodeURIComponent(identifiedSpecies)}`,
+              { retries: 2 },
+            );
+            if (care?.presets) {
+              setValues((v) => ({
+                ...(v || {}),
+                name: identifiedName,
+                species: identifiedSpecies || '',
+                ...care.presets,
+              }));
+              setPlanSource({ type: 'preset', presetId: care.presetId });
+              if (care.updated) {
+                setNotice(
+                  `Found care preset • last updated ${new Date(care.updated).toLocaleDateString()}`,
+                );
+              } else {
+                setNotice('Found care preset');
+              }
+            } else {
+              setValues((v) => ({
+                ...(v || {}),
+                name: identifiedName,
+                species: identifiedSpecies || '',
+              }));
+            }
+          } else {
+            setValues((v) => ({
+              ...(v || {}),
+              name: identifiedName,
+              species: identifiedSpecies || '',
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to load care defaults', err);
+          setValues((v) => ({
+            ...(v || {}),
+            name: identifiedName,
+            species: identifiedSpecies || '',
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Species identification failed', err);
+      setRecognizeError('Could not identify plant');
+    } finally {
+      setRecognizing(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
   useEffect(() => {
     if (!open) return;
     prevFocus.current = document.activeElement as HTMLElement | null;
@@ -122,6 +211,7 @@ export default function AddPlantModal({
       setNotice(null);
       setStep(0);
       setPlanSource({ type: 'manual' });
+      setLocationTag(null);
       let stored: any = {};
       try {
         stored = JSON.parse(localStorage.getItem('plantDefaults') || '{}');
@@ -147,6 +237,16 @@ export default function AddPlantModal({
         lastWatered: todayLocalYYYYMMDD(),
         lastFertilized: todayLocalYYYYMMDD(),
       };
+      if ('geolocation' in navigator) {
+        try {
+          const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject)
+          );
+          base.lat = pos.coords.latitude.toFixed(6);
+          base.lon = pos.coords.longitude.toFixed(6);
+          setLocationTag('Current location');
+        } catch {}
+      }
       setDefaults({
         pot: base.pot,
         potMaterial: base.potMaterial,
@@ -321,7 +421,7 @@ export default function AddPlantModal({
   }
 
   function nextStep() {
-    setStep((s) => Math.min(s + 1, 2));
+    setStep((s) => Math.min(s + 1, 3));
   }
 
   function prevStep() {
@@ -350,7 +450,7 @@ export default function AddPlantModal({
                 Add Plant
               </Dialog.Title>
               <div className="mt-4 flex gap-2">
-                {[0, 1, 2].map((n) => (
+                {[0, 1, 2, 3].map((n) => (
                   <div
                     key={n}
                     className={`h-1 flex-1 rounded ${step >= n ? 'bg-primary' : 'bg-neutral-200'}`}
@@ -378,15 +478,49 @@ export default function AddPlantModal({
                     </div>
                   )}
                   {step === 0 && (
-                    <BasicsFields
+                    <>
+                      <div className="mb-4">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          ref={fileInputRef}
+                          className="hidden"
+                          onChange={handleImageChange}
+                        />
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-2 rounded-lg bg-secondary text-secondary-foreground px-4 py-2 shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 disabled:opacity-70"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={recognizing}
+                        >
+                          {recognizing ? 'Identifying…' : 'Identify from photo'}
+                        </button>
+                        {recognizeError && (
+                          <div className="mt-2 text-sm text-red-600">
+                            {recognizeError}
+                          </div>
+                        )}
+                      </div>
+                      <BasicsFields
+                        state={values}
+                        setState={setValues}
+                        defaults={defaults || undefined}
+                        nameInputRef={firstFieldRef}
+                        onSaveDefault={saveDefault}
+                        careTips={careTips}
+                      />
+                    </>
+                  )}
+                  {step === 1 && (
+                    <EnvironmentFields
                       state={values}
                       setState={setValues}
-                      defaults={defaults || undefined}
-                      nameInputRef={firstFieldRef}
-                      onSaveDefault={saveDefault}
+                      locationTag={locationTag}
+                      onLocationEdit={() => setLocationTag(null)}
+                      onUseCurrentLocation={() => setLocationTag('Current location')}
                     />
                   )}
-                  {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
                   {step === 2 && (
                     <CarePlanFields
                       state={values}
@@ -395,6 +529,7 @@ export default function AddPlantModal({
                       onPlanModeChange={(v) => setPlanSource(v)}
                     />
                   )}
+                  {step === 3 && <PlanSummary values={values} />}
                   <div className="mt-6 flex flex-wrap gap-2 text-xs">
                     <span className="rounded-full border bg-white px-3 py-1 shadow-sm">
                       {`Water every ${values.waterEvery}d · ${values.waterAmount} ml • Fertilize every ${values.fertEvery}d`}
@@ -420,7 +555,7 @@ export default function AddPlantModal({
                     {validationMessage}
                   </div>
                 )}
-                {step === 2 && saveError && (
+                {step === 3 && saveError && (
                   <div
                     id={saveErrorId}
                     role="status"
@@ -446,18 +581,18 @@ export default function AddPlantModal({
                     Back
                   </button>
                 )}
-                {step < 2 && (
+                {step < 3 && (
                   <button
                     className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                     onClick={nextStep}
-                    disabled={step === 0 && !basicsValid}
+                    disabled={(step === 0 && !basicsValid) || (step === 2 && !canSubmit)}
                     aria-describedby={validationMessage ? validationId : undefined}
                   >
                     <ArrowRight className="h-4 w-4" />
                     Next
                   </button>
                 )}
-                {step === 2 && (
+                {step === 3 && (
                   <button
                     className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-3 min-h-11 min-w-11 shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-70 transition-colors"
                     onClick={() =>
@@ -467,13 +602,7 @@ export default function AddPlantModal({
                     aria-describedby={submitDescribedBy}
                   >
                     <Check className="h-4 w-4" />
-                    {saving
-                      ? 'Saving…'
-                      : planSource?.type === 'ai'
-                      ? 'Create with Suggested Plan'
-                      : planSource?.type === 'preset'
-                      ? 'Create with Preset Plan'
-                      : 'Create Plant (Manual)'}
+                    {saving ? 'Saving…' : 'Confirm Plan'}
                   </button>
                 )}
               </footer>

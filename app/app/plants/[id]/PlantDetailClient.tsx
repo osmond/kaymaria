@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
+ import { useEffect, useMemo, useState, useRef } from "react";
+ import { useRouter, useSearchParams } from "next/navigation";
+ import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil, MoreVertical } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
 import BottomNav from '@/components/BottomNav';
 import CareSummary from '@/components/CareSummary';
@@ -55,6 +55,8 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
   const [undoInfo, setUndoInfo] = useState<{ task: TaskDTO; eventAt: string } | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [weather, setWeather] = useState<{ temperature: number } | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const plantTasks = useMemo(() => (allTasks ?? []).filter(t => t.plantId === id), [allTasks, id]);
   const nextWater = useMemo(() => {
     const t = plantTasks
@@ -142,6 +144,16 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
     })();
     return () => { alive = false; };
   }, [id, plantState.latitude, plantState.longitude]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
 
 
 
@@ -262,6 +274,31 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               >
                 <Pencil className="h-5 w-5" />
               </button>
+              <div ref={menuRef} className="relative">
+                <button
+                  aria-label="More options"
+                  onClick={() => setMenuOpen(o => !o)}
+                  className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
+                >
+                  <MoreVertical className="h-5 w-5" />
+                </button>
+                {menuOpen && (
+                  <div className="absolute right-0 z-10 mt-1 w-28 rounded-md border border-border bg-white shadow-card py-1 text-sm">
+                    <button
+                      onClick={() => { setEditOpen(true); setMenuOpen(false); }}
+                      className="w-full text-left px-3 py-1.5 hover:bg-neutral-100"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => { setMenuOpen(false); deletePlant(); }}
+                      className="w-full text-left px-3 py-1.5 hover:bg-neutral-100 text-red-600"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -475,12 +512,6 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
           </section>
         )}
 
-        <button
-          onClick={deletePlant}
-          className="mt-4 w-full rounded-lg border border-red-200 bg-red-50 py-2 text-sm text-red-700"
-        >
-          Delete plant
-        </button>
         <div className="h-16" />
       </main>
 

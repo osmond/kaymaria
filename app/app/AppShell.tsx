@@ -25,6 +25,7 @@ import {
   Droplet,
   FlaskRound,
   Sprout,
+  Sprout as PottedPlant,
   Home,
   X,
   Filter as FilterIcon,
