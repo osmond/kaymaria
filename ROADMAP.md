@@ -8,7 +8,7 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
 
 ## Phase 0 – Foundation
 
-- [ ] Supabase Auth setup ([#90](https://github.com/osmond/kaymaria/issues/90))
+ - [x] Supabase Auth setup ([#90](https://github.com/osmond/kaymaria/issues/90))
 - [x] Real-time data sync across devices
 - [x] Backend persistence for plant data
 - [x] End-to-end test suite
