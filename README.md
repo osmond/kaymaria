@@ -6,7 +6,7 @@ All pages should follow the [style guide](./docs/style-guide.md) to ensure a con
 
 The Add Plant form uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Form fields include validation for required entries and numeric values. Submitting the form now persists the plant to the backend and pre-creates care tasks.
 
-The Plant detail page shows a skeleton screen while loading, includes a back link to the Plants list for smoother navigation, and now displays its hero photo with a consistent aspect ratio for a more polished layout.
+The Plant detail page shows a skeleton screen while loading, includes a back link to the Plants list for smoother navigation, and now displays its hero photo with a consistent aspect ratio for a more polished layout. Basic smoke tests verify the page renders successfully.
 
 ## Quick Start
 Kay Maria is intended to run in single-user mode by default.
