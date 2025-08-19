@@ -482,7 +482,7 @@ export default function AddPlantModal({
                   />
                 ))}
               </div>
-              <div className="mt-2 flex justify-between text-xs text-neutral-600">
+              <div className="mt-1 flex justify-between text-sm text-neutral-700 dark:text-neutral-300">
                 {stepTitles.map((title, n) => (
                   <span
                     key={title}
