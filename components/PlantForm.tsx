@@ -194,7 +194,7 @@ export function BasicsFields({
 }) {
   const { errors, touched, validate, markTouched } = validation;
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-0 space-y-6">
       <Field
         label="Name"
         message={
@@ -379,7 +379,7 @@ export function EnvironmentFields({
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-0 space-y-6">
       <Field label="Environment">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <select
@@ -693,7 +693,7 @@ export function CarePlanFields({
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-0 space-y-6">
       {showSuggest && (
         <div className="rounded-2xl border p-3 bg-neutral-50">
           <div className="text-sm font-medium mb-2">
