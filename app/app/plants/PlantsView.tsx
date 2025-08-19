@@ -3,6 +3,7 @@ import Link from "next/link";
 import Fab from "@/components/Fab";
 import { useRouter } from "next/navigation";
 import usePlants from "./usePlants";
+import PlantsSkeleton from "./PlantsSkeleton";
 
 export default function PlantsView() {
   const { plants: items, error: err, isLoading } = usePlants();
@@ -32,9 +33,7 @@ export default function PlantsView() {
             </div>
           )}
 
-          {isLoading && !items && (
-            <div className="text-sm text-neutral-500">Loading…</div>
-          )}
+          {isLoading && !items && <PlantsSkeleton />}
 
           {sortedItems && (
             <div className="grid grid-cols-2 gap-3">
