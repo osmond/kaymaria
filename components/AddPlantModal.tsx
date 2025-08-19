@@ -349,13 +349,18 @@ export default function AddPlantModal({
               >
                 Add Plant
               </Dialog.Title>
-              <div className="mt-4 flex gap-2">
-                {[0, 1, 2].map((n) => (
-                  <div
-                    key={n}
-                    className={`h-1 flex-1 rounded ${step >= n ? 'bg-primary' : 'bg-neutral-200'}`}
-                  />
-                ))}
+              <div className="mt-4">
+                <p className="text-sm text-neutral-600" aria-live="polite">
+                  {`Step ${step + 1} of 3: ${['Basics', 'Environment', 'Care plan'][step]}`}
+                </p>
+                <div className="mt-2 flex gap-2" aria-hidden="true">
+                  {[0, 1, 2].map((n) => (
+                    <div
+                      key={n}
+                      className={`h-1 flex-1 rounded ${step >= n ? 'bg-primary' : 'bg-neutral-200'}`}
+                    />
+                  ))}
+                </div>
               </div>
             </header>
             <div className="flex-1 overflow-y-auto p-6">
