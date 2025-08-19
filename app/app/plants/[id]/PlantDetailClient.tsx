@@ -274,12 +274,12 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
   return (
     <div className="min-h-[100dvh] bg-background text-foreground flex flex-col">
       {/* Header */}
-      <header className="px-4 pt-6 pb-2 sticky top-0 bg-white/90 backdrop-blur border-b border-border">
+      <header className="px-4 pt-6 pb-2 sticky top-0 bg-background/90 backdrop-blur border-b border-border">
         <div className="flex items-center gap-2">
           <Link
             href="/app/plants"
             aria-label="Back to plants"
-            className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
+            className="h-9 w-9 rounded-lg grid place-items-center hover:bg-secondary"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -292,7 +292,10 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               <Link
                 href={`/app/plants/${id}/edit`}
                 aria-label="Edit plant"
-                className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
+
+                onClick={() => setEditOpen(true)}
+            className="h-9 w-9 rounded-lg grid place-items-center hover:bg-secondary"
+
               >
                 <Pencil className="h-5 w-5" />
               </Link>
@@ -300,22 +303,25 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
                 <button
                   aria-label="More options"
                   onClick={() => setMenuOpen(o => !o)}
-                  className="h-9 w-9 rounded-lg grid place-items-center hover:bg-neutral-100"
+                  className="h-9 w-9 rounded-lg grid place-items-center hover:bg-secondary"
                 >
                   <MoreVertical className="h-5 w-5" />
                 </button>
                 {menuOpen && (
                   <div className="absolute right-0 z-10 mt-1 w-28 rounded-md border border-border bg-white shadow-card py-1 text-sm">
-                    <Link
-                      href={`/app/plants/${id}/edit`}
-                      onClick={() => setMenuOpen(false)}
-                      className="block w-full text-left px-3 py-1.5 hover:bg-neutral-100"
+
+                    <button
+                      onClick={() => {
+                        setEditOpen(true);
+                        setMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 hover:bg-secondary"
                     >
                       Edit
-                    </Link>
+                    </button>
                     <button
                       onClick={() => { setMenuOpen(false); deletePlant(); }}
-                      className="w-full text-left px-3 py-1.5 hover:bg-neutral-100 text-destructive"
+                      className="w-full text-left px-3 py-1.5 hover:bg-secondary text-destructive"
                     >
                       Delete
                     </button>
@@ -341,7 +347,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
           </CardContent>
         </Card>
           {careTips.length > 0 && (
-            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+            <div className="mt-4 rounded-lg border border-warning/20 bg-warning/10 p-3 text-sm text-warning">
               {careTips.map((t, i) => (
                 <div key={i}>{t}</div>
               ))}
@@ -425,11 +431,14 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               <CardDescription>Upcoming &amp; recent care</CardDescription>
             </CardHeader>
             {undoInfo && (
+
               <div className="px-4 md:px-6 py-2 text-xs bg-green-50 text-green-800 flex justify-between">
+
                 <span>Task completed.</span>
                 <button onClick={undoTimeline} className="underline">Undo</button>
               </div>
             )}
+
             <CardContent className="pt-2">
               <ul className="text-sm">
                 {allTasks === null && !err && (
@@ -460,6 +469,7 @@ export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtra
               </ul>
             </CardContent>
           </Card>
+
         )}
 
         {tab === "notes" && (
