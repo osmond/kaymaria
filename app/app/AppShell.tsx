@@ -647,10 +647,9 @@ export function SettingsView() {
               </Button>
               <Button variant="default" size="sm">
                 Import
-
-              </button>
-            </div>
-          </div>
+              </Button>
+            </CardContent>
+          </Card>
           <div className="rounded-xl border bg-white shadow-sm p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
             <div className="text-base font-medium">Theme</div>
             <ThemeToggle />
@@ -661,17 +660,6 @@ export function SettingsView() {
           >
             Sign out
           </button>
-
-              </Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center justify-between">
-              <div className="text-base font-medium">Theme</div>
-              <ThemeToggle />
-            </CardContent>
-          </Card>
-
         </section>
       </main>
     </div>
