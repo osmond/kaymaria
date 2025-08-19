@@ -73,6 +73,28 @@ export default function AddPlantModal({
     potMaterial: string;
     light: string;
   } | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  function saveDefault(
+    field: 'pot' | 'potMaterial' | 'light',
+    value: string,
+  ) {
+    setDefaults((d) => ({ ...(d || {}), [field]: value }));
+    try {
+      const stored = JSON.parse(localStorage.getItem('plantDefaults') || '{}');
+      localStorage.setItem(
+        'plantDefaults',
+        JSON.stringify({ ...stored, [field]: value }),
+      );
+    } catch {}
+    setToast('Defaults saved.');
+  }
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   function close() {
     onOpenChange(false);
@@ -289,93 +311,101 @@ export default function AddPlantModal({
   if (!open) return null;
 
   return (
-    <Dialog
-      open={open}
-      onClose={close}
-      className="relative z-50"
-      initialFocus={firstFieldRef}
-      aria-labelledby={titleId}
-    >
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-      <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-white rounded-none sm:rounded-2xl shadow-xl overflow-y-auto sm:max-h-[90vh]">
-          <div className="p-5 border-b">
-            <Dialog.Title
-              id={titleId}
-              className="text-lg font-display font-semibold"
-            >
-              Add Plant
-            </Dialog.Title>
-          </div>
-          {loading && (
-            <div className="p-5 space-y-4 animate-pulse">
-              <div className="h-6 bg-neutral-200 rounded" />
-              <div className="h-6 bg-neutral-200 rounded" />
-              <div className="h-6 bg-neutral-200 rounded" />
+    <>
+      <Dialog
+        open={open}
+        onClose={close}
+        className="relative z-50"
+        initialFocus={firstFieldRef}
+        aria-labelledby={titleId}
+      >
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <Dialog.Panel className="relative w-full h-full sm:h-auto sm:max-w-lg bg-white rounded-none sm:rounded-2xl shadow-xl overflow-y-auto sm:max-h-[90vh]">
+            <div className="p-5 border-b">
+              <Dialog.Title
+                id={titleId}
+                className="text-lg font-display font-semibold"
+              >
+                Add Plant
+              </Dialog.Title>
             </div>
-          )}
-          {!loading && values && (
-            <>
-              {notice && (
-                <div className="p-5 text-sm text-gray-600">{notice}</div>
-              )}
-              {step === 0 && (
-                <BasicsFields
-                  state={values}
-                  setState={setValues}
-                  defaults={defaults || undefined}
-                  nameInputRef={firstFieldRef}
-                />
-              )}
-              {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
-              {step === 2 && (
-                <CarePlanFields
-                  state={values}
-                  setState={setValues}
-                  initialSuggest={initialSuggest}
-                  onPlanModeChange={setPlanSource}
-                />
-              )}
-              <div className="p-5 border-t flex gap-2 justify-end items-center">
-                {saveError && step === 2 && (
-                  <div className="text-xs text-red-600 mr-auto">{saveError}</div>
-                )}
-                <button className="btn-secondary" onClick={close}>
-                  Cancel
-                </button>
-                {step > 0 && (
-                  <button className="btn-secondary" onClick={prevStep}>
-                    Back
-                  </button>
-                )}
-                {step < 2 && (
-                  <button className="btn" onClick={nextStep}>
-                    Next
-                  </button>
-                )}
-                {step === 2 && (
-                  <button
-                    className="btn"
-                    onClick={() =>
-                      submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual')
-                    }
-                    disabled={saving || !values.name.trim()}
-                  >
-                    {saving
-                      ? 'Saving…'
-                      : saveError
-                      ? 'Retry'
-                      : planSource && planSource.type !== 'manual'
-                      ? 'Create with Suggested Plan'
-                      : 'Create Plant (Manual)'}
-                  </button>
-                )}
+            {loading && (
+              <div className="p-5 space-y-4 animate-pulse">
+                <div className="h-6 bg-neutral-200 rounded" />
+                <div className="h-6 bg-neutral-200 rounded" />
+                <div className="h-6 bg-neutral-200 rounded" />
               </div>
-              <FormStyles />
-            </>
-          )}
-        </Dialog.Panel>
-      </div>
-    </Dialog>
+            )}
+            {!loading && values && (
+              <>
+                {notice && (
+                  <div className="p-5 text-sm text-gray-600">{notice}</div>
+                )}
+                {step === 0 && (
+                  <BasicsFields
+                    state={values}
+                    setState={setValues}
+                    defaults={defaults || undefined}
+                    nameInputRef={firstFieldRef}
+                    onSaveDefault={saveDefault}
+                  />
+                )}
+                {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
+                {step === 2 && (
+                  <CarePlanFields
+                    state={values}
+                    setState={setValues}
+                    initialSuggest={initialSuggest}
+                    onPlanModeChange={setPlanSource}
+                  />
+                )}
+                <div className="p-5 border-t flex gap-2 justify-end items-center">
+                  {saveError && step === 2 && (
+                    <div className="text-xs text-red-600 mr-auto">{saveError}</div>
+                  )}
+                  <button className="btn-secondary" onClick={close}>
+                    Cancel
+                  </button>
+                  {step > 0 && (
+                    <button className="btn-secondary" onClick={prevStep}>
+                      Back
+                    </button>
+                  )}
+                  {step < 2 && (
+                    <button className="btn" onClick={nextStep}>
+                      Next
+                    </button>
+                  )}
+                  {step === 2 && (
+                    <button
+                      className="btn"
+                      onClick={() =>
+                        submitCurrent(planSource?.type === 'ai' ? 'ai' : 'manual')
+                      }
+                      disabled={saving || !values.name.trim()}
+                    >
+                      {saving
+                        ? 'Saving…'
+                        : saveError
+                        ? 'Retry'
+                        : planSource && planSource.type !== 'manual'
+                        ? 'Create with Suggested Plan'
+                        : 'Create Plant (Manual)'}
+                    </button>
+                  )}
+                </div>
+                <FormStyles />
+              </>
+            )}
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+      {toast && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-sm px-4 py-2 rounded-full shadow-lg">
+          {toast}
+        </div>
+      )}
+    </>
   );
 }
