@@ -69,6 +69,7 @@ export default function AddPlantModal({
     ? plantFieldSchemas.name.safeParse(values.name).success &&
       plantFieldSchemas.roomId.safeParse(values.roomId).success
     : false;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validationMessage =
     step === 0 && !basicsValid
@@ -229,6 +230,60 @@ export default function AddPlantModal({
     return () => controller.abort();
   }, [open, prefillName, defaultRoomId]);
 
+  async function identifyPhoto(file: File) {
+    if (!values) return;
+    setNotice('Identifying species…');
+    try {
+      const form = new FormData();
+      form.append('image', file);
+      const res = await fetch('/api/species-identify', {
+        method: 'POST',
+        body: form,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data: { name?: string; species?: string } = await res.json();
+      if (data?.species) {
+        const species = data.species;
+        const name = data.name || species;
+        setValues((v) =>
+          v ? { ...v, name, species } : v,
+        );
+        try {
+          const json = await fetchJson<{
+            presets?: Partial<PlantFormValues>;
+            presetId?: string;
+            updated?: string;
+          }>(`/api/species-care?species=${encodeURIComponent(species)}`, {
+            retries: 2,
+          });
+          if (json?.presets) {
+            setValues((v) =>
+              v ? { ...v, ...json.presets, name, species } : v,
+            );
+            setPlanSource({ type: 'preset', presetId: json.presetId });
+            if (json.updated) {
+              setNotice(
+                `Found care preset • last updated ${new Date(json.updated).toLocaleDateString()}`,
+              );
+            } else {
+              setNotice('Found care preset');
+            }
+          } else {
+            setNotice('Species identified');
+          }
+        } catch (e) {
+          console.error('Failed to load care defaults', e);
+          setNotice('Species identified');
+        }
+      } else {
+        setNotice('No match found');
+      }
+    } catch (e) {
+      console.error('identifyPhoto failed', e);
+      setNotice('Could not identify species');
+    }
+  }
+
   async function handleSubmit(
     data: PlantFormSubmit,
     source: 'ai' | 'manual' = 'manual',
@@ -378,13 +433,32 @@ export default function AddPlantModal({
                     </div>
                   )}
                   {step === 0 && (
-                    <BasicsFields
-                      state={values}
-                      setState={setValues}
-                      defaults={defaults || undefined}
-                      nameInputRef={firstFieldRef}
-                      onSaveDefault={saveDefault}
-                    />
+                    <>
+                      <BasicsFields
+                        state={values}
+                        setState={setValues}
+                        defaults={defaults || undefined}
+                        nameInputRef={firstFieldRef}
+                        onSaveDefault={saveDefault}
+                      />
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium mb-1">
+                          Identify from photo
+                        </label>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) identifyPhoto(file);
+                            e.target.value = '';
+                          }}
+                          className="block w-full text-sm"
+                        />
+                      </div>
+                    </>
                   )}
                   {step === 1 && <EnvironmentFields state={values} setState={setValues} />}
                   {step === 2 && (
