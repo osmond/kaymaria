@@ -7,6 +7,7 @@ import { ArrowLeft, Droplet, FlaskConical, Sprout, Pencil } from "lucide-react";
 import EditPlantModal from '@/components/EditPlantModal';
 import BottomNav from '@/components/BottomNav';
 import CareSummary from '@/components/CareSummary';
+import type { Plant } from '@prisma/client';
 
 type CareType = "water" | "fertilize" | "repot";
 type TaskDTO = {
@@ -21,11 +22,7 @@ type TaskDTO = {
 
 type Note = { id: string; note: string; createdAt: string };
 
-export default function PlantDetailClient({ plant }: { plant: {
-  id: string;
-  name: string;
-  species?: string;
-  roomId?: string;
+type PlantExtras = {
   photos?: string[];
   acquiredAt?: string;
   nextWater?: string;
@@ -35,17 +32,11 @@ export default function PlantDetailClient({ plant }: { plant: {
   fertilizeIntervalDays?: number;
   fertilizeFormula?: string;
   light?: string;
-  lightLevel?: string;
   humidity?: string;
-  potSize?: string;
-  potMaterial?: string;
-  soilType?: string;
-  drainage?: 'poor' | 'ok' | 'great';
-  indoor?: boolean;
-  latitude?: number;
-  longitude?: number;
-} }) {
-  const [plantState, setPlantState] = useState(plant);
+};
+
+export default function PlantDetailClient({ plant }: { plant: Plant & PlantExtras }) {
+  const [plantState, setPlantState] = useState<Plant & PlantExtras>(plant);
   const id = plantState.id;
   const router = useRouter();
   const searchParams = useSearchParams();

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Dialog } from '@headlessui/react';
 import PlantForm, { PlantFormSubmit } from './PlantForm';
+import type { Plant } from '@prisma/client';
 
 export default function EditPlantModal({
   open,
@@ -12,8 +13,8 @@ export default function EditPlantModal({
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  plant: any;
-  onUpdated: (p: any) => void;
+  plant: Plant;
+  onUpdated: (p: Plant) => void;
 }) {
   function close() {
     onOpenChange(false);
