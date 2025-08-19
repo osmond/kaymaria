@@ -23,6 +23,7 @@ export type PlantFormValues = {
   indoor: 'Indoor' | 'Outdoor';
   drainage: 'poor' | 'ok' | 'great';
   soil: string;
+  humidity: string;
   lat?: string;
   lon?: string;
   waterEvery: string;
@@ -349,14 +350,24 @@ export function EnvironmentFields({
         </div>
       </Field>
       {showMore && (
-        <Field label="Soil type">
-          <input
-            className="input"
-            value={state.soil}
-            onChange={(e) => setState({ ...state, soil: e.target.value })}
-            placeholder="e.g., cactus mix"
-          />
-        </Field>
+        <>
+          <Field label="Soil type">
+            <input
+              className="input"
+              value={state.soil}
+              onChange={(e) => setState({ ...state, soil: e.target.value })}
+              placeholder="e.g., cactus mix"
+            />
+          </Field>
+          <Field label="Humidity (%)">
+            <Stepper
+              value={state.humidity}
+              onChange={(v) => setState({ ...state, humidity: v })}
+              min={0}
+              step={5}
+            />
+          </Field>
+        </>
       )}
 
       <Field label="Location (for weather)">
@@ -522,6 +533,11 @@ export function CarePlanFields({
           species: state.species,
           potSize: state.pot,
           potMaterial: state.potMaterial,
+          light: state.light,
+          indoor: state.indoor === 'Indoor',
+          drainage: state.drainage,
+          soil: state.soil,
+          humidity: Number(state.humidity),
         };
         if (state.lat && state.lon) {
           body.lat = Number(state.lat);
@@ -556,7 +572,20 @@ export function CarePlanFields({
       }
     }
     if (showSuggest) fetchSuggest();
-  }, [state.species, state.pot, state.potMaterial, state.lat, state.lon, setState, showSuggest]);
+  }, [
+    state.species,
+    state.pot,
+    state.potMaterial,
+    state.light,
+    state.indoor,
+    state.drainage,
+    state.soil,
+    state.humidity,
+    state.lat,
+    state.lon,
+    setState,
+    showSuggest,
+  ]);
 
   useEffect(() => {
     onSuggestChange?.(suggest);

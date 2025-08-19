@@ -122,6 +122,7 @@ export default function AddPlantModal({
         indoor: 'Indoor',
         drainage: 'ok',
         soil: stored.soil || 'Well-draining mix',
+        humidity: stored.humidity || '50',
         lat: '',
         lon: '',
         waterEvery: '7',
@@ -163,6 +164,11 @@ export default function AddPlantModal({
               species: base.species,
               potSize: base.pot,
               potMaterial: base.potMaterial,
+              light: base.light,
+              indoor: base.indoor === 'Indoor',
+              drainage: base.drainage,
+              soil: base.soil,
+              humidity: Number(base.humidity),
             };
             if (base.lat && base.lon) {
               aiBody.lat = Number(base.lat);
@@ -262,6 +268,7 @@ export default function AddPlantModal({
             potMaterial: current.potMaterial,
             light: current.light,
             soil: current.soil,
+            humidity: current.humidity,
             fertFormula: current.fertFormula,
           }),
         );
