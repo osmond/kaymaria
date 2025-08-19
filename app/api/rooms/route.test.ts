@@ -77,6 +77,6 @@ describe('GET/POST /api/rooms', () => {
     expect(res.status).toBe(500);
     const json = await res.json();
     expect(json).toEqual({ error: 'misconfigured server' });
-    expect(createRouteHandlerClient).not.toHaveBeenCalled();
+    expect(createRouteHandlerClient).toHaveBeenCalled();
   });
 });

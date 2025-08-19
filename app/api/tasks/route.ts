@@ -1,25 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@/lib/supabase";
+import { getUserId } from "@/lib/getUserId";
 
 export async function GET(req: NextRequest) {
   const supabase = await createRouteHandlerClient();
-  const singleUser = process.env.SINGLE_USER_MODE === "true";
-  let userId: string | undefined;
-  if (singleUser) {
-    userId = process.env.SINGLE_USER_ID;
-    if (!userId) {
-      console.error("SINGLE_USER_MODE enabled but SINGLE_USER_ID not set");
-      return NextResponse.json({ error: "server" }, { status: 500 });
-    }
-  } else {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError || !user)
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    userId = user.id;
-  }
+  const { userId, error: userIdError } = await getUserId(supabase);
+  if (userIdError === "unauthorized")
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (userIdError)
+    return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
 
   const url = new URL(req.url);
   const win = url.searchParams.get("window") || "7d";
@@ -54,23 +43,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const supabase = await createRouteHandlerClient();
-  const singleUser = process.env.SINGLE_USER_MODE === "true";
-  let userId: string | undefined;
-  if (singleUser) {
-    userId = process.env.SINGLE_USER_ID;
-    if (!userId) {
-      console.error("SINGLE_USER_MODE enabled but SINGLE_USER_ID not set");
-      return NextResponse.json({ error: "server" }, { status: 500 });
-    }
-  } else {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError || !user)
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    userId = user.id;
-  }
+  const { userId, error: userIdError } = await getUserId(supabase);
+  if (userIdError === "unauthorized")
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (userIdError)
+    return NextResponse.json({ error: "misconfigured server" }, { status: 500 });
 
   const body = await req.json().catch(() => ({}));
   const action = String(body.action || "Water").toLowerCase();

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listPlants, createPlant } from "@/lib/prisma/plants";
 import { createRouteHandlerClient } from "@/lib/supabase";
+import { getUserId } from "@/lib/getUserId";
 
 export async function GET() {
   try {
@@ -22,12 +23,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const singleUser = process.env.SINGLE_USER_MODE === "true";
     if (
       !process.env.DATABASE_URL ||
       !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-      (singleUser && !process.env.SINGLE_USER_ID)
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     ) {
       console.error("Missing Supabase or database environment variables");
       return NextResponse.json(
@@ -37,18 +36,14 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = await createRouteHandlerClient();
-    let userId: string | undefined;
-    if (singleUser) {
-      userId = process.env.SINGLE_USER_ID!;
-    } else {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (userError || !user)
-        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-      userId = user.id;
-    }
+    const { userId, error } = await getUserId(supabase);
+    if (error === "unauthorized")
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    if (error)
+      return NextResponse.json(
+        { error: "misconfigured server" },
+        { status: 500 }
+      );
 
     const body = await req.json().catch(() => ({}));
     const plant = await createPlant(userId!, body);
