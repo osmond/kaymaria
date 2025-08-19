@@ -20,16 +20,16 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
 
 ### 🪴 Plant Management
 
-- [ ] Add Plant Form Polish
+- [x] Add Plant Form Polish
   - [x] UI styling
   - [x] Validation
   - [x] Persistence
   - [x] Smoke tests
 
-- [ ] Revisit New Plant Page (`/app/plants/new`)
-  - [ ] Full UI/UX alignment with style guide
-  - [ ] Responsive layout check
-  - [ ] Accessibility audit
+- [x] Revisit New Plant Page (`/app/plants/new`)
+  - [x] Full UI/UX alignment with style guide
+  - [x] Responsive layout check
+  - [x] Accessibility audit
 
 - [ ] Plant Detail Page
   - [ ] UI styling
