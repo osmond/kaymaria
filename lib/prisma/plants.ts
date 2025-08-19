@@ -15,6 +15,8 @@ type PlantData = {
   presetId?: string | null;
   aiModel?: string | null;
   aiVersion?: string | null;
+  lastWateredAt?: string | null;
+  lastFertilizedAt?: string | null;
 };
 
 export async function listPlants(): Promise<Plant[]> {
@@ -41,6 +43,10 @@ export async function createPlant(userId: string, data: PlantData): Promise<Plan
       presetId: data.presetId ?? undefined,
       aiModel: data.aiModel ?? undefined,
       aiVersion: data.aiVersion ?? undefined,
+      lastWateredAt: data.lastWateredAt ? new Date(data.lastWateredAt) : undefined,
+      lastFertilizedAt: data.lastFertilizedAt
+        ? new Date(data.lastFertilizedAt)
+        : undefined,
     },
   });
 }
@@ -62,6 +68,10 @@ export async function updatePlant(id: string, data: PlantData): Promise<Plant | 
       presetId: data.presetId ?? undefined,
       aiModel: data.aiModel ?? undefined,
       aiVersion: data.aiVersion ?? undefined,
+      lastWateredAt: data.lastWateredAt ? new Date(data.lastWateredAt) : undefined,
+      lastFertilizedAt: data.lastFertilizedAt
+        ? new Date(data.lastFertilizedAt)
+        : undefined,
     },
   });
   } catch (e: any) {

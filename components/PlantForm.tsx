@@ -30,6 +30,8 @@ export type PlantFormValues = {
   waterAmount: string;
   fertEvery: string;
   fertFormula: string;
+  lastWatered: string;
+  lastFertilized: string;
 };
 
 export type PlantFormSubmit = {
@@ -44,7 +46,14 @@ export type PlantFormSubmit = {
   drainage: 'poor' | 'ok' | 'great';
   lat?: number;
   lon?: number;
-  rules: { type: 'water' | 'fertilize'; intervalDays: number; amountMl?: number; formula?: string }[];
+  lastWateredAt?: string;
+  lastFertilizedAt?: string;
+  rules: {
+    type: 'water' | 'fertilize';
+    intervalDays: number;
+    amountMl?: number;
+    formula?: string;
+  }[];
 };
 
 export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
@@ -71,6 +80,12 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
       },
     ],
   };
+  if (s.lastWatered) {
+    base.lastWateredAt = new Date(s.lastWatered).toISOString();
+  }
+  if (s.lastFertilized) {
+    base.lastFertilizedAt = new Date(s.lastFertilized).toISOString();
+  }
   if (s.lat && s.lon && !isNaN(Number(s.lat)) && !isNaN(Number(s.lon))) {
     base.lat = Number(s.lat);
     base.lon = Number(s.lon);
@@ -89,6 +104,8 @@ type FieldName =
   | 'waterEvery'
   | 'waterAmount'
   | 'fertEvery'
+  | 'lastWatered'
+  | 'lastFertilized'
   | 'lat'
   | 'lon';
 
@@ -490,12 +507,18 @@ export function CarePlanFields({
 
   const fmtDate = (d: Date) =>
     new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(d);
-  const nextWater = Number(state.waterEvery) > 0
-    ? new Date(Date.now() + Number(state.waterEvery) * 864e5)
+  const lastWateredDate = state.lastWatered ? new Date(state.lastWatered) : null;
+  const lastFertilizedDate = state.lastFertilized
+    ? new Date(state.lastFertilized)
     : null;
-  const nextFertilize = Number(state.fertEvery) > 0
-    ? new Date(Date.now() + Number(state.fertEvery) * 864e5)
-    : null;
+  const nextWater =
+    lastWateredDate && Number(state.waterEvery) > 0
+      ? new Date(lastWateredDate.getTime() + Number(state.waterEvery) * 864e5)
+      : null;
+  const nextFertilize =
+    lastFertilizedDate && Number(state.fertEvery) > 0
+      ? new Date(lastFertilizedDate.getTime() + Number(state.fertEvery) * 864e5)
+      : null;
 
   useEffect(() => {
     if (!initialSuggest) return;
@@ -696,7 +719,27 @@ export function CarePlanFields({
         </Field>
       </div>
 
-      <div className={`grid gap-3 ${showMore ? 'grid-cols-2' : 'grid-cols-1'}`}
+      <Field label="Last watered">
+        <input
+          type="date"
+          className="input"
+          value={state.lastWatered}
+          onChange={(e) => {
+            setState({ ...state, lastWatered: e.target.value });
+            markTouched('lastWatered');
+            validate('lastWatered', e.target.value);
+          }}
+        />
+        {touched.lastWatered && (
+          errors.lastWatered ? (
+            <span className="text-xs text-red-600">{errors.lastWatered}</span>
+          ) : (
+            <span className="text-xs text-green-600">Looks good!</span>
+          )
+        )}
+      </Field>
+
+      <div className={`grid gap-3 ${showMore ? 'grid-cols-3' : 'grid-cols-2'}`}
       >
         <Field label="Fertilize every (days)">
           <Stepper
@@ -718,6 +761,25 @@ export function CarePlanFields({
           <p className="hint">Use arrows or type a number.</p>
           {nextFertilize && (
             <p className="hint">Next fertilizing: {fmtDate(nextFertilize)}</p>
+          )}
+        </Field>
+        <Field label="Last fertilized">
+          <input
+            type="date"
+            className="input"
+            value={state.lastFertilized}
+            onChange={(e) => {
+              setState({ ...state, lastFertilized: e.target.value });
+              markTouched('lastFertilized');
+              validate('lastFertilized', e.target.value);
+            }}
+          />
+          {touched.lastFertilized && (
+            errors.lastFertilized ? (
+              <span className="text-xs text-red-600">{errors.lastFertilized}</span>
+            ) : (
+              <span className="text-xs text-green-600">Looks good!</span>
+            )
           )}
         </Field>
         {showMore && (
