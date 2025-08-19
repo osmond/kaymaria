@@ -9,12 +9,16 @@ type PlantData = {
   potSize?: string | null;
   potMaterial?: string | null;
   soilType?: string | null;
+  lightLevel?: string | null;
+  indoor?: boolean | null;
+  drainage?: 'poor' | 'ok' | 'great' | null;
   lat?: number | null;
   lon?: number | null;
   carePlanSource?: string | null;
   presetId?: string | null;
   aiModel?: string | null;
   aiVersion?: string | null;
+  carePlan?: Prisma.JsonValue | null;
   lastWateredAt?: string | null;
   lastFertilizedAt?: string | null;
 };
@@ -37,9 +41,13 @@ export async function createPlant(userId: string, data: PlantData): Promise<Plan
       potSize: data.potSize,
       potMaterial: data.potMaterial,
       soilType: data.soilType,
+      lightLevel: data.lightLevel,
+      indoor: data.indoor ?? undefined,
+      drainage: data.drainage,
       latitude: data.lat ?? undefined,
       longitude: data.lon ?? undefined,
       carePlanSource: data.carePlanSource ?? undefined,
+      carePlan: data.carePlan ?? undefined,
       presetId: data.presetId ?? undefined,
       aiModel: data.aiModel ?? undefined,
       aiVersion: data.aiVersion ?? undefined,
@@ -61,18 +69,22 @@ export async function updatePlant(id: string, data: PlantData): Promise<Plant | 
         species: data.species,
         potSize: data.potSize,
         potMaterial: data.potMaterial,
-      soilType: data.soilType,
-      latitude: data.lat ?? undefined,
-      longitude: data.lon ?? undefined,
-      carePlanSource: data.carePlanSource ?? undefined,
-      presetId: data.presetId ?? undefined,
-      aiModel: data.aiModel ?? undefined,
-      aiVersion: data.aiVersion ?? undefined,
-      lastWateredAt: data.lastWateredAt ? new Date(data.lastWateredAt) : undefined,
-      lastFertilizedAt: data.lastFertilizedAt
-        ? new Date(data.lastFertilizedAt)
-        : undefined,
-    },
+        soilType: data.soilType,
+        lightLevel: data.lightLevel,
+        indoor: data.indoor ?? undefined,
+        drainage: data.drainage,
+        latitude: data.lat ?? undefined,
+        longitude: data.lon ?? undefined,
+        carePlanSource: data.carePlanSource ?? undefined,
+        carePlan: data.carePlan ?? undefined,
+        presetId: data.presetId ?? undefined,
+        aiModel: data.aiModel ?? undefined,
+        aiVersion: data.aiVersion ?? undefined,
+        lastWateredAt: data.lastWateredAt ? new Date(data.lastWateredAt) : undefined,
+        lastFertilizedAt: data.lastFertilizedAt
+          ? new Date(data.lastFertilizedAt)
+          : undefined,
+      },
   });
   } catch (e: any) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025") {
