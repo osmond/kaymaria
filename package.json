@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "db:migrate": "prisma migrate dev",
+    "db:sync": "prisma db pull && prisma generate",
     "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
     "test": "jest"
   },
   "dependencies": {
@@ -36,8 +37,5 @@
     "tailwindcss": "^3.4.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.0"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }

@@ -18,27 +18,24 @@ This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion
    - `SINGLE_USER_MODE` and `SINGLE_USER_ID` for skipping Supabase auth
 3. Sync Prisma schema and client
    ```bash
-   npx prisma db pull
-   npx prisma generate
+   npm run db:sync
    ```
-   These commands keep the Prisma schema and generated client up to date.
-4. Prepare the database and start the app
+   This pulls the latest schema from Supabase and regenerates the Prisma client.
+4. Start the app
    ```bash
-   npm run db:migrate
    npm run dev
    # open http://localhost:3000/app
    ```
-   The `npm run db:seed` script only clears the `task` and `plant` tables and doesn’t insert mock data. Migrations already create empty tables, so run this script only if you need to wipe existing data.
+   The `npm run db:seed` script only clears the `task` and `plant` tables and doesn’t insert mock data. Run it only if you need to wipe existing data.
 
 ## Common Scripts
 | command | description |
 |---|---|
 | `npm run dev` | start development server |
 | `npm run build` | create production build |
-| `npm run db:migrate` | run Prisma migrations |
+| `npm run db:sync` | sync schema from DB and generate Prisma client |
 | `npm run db:seed` | clear `task` and `plant` tables |
-| `npx prisma db pull` | sync schema from DB |
-| `npx prisma generate` | generate Prisma client |
+| `npm run db:studio` | open Prisma Studio |
 
 ## Testing
 - Unit tests: `npm test`
