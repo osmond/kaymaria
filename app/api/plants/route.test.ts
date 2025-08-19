@@ -22,13 +22,27 @@ describe('GET/POST /api/plants', () => {
   });
 
   it('returns plants', async () => {
-    const plants = [{ id: 'p1', name: 'Fiddle' }];
+    const plants = [
+      {
+        id: 'p1',
+        name: 'Fiddle',
+        lastWateredAt: new Date('2024-01-01T00:00:00.000Z'),
+        lastFertilizedAt: new Date('2024-01-02T00:00:00.000Z'),
+      },
+    ];
     (listPlants as jest.Mock).mockResolvedValue(plants);
 
     const res = await GET();
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toEqual(plants);
+    expect(json).toEqual([
+      {
+        id: 'p1',
+        name: 'Fiddle',
+        lastWateredAt: '2024-01-01T00:00:00.000Z',
+        lastFertilizedAt: '2024-01-02T00:00:00.000Z',
+      },
+    ]);
     expect(listPlants).toHaveBeenCalled();
   });
 
@@ -83,7 +97,12 @@ describe('GET/POST /api/plants', () => {
   });
 
   it('passes last care dates when provided', async () => {
-    const newPlant = { id: 'p_new', name: 'New Plant' };
+    const newPlant = {
+      id: 'p_new',
+      name: 'New Plant',
+      lastWateredAt: new Date('2024-01-01T00:00:00.000Z'),
+      lastFertilizedAt: new Date('2024-01-02T00:00:00.000Z'),
+    };
     (createPlant as jest.Mock).mockResolvedValue(newPlant);
 
     const mockSupabase = { auth: { getUser: jest.fn() } };
@@ -101,12 +120,14 @@ describe('GET/POST /api/plants', () => {
 
     const res = await POST(req as any);
     expect(res.status).toBe(201);
-    await res.json();
+    const json = await res.json();
     expect(createPlant).toHaveBeenCalledWith('user-1', {
       name: 'New Plant',
       lastWateredAt: '2024-01-01T00:00:00.000Z',
       lastFertilizedAt: '2024-01-02T00:00:00.000Z',
     });
+    expect(json.lastWateredAt).toBe('2024-01-01T00:00:00.000Z');
+    expect(json.lastFertilizedAt).toBe('2024-01-02T00:00:00.000Z');
   });
 
   it('returns 503 when env vars missing', async () => {

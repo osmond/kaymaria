@@ -48,7 +48,7 @@ model Task {
   userId     String    @map("user_id") @db.Uuid
   plantId    String    @map("plant_id") @db.Uuid
   type       String
-  dueDate    DateTime  @map("due_date")
+  dueAt      DateTime  @map("due_at")
   lastDoneAt DateTime? @map("last_done_at")
   notes      String?
   createdAt  DateTime  @default(now()) @map("created_at")
