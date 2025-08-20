@@ -9,6 +9,13 @@ export async function createRouteHandlerClient(): Promise<SupabaseClient<Databas
   // `cookies()` is now asynchronous in Next 15 and must be awaited
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("sb-access-token")?.value;
-  supabase.auth.setAuth(accessToken ?? "");
+  if (accessToken) {
+    const auth: any = supabase.auth as any;
+    if (typeof auth.setAuth === "function") {
+      auth.setAuth(accessToken);
+    } else if (typeof auth.setSession === "function") {
+      await auth.setSession({ access_token: accessToken, refresh_token: "" });
+    }
+  }
   return supabase;
 }
