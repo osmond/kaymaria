@@ -15,11 +15,18 @@ function BasicsStep({ register }: { register: UseFormRegister<AddPlantFormData> 
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
         <span className="font-medium">Name</span>
-        <input type="text" {...register('name')} className="border rounded p-2" />
+        <input
+          type="text"
+          {...register('name', { required: true })}
+          className="border rounded p-2"
+        />
       </label>
       <label className="flex flex-col gap-1">
         <span className="font-medium">Room</span>
-        <select {...register('roomId')} className="border rounded p-2">
+        <select
+          {...register('roomId', { required: true })}
+          className="border rounded p-2"
+        >
           <option value="">Select a room</option>
           <option value="living">Living Room</option>
           <option value="bedroom">Bedroom</option>
@@ -34,7 +41,10 @@ function EnvironmentStep({ register }: { register: UseFormRegister<AddPlantFormD
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
         <span className="font-medium">Light</span>
-        <select {...register('light')} className="border rounded p-2">
+        <select
+          {...register('light', { required: true })}
+          className="border rounded p-2"
+        >
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
@@ -51,7 +61,11 @@ function CareStep({ register }: { register: UseFormRegister<AddPlantFormData> })
         <span className="font-medium">Water every (days)</span>
         <input
           type="number"
-          {...register('waterInterval', { valueAsNumber: true })}
+          {...register('waterInterval', {
+            valueAsNumber: true,
+            required: true,
+            min: 1,
+          })}
           className="border rounded p-2"
           min={1}
         />
@@ -71,7 +85,8 @@ export default function AddPlantForm({
   initialValues,
   submitLabel,
 }: AddPlantFormProps) {
-  const { register, handleSubmit } = useForm<AddPlantFormData>({
+  const { register, handleSubmit, watch } = useForm<AddPlantFormData>({
+    mode: 'onChange',
     defaultValues:
       initialValues ?? {
         name: '',
@@ -83,12 +98,29 @@ export default function AddPlantForm({
   const [step, setStep] = useState(0);
 
   const steps = [
-    { title: 'Basics', component: <BasicsStep register={register} /> },
-    { title: 'Environment', component: <EnvironmentStep register={register} /> },
-    { title: 'Care', component: <CareStep register={register} /> },
+    {
+      title: 'Basics',
+      component: <BasicsStep register={register} />,
+      isValid: (v: AddPlantFormData) => v.name.trim() !== '' && v.roomId !== '',
+    },
+    {
+      title: 'Environment',
+      component: <EnvironmentStep register={register} />,
+      isValid: (v: AddPlantFormData) => v.light !== '',
+    },
+    {
+      title: 'Care',
+      component: <CareStep register={register} />,
+      isValid: (v: AddPlantFormData) => v.waterInterval > 0,
+    },
   ];
 
-  const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
+  const values = watch();
+  const canGoForward = steps[step].isValid(values);
+
+  const next = () => {
+    if (canGoForward) setStep((s) => Math.min(s + 1, steps.length - 1));
+  };
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   return (
@@ -97,6 +129,22 @@ export default function AddPlantForm({
       aria-label="plant-form"
       className="flex flex-col gap-6"
     >
+      <ol className="flex items-center gap-2 text-sm" aria-label="progress">
+        {steps.map((s, i) => (
+          <li key={s.title} className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => i < step && setStep(i)}
+              disabled={i > step}
+              aria-current={i === step ? 'step' : undefined}
+              className={i === step ? 'font-medium' : 'text-neutral-500'}
+            >
+              {s.title}
+            </button>
+            {i < steps.length - 1 && <span aria-hidden="true">→</span>}
+          </li>
+        ))}
+      </ol>
       <h2 className="text-xl font-medium">{steps[step].title}</h2>
       {steps[step].component}
       <div className="flex gap-2">
@@ -106,7 +154,12 @@ export default function AddPlantForm({
           </button>
         )}
         {step < steps.length - 1 && (
-          <button type="button" onClick={next} className="btn btn-primary">
+          <button
+            type="button"
+            onClick={next}
+            className="btn btn-primary"
+            disabled={!canGoForward}
+          >
             Next
           </button>
         )}

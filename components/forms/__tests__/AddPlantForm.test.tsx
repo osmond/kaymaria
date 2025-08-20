@@ -56,4 +56,32 @@ describe('AddPlantForm', () => {
     await user.click(screen.getByRole('button', { name: /next/i }));
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
   });
+
+  it('stepper reflects current step', async () => {
+    const user = userEvent.setup();
+    render(<AddPlantForm onSubmit={jest.fn()} />);
+    expect(screen.getByRole('button', { name: /basics/i })).toHaveAttribute(
+      'aria-current',
+      'step'
+    );
+    await user.type(screen.getByLabelText(/name/i), 'Ficus');
+    await user.selectOptions(screen.getByLabelText(/room/i), 'living');
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    expect(
+      screen.getByRole('button', { name: /environment/i })
+    ).toHaveAttribute('aria-current', 'step');
+  });
+
+  it('allows back navigation via the stepper', async () => {
+    const user = userEvent.setup();
+    render(<AddPlantForm onSubmit={jest.fn()} />);
+    await user.type(screen.getByLabelText(/name/i), 'Ficus');
+    await user.selectOptions(screen.getByLabelText(/room/i), 'living');
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    await user.click(screen.getByRole('button', { name: /basics/i }));
+    expect(screen.getByRole('button', { name: /basics/i })).toHaveAttribute(
+      'aria-current',
+      'step'
+    );
+  });
 });
