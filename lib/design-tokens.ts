@@ -1,17 +1,25 @@
 export const lightTokens = {
-  primary: "#3B82F6",
-  secondary: "#F1F5F9",
-  background: "#FFFFFF",
+  primary: "#508C7E",
+  secondary: "#D3EDE6",
+  background: "#F9F9F9",
   foreground: "#111827",
-  muted: "#6B7280",
+  muted: "#9CA3AF",
+  border: "#E5E7EB",
+  success: "#16A34A",
+  warning: "#F59E0B",
+  destructive: "#DC2626",
 };
 
 export const darkTokens = {
-  primary: "#3B82F6",
-  secondary: "#1F2937",
-  background: "#0F172A",
-  foreground: "#F9FAFB",
+  primary: "#508C7E",
+  secondary: "#D3EDE6",
+  background: "#0B0F0E",
+  foreground: "#E5E7EB",
   muted: "#9CA3AF",
+  border: "#1F2A28",
+  success: "#16A34A",
+  warning: "#F59E0B",
+  destructive: "#DC2626",
 };
 
 export const coreColors = lightTokens;

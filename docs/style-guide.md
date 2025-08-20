@@ -1,7 +1,7 @@
 # Kay Maria Style Guide
 
 _A living spec for design & implementation. Keep this in `/docs/STYLEGUIDE.md` and update alongside UI changes._  
-_Last updated: 2025-08-19_
+_Last updated: 2025-10-30_
 
 ---
 
@@ -19,7 +19,7 @@ Use semantic roles so components don’t rely on raw hex values.
 ### Functional Roles
 - **Success**: `#16A34A`
 - **Warning**: `#F59E0B`
-- **Error**: `#DC2626`
+- **Error/Destructive**: `#DC2626`
 - **Borders**: `#E5E7EB` (default), `#F1F5F9` (subtle)
 
 > **Rule:** Use semantic roles in code (e.g., `text-text`, `bg-surface-1`, `border-border`) rather than raw hex.
@@ -196,4 +196,5 @@ Use this to validate each view against the style guide.
 ## Changelog
 
 - **2025-08-19:** Explicit revision: tokens, components, state matrix, patterns, and dark mode. QA checklist template added.
+- **2025-10-30:** Palette synchronized across design tokens and global styles.
 

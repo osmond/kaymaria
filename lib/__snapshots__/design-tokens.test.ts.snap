@@ -1,21 +1,29 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`design tokens matches dark token snapshot 1`] = `
 {
-  "background": "#0F172A",
-  "foreground": "#F9FAFB",
+  "background": "#0B0F0E",
+  "border": "#1F2A28",
+  "destructive": "#DC2626",
+  "foreground": "#E5E7EB",
   "muted": "#9CA3AF",
-  "primary": "#3B82F6",
-  "secondary": "#1F2937",
+  "primary": "#508C7E",
+  "secondary": "#D3EDE6",
+  "success": "#16A34A",
+  "warning": "#F59E0B",
 }
 `;
 
 exports[`design tokens matches light token snapshot 1`] = `
 {
-  "background": "#FFFFFF",
+  "background": "#F9F9F9",
+  "border": "#E5E7EB",
+  "destructive": "#DC2626",
   "foreground": "#111827",
-  "muted": "#6B7280",
-  "primary": "#3B82F6",
-  "secondary": "#F1F5F9",
+  "muted": "#9CA3AF",
+  "primary": "#508C7E",
+  "secondary": "#D3EDE6",
+  "success": "#16A34A",
+  "warning": "#F59E0B",
 }
 `;

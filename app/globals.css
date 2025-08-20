@@ -4,36 +4,36 @@
   :root {
     --font-display: "Cabinet Grotesk", ui-sans-serif, system-ui, sans-serif;
     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 215 16% 47%;
-    --border: 214 32% 91%;
-    --destructive: 0 84% 48%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 72% 30%;
-    --success-foreground: 210 40% 98%;
-    --warning: 45 100% 51%;
-    --warning-foreground: 222 47% 11%;
+    --background: 0 0% 98%;
+    --foreground: 221 39% 11%;
+    --primary: 166 27% 43%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 164 42% 88%;
+    --secondary-foreground: 221 39% 11%;
+    --muted: 218 11% 65%;
+    --border: 220 13% 91%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 221 39% 11%;
   }
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 222 47% 20%;
-    --secondary-foreground: 210 40% 96%;
-    --muted: 215 16% 65%;
-    --border: 217 16% 26%;
-    --destructive: 0 84% 48%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 72% 30%;
-    --success-foreground: 210 40% 98%;
-    --warning: 45 100% 51%;
-    --warning-foreground: 210 40% 98%;
+    --background: 165 15% 5%;
+    --foreground: 220 13% 91%;
+    --primary: 166 27% 43%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 164 42% 88%;
+    --secondary-foreground: 221 39% 11%;
+    --muted: 218 11% 65%;
+    --border: 169 15% 14%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 221 39% 11%;
   }
   body {
     background-color: hsl(var(--background));
