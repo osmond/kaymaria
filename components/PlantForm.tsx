@@ -51,7 +51,7 @@ export type PlantFormSubmit = {
   lastWateredAt?: string;
   lastFertilizedAt?: string;
   createTasks?: boolean;
-  rules: {
+  plan: {
     type: 'water' | 'fertilize';
     intervalDays: number;
     amountMl?: number;
@@ -76,7 +76,7 @@ export function plantValuesToSubmit(s: PlantFormValues): PlantFormSubmit {
     indoor: s.indoor === 'Indoor',
     soilType: s.soil || undefined,
     drainage: s.drainage,
-    rules: [
+    plan: [
       {
         type: 'water',
         intervalDays: Number(s.waterEvery || 7),
