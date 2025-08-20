@@ -15,6 +15,12 @@ export type AddPlantFormData = {
   roomId: string;
   light: string;
   waterEvery: number;
+  waterAmount: number;
+  fertEvery: number;
+  lastWatered?: string;
+  lastFertilized?: string;
+  lat?: number;
+  lon?: number;
 };
 
 type StepProps = {
@@ -54,7 +60,7 @@ function BasicsStep({ register, errors }: StepProps) {
   );
 }
 
-function EnvironmentStep({ register }: StepProps) {
+function EnvironmentStep({ register, errors }: StepProps) {
   return (
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
@@ -64,6 +70,34 @@ function EnvironmentStep({ register }: StepProps) {
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Latitude</span>
+        <input
+          type="number"
+          step="any"
+          {...register('lat')}
+          className={`border rounded p-2 ${errors.lat ? 'border-red-500' : ''}`}
+          min={-90}
+          max={90}
+        />
+        {errors.lat && (
+          <p className="text-sm text-red-600">{errors.lat.message}</p>
+        )}
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Longitude</span>
+        <input
+          type="number"
+          step="any"
+          {...register('lon')}
+          className={`border rounded p-2 ${errors.lon ? 'border-red-500' : ''}`}
+          min={-180}
+          max={180}
+        />
+        {errors.lon && (
+          <p className="text-sm text-red-600">{errors.lon.message}</p>
+        )}
       </label>
     </div>
   );
@@ -82,6 +116,48 @@ function CareStep({ register, errors }: StepProps) {
         />
         {errors.waterEvery && (
           <p className="text-sm text-red-600">{errors.waterEvery.message}</p>
+        )}
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Water amount (ml)</span>
+        <input
+          type="number"
+          {...register('waterAmount', { valueAsNumber: true })}
+          className={`border rounded p-2 ${errors.waterAmount ? 'border-red-500' : ''}`}
+          min={10}
+        />
+        {errors.waterAmount && (
+          <p className="text-sm text-red-600">{errors.waterAmount.message}</p>
+        )}
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Fertilize every (days)</span>
+        <input
+          type="number"
+          {...register('fertEvery', { valueAsNumber: true })}
+          className={`border rounded p-2 ${errors.fertEvery ? 'border-red-500' : ''}`}
+          min={1}
+        />
+        {errors.fertEvery && (
+          <p className="text-sm text-red-600">{errors.fertEvery.message}</p>
+        )}
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Last watered</span>
+        <input type="date" {...register('lastWatered')} className="border rounded p-2" />
+        {errors.lastWatered && (
+          <p className="text-sm text-red-600">{errors.lastWatered.message}</p>
+        )}
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Last fertilized</span>
+        <input
+          type="date"
+          {...register('lastFertilized')}
+          className="border rounded p-2"
+        />
+        {errors.lastFertilized && (
+          <p className="text-sm text-red-600">{errors.lastFertilized.message}</p>
         )}
       </label>
     </div>
@@ -103,6 +179,16 @@ export default function AddPlantForm({
     name: plantFieldSchemas.name,
     roomId: plantFieldSchemas.roomId,
     waterEvery: plantFieldSchemas.waterEvery,
+    waterAmount: plantFieldSchemas.waterAmount,
+    fertEvery: plantFieldSchemas.fertEvery,
+    lastWatered: plantFieldSchemas.lastWatered.transform((d) =>
+      d ? d.toISOString().slice(0, 10) : ''
+    ),
+    lastFertilized: plantFieldSchemas.lastFertilized.transform((d) =>
+      d ? d.toISOString().slice(0, 10) : ''
+    ),
+    lat: plantFieldSchemas.lat,
+    lon: plantFieldSchemas.lon,
     light: z.string(),
   });
   const {
@@ -118,6 +204,12 @@ export default function AddPlantForm({
         roomId: '',
         light: 'medium',
         waterEvery: 7,
+        waterAmount: 250,
+        fertEvery: 30,
+        lastWatered: '',
+        lastFertilized: '',
+        lat: undefined,
+        lon: undefined,
       },
   });
   const [step, setStep] = useState(0);
@@ -133,8 +225,8 @@ export default function AddPlantForm({
 
   const stepFields: (keyof AddPlantFormData)[][] = [
     ['name', 'roomId'],
-    ['light'],
-    ['waterEvery'],
+    ['light', 'lat', 'lon'],
+    ['waterEvery', 'waterAmount', 'fertEvery', 'lastWatered', 'lastFertilized'],
   ];
   const next = async () => {
     const fields = stepFields[step];
