@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { randomUUID } from 'node:crypto';
 
 export type GetUserIdResult =
   | { userId: string }
@@ -22,6 +23,28 @@ export async function getUserId(
       );
       return { error: 'misconfigured' };
     }
+
+    try {
+      const { createSupabaseAdminClient } = await import('./supabaseAdmin');
+      const admin = createSupabaseAdminClient();
+      const { data, error } = await admin.auth.admin.getUserById(userId);
+      if (error || !data.user) {
+        const { error: createError } = await admin.auth.admin.createUser({
+          id: userId,
+          email: `${userId}@example.com`,
+          password: randomUUID(),
+          email_confirm: true,
+        });
+        if (createError) {
+          console.error('Failed to ensure single user exists', createError);
+          return { error: 'misconfigured' };
+        }
+      }
+    } catch (e) {
+      console.error('Failed to ensure single user exists', e);
+      return { error: 'misconfigured' };
+    }
+
     return { userId };
   }
 
