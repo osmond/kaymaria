@@ -32,6 +32,13 @@ describe('GET/POST /api/plants', () => {
     ];
     (listPlants as jest.Mock).mockResolvedValue(plants);
 
+    const mockSupabase = { auth: { getUser: jest.fn() } } as any;
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    });
+
     const res = await GET(new Request('http://localhost/api/plants') as any);
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -43,16 +50,42 @@ describe('GET/POST /api/plants', () => {
         lastFertilizedAt: '2024-01-02T00:00:00.000Z',
       },
     ]);
-    expect(listPlants).toHaveBeenCalledWith(undefined);
+    expect(listPlants).toHaveBeenCalledWith('user-1', undefined);
   });
 
   it('filters by name and room', async () => {
     (listPlants as jest.Mock).mockResolvedValue([]);
+
+    const mockSupabase = { auth: { getUser: jest.fn() } } as any;
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    });
+
     const res = await GET(
       new Request('http://localhost/api/plants?name=Fiddle&roomId=r1') as any,
     );
     expect(res.status).toBe(200);
-    expect(listPlants).toHaveBeenCalledWith({ name: 'Fiddle', roomId: 'r1' });
+    expect(listPlants).toHaveBeenCalledWith('user-1', {
+      name: 'Fiddle',
+      roomId: 'r1',
+    });
+  });
+
+  it('returns 401 when unauthorized', async () => {
+    const mockSupabase = { auth: { getUser: jest.fn() } } as any;
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: null,
+    });
+
+    const res = await GET(new Request('http://localhost/api/plants') as any);
+    expect(res.status).toBe(401);
+    const json = await res.json();
+    expect(json).toEqual({ error: 'unauthorized' });
+    expect(listPlants).not.toHaveBeenCalled();
   });
 
   it('creates plant', async () => {

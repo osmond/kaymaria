@@ -2,16 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { listPlants, createPlant } from "@/lib/prisma/plants";
 import { createRouteHandlerClient } from "@/lib/supabase";
 import { getUserId } from "@/lib/getUserId";
+import { withAuth } from "@/lib/withAuth";
 import { z } from "zod";
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const name = searchParams.get("name") || undefined;
-    const roomId = searchParams.get("roomId") || undefined;
-    const filter = name || roomId ? { name, roomId } : undefined;
-    const plants = await listPlants(filter);
-    return NextResponse.json(plants);
+    return await withAuth(async (_supabase, userId) => {
+      const { searchParams } = new URL(req.url);
+      const name = searchParams.get("name") || undefined;
+      const roomId = searchParams.get("roomId") || undefined;
+      const filter = name || roomId ? { name, roomId } : undefined;
+      const plants = await listPlants(userId, filter);
+      return NextResponse.json(plants);
+    });
   } catch (e: any) {
     console.error("GET /api/plants failed:", e);
     return NextResponse.json({ error: "server" }, { status: 500 });

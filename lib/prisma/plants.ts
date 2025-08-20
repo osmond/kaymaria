@@ -22,12 +22,16 @@ type PlantData = {
   lastFertilizedAt?: string | null;
 };
 
-export async function listPlants(filter?: {
-  name?: string;
-  roomId?: string;
-}): Promise<Plant[]> {
+export async function listPlants(
+  userId: string,
+  filter?: {
+    name?: string;
+    roomId?: string;
+  },
+): Promise<Plant[]> {
   return prisma.plant.findMany({
     where: {
+      userId,
       ...(filter?.name ? { name: filter.name } : {}),
       ...(filter?.roomId ? { roomId: filter.roomId } : {}),
     },
