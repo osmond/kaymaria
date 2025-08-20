@@ -14,8 +14,21 @@ export default function NewPlantPage() {
         name: data.name,
         roomId: data.roomId,
         lightLevel: data.light,
+        lat: data.lat,
+        lon: data.lon,
+        lastWateredAt: data.lastWatered
+          ? new Date(data.lastWatered).toISOString()
+          : undefined,
+        lastFertilizedAt: data.lastFertilized
+          ? new Date(data.lastFertilized).toISOString()
+          : undefined,
         plan: [
-          { type: 'water', intervalDays: data.waterInterval || 7 },
+          {
+            type: 'water',
+            intervalDays: data.waterEvery || 7,
+            amountMl: data.waterAmount,
+          },
+          { type: 'fertilize', intervalDays: data.fertEvery },
         ],
       }),
     });

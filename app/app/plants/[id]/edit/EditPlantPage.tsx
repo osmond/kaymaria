@@ -6,6 +6,12 @@ import type { Plant } from '@prisma/client';
 
 type PlantExtras = {
   waterIntervalDays?: number | null;
+  waterAmountMl?: number | null;
+  fertIntervalDays?: number | null;
+  lastWateredAt?: Date | string | null;
+  lastFertilizedAt?: Date | string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export default function EditPlantPage({
@@ -23,8 +29,21 @@ export default function EditPlantPage({
         name: data.name,
         roomId: data.roomId,
         lightLevel: data.light,
+        lat: data.lat,
+        lon: data.lon,
+        lastWateredAt: data.lastWatered
+          ? new Date(data.lastWatered).toISOString()
+          : undefined,
+        lastFertilizedAt: data.lastFertilized
+          ? new Date(data.lastFertilized).toISOString()
+          : undefined,
         plan: [
-          { type: 'water', intervalDays: data.waterInterval || 7 },
+          {
+            type: 'water',
+            intervalDays: data.waterEvery || 7,
+            amountMl: data.waterAmount,
+          },
+          { type: 'fertilize', intervalDays: data.fertEvery },
         ],
       }),
     });
@@ -45,7 +64,17 @@ export default function EditPlantPage({
             name: plant.name,
             roomId: plant.roomId || '',
             light: (plant.lightLevel || 'medium').toLowerCase(),
-            waterInterval: plant.waterIntervalDays ?? 7,
+            lat: plant.latitude ?? undefined,
+            lon: plant.longitude ?? undefined,
+            waterEvery: plant.waterIntervalDays ?? 7,
+            waterAmount: plant.waterAmountMl ?? 500,
+            fertEvery: plant.fertIntervalDays ?? 30,
+            lastWatered: plant.lastWateredAt
+              ? new Date(plant.lastWateredAt).toISOString().slice(0, 10)
+              : '',
+            lastFertilized: plant.lastFertilizedAt
+              ? new Date(plant.lastFertilizedAt).toISOString().slice(0, 10)
+              : '',
           }}
           submitLabel="Save"
           onSubmit={handleSubmit}

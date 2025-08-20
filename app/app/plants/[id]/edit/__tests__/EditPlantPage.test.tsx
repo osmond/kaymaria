@@ -27,6 +27,12 @@ describe('EditPlantPage', () => {
       roomId: 'living',
       lightLevel: 'medium',
       waterIntervalDays: 5,
+      waterAmountMl: 500,
+      fertIntervalDays: 60,
+      lastWateredAt: '2024-01-01',
+      lastFertilizedAt: '2024-01-02',
+      latitude: 1.23,
+      longitude: 4.56,
     };
     render(<EditPlantPage plant={plant} />);
     expect(
@@ -42,6 +48,12 @@ describe('EditPlantPage', () => {
       roomId: 'living',
       lightLevel: 'medium',
       waterIntervalDays: 5,
+      waterAmountMl: 500,
+      fertIntervalDays: 60,
+      lastWateredAt: '2024-01-01',
+      lastFertilizedAt: '2024-01-02',
+      latitude: 1.23,
+      longitude: 4.56,
     };
     (fetch as jest.Mock).mockResolvedValue({
       ok: true,
@@ -56,11 +68,22 @@ describe('EditPlantPage', () => {
     await user.click(screen.getByRole('button', { name: /next/i }));
 
     await user.selectOptions(screen.getByLabelText(/light/i), 'low');
+    await user.clear(screen.getByLabelText(/latitude/i));
+    await user.type(screen.getByLabelText(/latitude/i), '9.87');
+    await user.clear(screen.getByLabelText(/longitude/i));
+    await user.type(screen.getByLabelText(/longitude/i), '65.43');
     await user.click(screen.getByRole('button', { name: /next/i }));
 
-    const waterInput = screen.getByLabelText(/water every/i);
-    await user.clear(waterInput);
-    await user.type(waterInput, '10');
+    await user.clear(screen.getByLabelText(/water every/i));
+    await user.type(screen.getByLabelText(/water every/i), '10');
+    await user.clear(screen.getByLabelText(/water amount/i));
+    await user.type(screen.getByLabelText(/water amount/i), '700');
+    await user.clear(screen.getByLabelText(/fertilize every/i));
+    await user.type(screen.getByLabelText(/fertilize every/i), '40');
+    await user.clear(screen.getByLabelText(/last watered/i));
+    await user.type(screen.getByLabelText(/last watered/i), '2024-01-03');
+    await user.clear(screen.getByLabelText(/last fertilized/i));
+    await user.type(screen.getByLabelText(/last fertilized/i), '2024-01-04');
     await user.click(screen.getByRole('button', { name: /save/i }));
 
     expect(fetch).toHaveBeenCalledWith('/api/plants/1', {
@@ -70,7 +93,14 @@ describe('EditPlantPage', () => {
         name: 'Snake Plant',
         roomId: 'bedroom',
         lightLevel: 'low',
-        plan: [{ type: 'water', intervalDays: 10 }],
+        lat: 9.87,
+        lon: 65.43,
+        lastWateredAt: '2024-01-03T00:00:00.000Z',
+        lastFertilizedAt: '2024-01-04T00:00:00.000Z',
+        plan: [
+          { type: 'water', intervalDays: 10, amountMl: 700 },
+          { type: 'fertilize', intervalDays: 40 },
+        ],
       }),
     });
     expect(push).toHaveBeenCalledWith('/app/plants/1');

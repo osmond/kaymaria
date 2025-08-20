@@ -19,12 +19,19 @@ describe('AddPlantForm', () => {
 
     // Environment step
     await user.selectOptions(screen.getByLabelText(/light/i), 'medium');
+    await user.type(screen.getByLabelText(/latitude/i), '12.34');
+    await user.type(screen.getByLabelText(/longitude/i), '56.78');
     await user.click(screen.getByRole('button', { name: /next/i }));
 
     // Care step
-    const waterInput = screen.getByLabelText(/water every/i);
-    await user.clear(waterInput);
-    await user.type(waterInput, '5');
+    await user.clear(screen.getByLabelText(/water every/i));
+    await user.type(screen.getByLabelText(/water every/i), '5');
+    await user.clear(screen.getByLabelText(/water amount/i));
+    await user.type(screen.getByLabelText(/water amount/i), '600');
+    await user.clear(screen.getByLabelText(/fertilize every/i));
+    await user.type(screen.getByLabelText(/fertilize every/i), '30');
+    await user.type(screen.getByLabelText(/last watered/i), '2024-01-01');
+    await user.type(screen.getByLabelText(/last fertilized/i), '2024-01-02');
     await user.click(screen.getByRole('button', { name: /add plant/i }));
 
     expect(handleSubmit).toHaveBeenCalled();
@@ -32,7 +39,13 @@ describe('AddPlantForm', () => {
       name: 'Ficus',
       roomId: 'living',
       light: 'medium',
-      waterInterval: 5,
+      lat: 12.34,
+      lon: 56.78,
+      waterEvery: 5,
+      waterAmount: 600,
+      fertEvery: 30,
+      lastWatered: '2024-01-01',
+      lastFertilized: '2024-01-02',
     });
   });
 
@@ -45,7 +58,13 @@ describe('AddPlantForm', () => {
           name: 'Fern',
           roomId: 'bedroom',
           light: 'low',
-          waterInterval: 10,
+          lat: 1.23,
+          lon: 4.56,
+          waterEvery: 10,
+          waterAmount: 500,
+          fertEvery: 60,
+          lastWatered: '2024-01-01',
+          lastFertilized: '2024-01-02',
         }}
         submitLabel="Save"
       />

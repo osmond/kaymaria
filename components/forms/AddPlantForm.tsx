@@ -7,7 +7,13 @@ export type AddPlantFormData = {
   name: string;
   roomId: string;
   light: string;
-  waterInterval: number;
+  lat?: number;
+  lon?: number;
+  waterEvery: number;
+  waterAmount: number;
+  fertEvery: number;
+  lastWatered?: string;
+  lastFertilized?: string;
 };
 
 function BasicsStep({ register }: { register: UseFormRegister<AddPlantFormData> }) {
@@ -40,6 +46,24 @@ function EnvironmentStep({ register }: { register: UseFormRegister<AddPlantFormD
           <option value="high">High</option>
         </select>
       </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Latitude</span>
+        <input
+          type="number"
+          step="any"
+          {...register('lat', { valueAsNumber: true })}
+          className="border rounded p-2"
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Longitude</span>
+        <input
+          type="number"
+          step="any"
+          {...register('lon', { valueAsNumber: true })}
+          className="border rounded p-2"
+        />
+      </label>
     </div>
   );
 }
@@ -51,10 +75,36 @@ function CareStep({ register }: { register: UseFormRegister<AddPlantFormData> })
         <span className="font-medium">Water every (days)</span>
         <input
           type="number"
-          {...register('waterInterval', { valueAsNumber: true })}
+          {...register('waterEvery', { valueAsNumber: true })}
           className="border rounded p-2"
           min={1}
         />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Water amount (ml)</span>
+        <input
+          type="number"
+          {...register('waterAmount', { valueAsNumber: true })}
+          className="border rounded p-2"
+          min={10}
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Fertilize every (days)</span>
+        <input
+          type="number"
+          {...register('fertEvery', { valueAsNumber: true })}
+          className="border rounded p-2"
+          min={1}
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Last watered</span>
+        <input type="date" {...register('lastWatered')} className="border rounded p-2" />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Last fertilized</span>
+        <input type="date" {...register('lastFertilized')} className="border rounded p-2" />
       </label>
     </div>
   );
@@ -77,7 +127,13 @@ export default function AddPlantForm({
         name: '',
         roomId: '',
         light: 'medium',
-        waterInterval: 7,
+        lat: undefined,
+        lon: undefined,
+        waterEvery: 7,
+        waterAmount: 500,
+        fertEvery: 30,
+        lastWatered: '',
+        lastFertilized: '',
       },
   });
   const [step, setStep] = useState(0);
