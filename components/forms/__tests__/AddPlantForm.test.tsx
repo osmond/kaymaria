@@ -117,4 +117,29 @@ describe('AddPlantForm', () => {
     await user.click(screen.getByRole('button', { name: /add plant/i }));
     expect(handleSubmit).toHaveBeenCalled();
   });
+
+  it('shows stepper progress and allows navigating back via stepper', async () => {
+    const user = userEvent.setup();
+    render(<AddPlantForm onSubmit={jest.fn()} />);
+    // initial step highlighted
+    expect(
+      screen.getByRole('button', { name: 'Basics' })
+    ).toHaveAttribute('aria-current', 'step');
+    expect(screen.getByRole('button', { name: 'Environment' })).toBeDisabled();
+
+    // fill basics and advance
+    await user.type(screen.getByLabelText(/name/i), 'Ficus');
+    await user.selectOptions(screen.getByLabelText(/room/i), 'living');
+    await user.click(screen.getByRole('button', { name: /next/i }));
+
+    expect(
+      screen.getByRole('button', { name: 'Environment' })
+    ).toHaveAttribute('aria-current', 'step');
+
+    // go back using stepper
+    await user.click(screen.getByRole('button', { name: 'Basics' }));
+    expect(
+      screen.getByRole('heading', { name: /basics/i })
+    ).toBeInTheDocument();
+  });
 });
