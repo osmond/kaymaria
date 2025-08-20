@@ -940,7 +940,7 @@ export function SettingsView() {
                 Export CSV
               </Button>
               <Button
-                variant="default"
+                variant="primary"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
               >

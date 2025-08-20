@@ -2,7 +2,7 @@
 
 This repository hosts **Kay Maria**, a Next.js + TypeScript plant care companion with real-time task and plant syncing across devices. The goal of this README is to give contributors (like me) a fast reference for building, testing and exploring the project.
 
-All pages should follow the [style guide](./docs/style-guide.md) to ensure a consistent look and feel across the app. Headings use the Cabinet Grotesk typeface while body text uses Inter; both fonts load from Google Fonts and are applied via Tailwind classes.
+All pages should follow the [style guide](./docs/style-guide.md) to ensure a consistent look and feel across the app. Headings use the Cabinet Grotesk typeface while body text uses Inter; both fonts load from Google Fonts and are applied via Tailwind classes. Buttons and form labels rely on semantic design tokens for their colors and state styles.
 
 The Add Plant form uses a labeled stepper to guide users through Basics, Setup and Care plan sections. Form fields include validation for required entries, numeric values, and latitude/longitude ranges. Submitting the form now persists the plant to the backend and pre-creates care tasks. A Playwright smoke test ensures the Add Plant page renders.
 
