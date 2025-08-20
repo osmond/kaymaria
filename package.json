@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
+    "@hookform/resolvers": "^3.10.0",
     "@prisma/client": "^6.14.0",
     "@supabase/supabase-js": "^2.55.0",
     "chart.js": "^4.5.0",

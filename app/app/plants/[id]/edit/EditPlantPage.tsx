@@ -24,7 +24,7 @@ export default function EditPlantPage({
         roomId: data.roomId,
         lightLevel: data.light,
         plan: [
-          { type: 'water', intervalDays: data.waterInterval || 7 },
+          { type: 'water', intervalDays: data.waterEvery || 7 },
         ],
       }),
     });
@@ -45,7 +45,7 @@ export default function EditPlantPage({
             name: plant.name,
             roomId: plant.roomId || '',
             light: (plant.lightLevel || 'medium').toLowerCase(),
-            waterInterval: plant.waterIntervalDays ?? 7,
+            waterEvery: plant.waterIntervalDays ?? 7,
           }}
           submitLabel="Save"
           onSubmit={handleSubmit}
