@@ -834,6 +834,70 @@ export function SettingsView() {
     }
   }
 
+  async function handleExport(format: "json" | "csv") {
+    try {
+      const res = await fetch("/api/plants");
+      if (!res.ok) throw new Error("Failed to fetch plants");
+      const plants = await res.json();
+      if (format === "json") {
+        const blob = new Blob([JSON.stringify(plants, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "plants.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        const rows = (plants || []).map((p: any) => {
+          const water = (p.carePlan || []).find((r: any) => r.type === "water") || {};
+          const fert = (p.carePlan || []).find((r: any) => r.type === "fertilize") || {};
+          return {
+            name: p.name ?? "",
+            roomId: p.roomId ?? "",
+            lat: p.latitude ?? "",
+            lon: p.longitude ?? "",
+            lastWatered: p.lastWateredAt ?? "",
+            lastFertilized: p.lastFertilizedAt ?? "",
+            waterEvery: water.intervalDays ?? "",
+            waterAmount: water.amountMl ?? "",
+            fertEvery: fert.intervalDays ?? "",
+          };
+        });
+        const header = [
+          "name",
+          "roomId",
+          "lat",
+          "lon",
+          "lastWatered",
+          "lastFertilized",
+          "waterEvery",
+          "waterAmount",
+          "fertEvery",
+        ];
+        const csv = [
+          header.join(","),
+          ...rows.map((r) =>
+            header
+              .map((key) => String((r as any)[key] ?? ""))
+              .map((v) => `"${v.replace(/"/g, '""')}"`)
+              .join(","),
+          ),
+        ].join("\n");
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "plants.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error("Export failed", err);
+    }
+  }
+
   async function handleSignOut() {
     await supabase.current.auth.signOut();
     document.cookie = "sb-access-token=; Path=/; Max-Age=0";
@@ -861,10 +925,18 @@ export function SettingsView() {
               </div>
             </CardHeader>
             <CardContent className="pt-0 flex gap-2">
-              <Button variant="secondary" size="sm">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleExport("json")}
+              >
                 Export JSON
               </Button>
-              <Button variant="secondary" size="sm">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleExport("csv")}
+              >
                 Export CSV
               </Button>
               <Button
