@@ -8,7 +8,8 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { plantFieldSchemas } from '@/lib/plantFormSchema';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getRooms, type Room } from '@/lib/rooms';
 
 export type AddPlantFormData = {
   name: string;
@@ -28,7 +29,9 @@ type StepProps = {
   errors: FieldErrors<AddPlantFormData>;
 };
 
-function BasicsStep({ register, errors }: StepProps) {
+type BasicsStepProps = StepProps & { rooms: Room[] };
+
+function BasicsStep({ register, errors, rooms }: BasicsStepProps) {
   return (
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
@@ -49,8 +52,11 @@ function BasicsStep({ register, errors }: StepProps) {
           className={`border rounded p-2 ${errors.roomId ? 'border-red-500' : ''}`}
         >
           <option value="">Select a room</option>
-          <option value="living">Living Room</option>
-          <option value="bedroom">Bedroom</option>
+          {rooms.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.name}
+            </option>
+          ))}
         </select>
         {errors.roomId && (
           <p className="text-sm text-red-600">{errors.roomId.message}</p>
@@ -213,9 +219,19 @@ export default function AddPlantForm({
       },
   });
   const [step, setStep] = useState(0);
+  const [rooms, setRooms] = useState<Room[]>([]);
+
+  useEffect(() => {
+    getRooms().then(setRooms).catch((e) => {
+      console.error('Failed to load rooms', e);
+    });
+  }, []);
 
   const steps = [
-    { title: 'Basics', component: <BasicsStep register={register} errors={errors} /> },
+    {
+      title: 'Basics',
+      component: <BasicsStep register={register} errors={errors} rooms={rooms} />,
+    },
     {
       title: 'Environment',
       component: <EnvironmentStep register={register} errors={errors} />,

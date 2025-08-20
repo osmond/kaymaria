@@ -14,6 +14,11 @@ jest.mock('next/navigation', () => ({
 }));
 
 describe('EditPlantPage', () => {
+  const rooms = [
+    { id: 'living', name: 'Living Room' },
+    { id: 'bedroom', name: 'Bedroom' },
+  ];
+
   beforeEach(() => {
     push.mockReset();
     refresh.mockReset();
@@ -28,6 +33,10 @@ describe('EditPlantPage', () => {
       lightLevel: 'medium',
       waterIntervalDays: 5,
     };
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => rooms,
+    });
     render(<EditPlantPage plant={plant} />);
     expect(
       screen.getByRole('heading', { level: 1, name: /edit plant/i })
@@ -43,10 +52,15 @@ describe('EditPlantPage', () => {
       lightLevel: 'medium',
       waterIntervalDays: 5,
     };
-    (fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: async () => ({}),
-    });
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => rooms,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({}),
+      });
     const user = userEvent.setup();
     render(<EditPlantPage plant={plant} />);
 
