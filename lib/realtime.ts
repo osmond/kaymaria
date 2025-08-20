@@ -1,8 +1,7 @@
-import { createSupabaseClient } from "./supabase";
+import supabase from "./supabaseClient";
 
 export function subscribeToTaskChanges(onChange: () => void) {
   try {
-    const supabase = createSupabaseClient();
     const channel = supabase
       .channel("tasks-db-changes")
       .on(
@@ -22,7 +21,6 @@ export function subscribeToTaskChanges(onChange: () => void) {
 
 export function subscribeToPlantChanges(onChange: () => void) {
   try {
-    const supabase = createSupabaseClient();
     const channel = supabase
       .channel("plants-db-changes")
       .on(
