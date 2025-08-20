@@ -4,6 +4,7 @@ import {
   useForm,
   type UseFormRegister,
   type FieldErrors,
+  type UseFormSetValue,
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,15 +14,22 @@ import { getRooms, type Room } from '@/lib/rooms';
 
 export type AddPlantFormData = {
   name: string;
+  species?: string;
   roomId: string;
   light: string;
+  indoor?: boolean;
+  lat?: number;
+  lon?: number;
+  potSize?: string;
+  potMaterial?: string;
+  soilType?: string;
+  drainage?: 'poor' | 'ok' | 'great';
   waterEvery: number;
   waterAmount: number;
   fertEvery: number;
+  fertFormula?: string;
   lastWatered?: string;
   lastFertilized?: string;
-  lat?: number;
-  lon?: number;
 };
 
 type StepProps = {
@@ -29,20 +37,22 @@ type StepProps = {
   errors: FieldErrors<AddPlantFormData>;
 };
 
-type BasicsStepProps = StepProps & {
+type IdentifyStepProps = StepProps & {
+  setValue: UseFormSetValue<AddPlantFormData>;
+};
+
+type PlaceStepProps = StepProps & {
   rooms: Room[];
   onAddRoom: (name: string) => Promise<void>;
   roomsError?: string | null;
 };
 
-function BasicsStep({ register, errors, rooms, onAddRoom, roomsError }: BasicsStepProps) {
-  const [newRoom, setNewRoom] = useState('');
-
-  const handleAdd = async () => {
-    await onAddRoom(newRoom);
-    setNewRoom('');
+function IdentifyStep({ register, errors, setValue }: IdentifyStepProps) {
+  const randomNames = ['Sprout', 'Leafy', 'Buddy', 'Sunny'];
+  const surprise = () => {
+    const name = randomNames[Math.floor(Math.random() * randomNames.length)];
+    setValue('name', name);
   };
-
   return (
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
@@ -56,6 +66,29 @@ function BasicsStep({ register, errors, rooms, onAddRoom, roomsError }: BasicsSt
           <p className="text-sm text-red-600">{errors.name.message}</p>
         )}
       </label>
+      <button
+        type="button"
+        className="self-start text-sm underline"
+        onClick={surprise}
+      >
+        Surprise me
+      </button>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Species (optional)</span>
+        <input type="text" {...register('species')} className="border rounded p-2" />
+      </label>
+    </div>
+  );
+}
+
+function PlaceStep({ register, errors, rooms, onAddRoom, roomsError }: PlaceStepProps) {
+  const [newRoom, setNewRoom] = useState('');
+  const handleAdd = async () => {
+    await onAddRoom(newRoom);
+    setNewRoom('');
+  };
+  return (
+    <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
         <span className="font-medium">Room</span>
         {rooms.length > 0 ? (
@@ -97,13 +130,6 @@ function BasicsStep({ register, errors, rooms, onAddRoom, roomsError }: BasicsSt
           <p className="text-sm text-red-600">{errors.roomId.message}</p>
         )}
       </label>
-    </div>
-  );
-}
-
-function EnvironmentStep({ register, errors }: StepProps) {
-  return (
-    <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
         <span className="font-medium">Light</span>
         <select {...register('light')} className="border rounded p-2">
@@ -111,6 +137,10 @@ function EnvironmentStep({ register, errors }: StepProps) {
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
+      </label>
+      <label className="flex items-center gap-2">
+        <input type="checkbox" {...register('indoor')} />
+        <span>Indoor</span>
       </label>
       <label className="flex flex-col gap-1">
         <span className="font-medium">Latitude</span>
@@ -144,7 +174,35 @@ function EnvironmentStep({ register, errors }: StepProps) {
   );
 }
 
-function CareStep({ register, errors }: StepProps) {
+function DescribeStep({ register }: StepProps) {
+  return (
+    <div className="flex flex-col gap-4">
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Pot size</span>
+        <input type="text" {...register('potSize')} className="border rounded p-2" />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Pot material</span>
+        <input type="text" {...register('potMaterial')} className="border rounded p-2" />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Drainage</span>
+        <select {...register('drainage')} className="border rounded p-2">
+          <option value="">Select</option>
+          <option value="poor">Poor</option>
+          <option value="ok">OK</option>
+          <option value="great">Great</option>
+        </select>
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="font-medium">Soil type</span>
+        <input type="text" {...register('soilType')} className="border rounded p-2" />
+      </label>
+    </div>
+  );
+}
+
+function CarePlanStep({ register, errors }: StepProps) {
   return (
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
@@ -184,23 +242,47 @@ function CareStep({ register, errors }: StepProps) {
         )}
       </label>
       <label className="flex flex-col gap-1">
+        <span className="font-medium">Fertilizer formula (optional)</span>
+        <input type="text" {...register('fertFormula')} className="border rounded p-2" />
+      </label>
+      <label className="flex flex-col gap-1">
         <span className="font-medium">Last watered</span>
         <input type="date" {...register('lastWatered')} className="border rounded p-2" />
-        {errors.lastWatered && (
-          <p className="text-sm text-red-600">{errors.lastWatered.message}</p>
-        )}
       </label>
       <label className="flex flex-col gap-1">
         <span className="font-medium">Last fertilized</span>
-        <input
-          type="date"
-          {...register('lastFertilized')}
-          className="border rounded p-2"
-        />
-        {errors.lastFertilized && (
-          <p className="text-sm text-red-600">{errors.lastFertilized.message}</p>
-        )}
+        <input type="date" {...register('lastFertilized')} className="border rounded p-2" />
       </label>
+    </div>
+  );
+}
+
+function ConfirmStep({ data, rooms }: { data: AddPlantFormData; rooms: Room[] }) {
+  const roomName = rooms.find((r) => r.id === data.roomId)?.name || '—';
+  return (
+    <div className="space-y-2">
+      <p>
+        <strong>{data.name}</strong>
+        {data.species ? ` (${data.species})` : ''}
+      </p>
+      <p>Room: {roomName}</p>
+      <p>Light: {data.light}</p>
+      <p>{data.indoor ? 'Indoor' : 'Outdoor'}</p>
+      {data.potSize && (
+        <p>
+          Pot: {data.potSize}
+          {data.potMaterial ? ` ${data.potMaterial}` : ''}
+        </p>
+      )}
+      {data.drainage && <p>Drainage: {data.drainage}</p>}
+      {data.soilType && <p>Soil: {data.soilType}</p>}
+      <p>
+        Water every {data.waterEvery} days ({data.waterAmount} ml)
+      </p>
+      <p>
+        Fertilize every {data.fertEvery} days
+        {data.fertFormula ? ` (${data.fertFormula})` : ''}
+      </p>
     </div>
   );
 }
@@ -218,19 +300,26 @@ export default function AddPlantForm({
 }: AddPlantFormProps) {
   const formSchema = z.object({
     name: plantFieldSchemas.name,
+    species: plantFieldSchemas.species,
     roomId: plantFieldSchemas.roomId,
+    light: plantFieldSchemas.light,
+    indoor: plantFieldSchemas.indoor,
+    lat: plantFieldSchemas.lat,
+    lon: plantFieldSchemas.lon,
+    potSize: plantFieldSchemas.potSize,
+    potMaterial: plantFieldSchemas.potMaterial,
+    soilType: plantFieldSchemas.soilType,
+    drainage: plantFieldSchemas.drainage,
     waterEvery: plantFieldSchemas.waterEvery,
     waterAmount: plantFieldSchemas.waterAmount,
     fertEvery: plantFieldSchemas.fertEvery,
+    fertFormula: plantFieldSchemas.fertFormula,
     lastWatered: plantFieldSchemas.lastWatered.transform((d) =>
       d ? d.toISOString().slice(0, 10) : ''
     ),
     lastFertilized: plantFieldSchemas.lastFertilized.transform((d) =>
       d ? d.toISOString().slice(0, 10) : ''
     ),
-    lat: plantFieldSchemas.lat,
-    lon: plantFieldSchemas.lon,
-    light: z.string(),
   });
   const {
     register,
@@ -238,20 +327,28 @@ export default function AddPlantForm({
     formState: { errors },
     trigger,
     setValue,
+    watch,
   } = useForm<AddPlantFormData>({
     resolver: zodResolver(formSchema),
     defaultValues:
       initialValues ?? {
         name: '',
+        species: '',
         roomId: '',
         light: 'medium',
+        indoor: true,
+        lat: undefined,
+        lon: undefined,
+        potSize: '',
+        potMaterial: '',
+        soilType: '',
+        drainage: undefined,
         waterEvery: 7,
         waterAmount: 250,
         fertEvery: 30,
+        fertFormula: '',
         lastWatered: '',
         lastFertilized: '',
-        lat: undefined,
-        lon: undefined,
       },
   });
   const [step, setStep] = useState(0);
@@ -295,9 +392,19 @@ export default function AddPlantForm({
 
   const steps = [
     {
-      title: 'Basics',
+      title: 'Identify',
       component: (
-        <BasicsStep
+        <IdentifyStep
+          register={register}
+          errors={errors}
+          setValue={setValue}
+        />
+      ),
+    },
+    {
+      title: 'Place',
+      component: (
+        <PlaceStep
           register={register}
           errors={errors}
           rooms={rooms}
@@ -307,16 +414,25 @@ export default function AddPlantForm({
       ),
     },
     {
-      title: 'Environment',
-      component: <EnvironmentStep register={register} errors={errors} />,
+      title: 'Describe',
+      component: <DescribeStep register={register} errors={errors} />,
     },
-    { title: 'Care', component: <CareStep register={register} errors={errors} /> },
+    {
+      title: 'Care Plan',
+      component: <CarePlanStep register={register} errors={errors} />,
+    },
+    {
+      title: 'Confirm',
+      component: <ConfirmStep data={watch()} rooms={rooms} />,
+    },
   ];
 
   const stepFields: (keyof AddPlantFormData)[][] = [
-    ['name', 'roomId'],
-    ['light', 'lat', 'lon'],
-    ['waterEvery', 'waterAmount', 'fertEvery', 'lastWatered', 'lastFertilized'],
+    ['name'],
+    ['roomId'],
+    [],
+    ['waterEvery', 'waterAmount', 'fertEvery'],
+    [],
   ];
   const next = async () => {
     const fields = stepFields[step];
@@ -379,7 +495,7 @@ export default function AddPlantForm({
             type="button"
             onClick={next}
             className="btn btn-primary"
-            disabled={step === 0 && rooms.length === 0}
+            disabled={step === 1 && rooms.length === 0}
           >
             Next
           </button>

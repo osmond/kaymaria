@@ -12,8 +12,14 @@ export default function NewPlantPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: data.name,
+        species: data.species,
         roomId: data.roomId,
+        potSize: data.potSize,
+        potMaterial: data.potMaterial,
+        soilType: data.soilType,
         lightLevel: data.light,
+        indoor: data.indoor,
+        drainage: data.drainage,
         lat: data.lat,
         lon: data.lon,
         lastWateredAt: data.lastWatered
@@ -28,7 +34,11 @@ export default function NewPlantPage() {
             intervalDays: data.waterEvery || 7,
             amountMl: data.waterAmount,
           },
-          { type: 'fertilize', intervalDays: data.fertEvery || 30 },
+          {
+            type: 'fertilize',
+            intervalDays: data.fertEvery || 30,
+            formula: data.fertFormula,
+          },
         ],
       }),
     });
