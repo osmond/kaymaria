@@ -2,20 +2,17 @@
 
 import { useMemo } from 'react';
 
-export type CareTipMap = {
-  potMaterial?: string;
-  light?: string;
-};
+export interface CareTipInput {
+  potMaterial: string;
+  light: string;
+}
 
-export type CareTipValues = {
-  potMaterial?: string;
-  light?: string;
-};
-
-export function useCareTips(values: CareTipValues | null): CareTipMap {
+export function useCareTips(
+  values: Partial<CareTipInput> | null,
+): Partial<CareTipInput> {
   return useMemo(() => {
     if (!values) return {};
-    const tips: CareTipMap = {};
+    const tips: Partial<CareTipInput> = {};
 
     switch (values.potMaterial) {
       case 'Terracotta':
