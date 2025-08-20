@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useTheme } from "next-themes";
 import InsightsSkeleton from "./InsightsSkeleton";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -65,29 +66,42 @@ export default function InsightsView() {
   const totalOverdueTasks =
     data?.reduce((s, d) => s + d.overdueTaskCount, 0) ?? 0;
 
-  const chartData = {
-    labels: data ? data.map((d) => d.period) : [],
-    datasets: [
-      {
-        label: "Completed Tasks",
-        data: data ? data.map((d) => d.completedTaskCount) : [],
-        borderColor: "#93c5fd",
-        backgroundColor: "rgba(147,197,253,0.5)",
-      },
-      {
-        label: "Overdue Tasks",
-        data: data ? data.map((d) => d.overdueTaskCount) : [],
-        borderColor: "#fca5a5",
-        backgroundColor: "rgba(252,165,165,0.5)",
-      },
-      {
-        label: "New Plants",
-        data: data ? data.map((d) => d.newPlantCount) : [],
-        borderColor: "#86efac",
-        backgroundColor: "rgba(134,239,172,0.5)",
-      },
-    ],
-  };
+  const { theme } = useTheme();
+  const chartData = useMemo(() => {
+    const style =
+      typeof window !== "undefined"
+        ? getComputedStyle(document.documentElement)
+        : null;
+    const primary =
+      style?.getPropertyValue("--primary").trim() || "221 83% 53%";
+    const destructive =
+      style?.getPropertyValue("--destructive").trim() || "0 84% 48%";
+    const success =
+      style?.getPropertyValue("--success").trim() || "142 72% 30%";
+    return {
+      labels: data ? data.map((d) => d.period) : [],
+      datasets: [
+        {
+          label: "Completed Tasks",
+          data: data ? data.map((d) => d.completedTaskCount) : [],
+          borderColor: `hsl(${primary})`,
+          backgroundColor: `hsl(${primary} / 0.5)`,
+        },
+        {
+          label: "Overdue Tasks",
+          data: data ? data.map((d) => d.overdueTaskCount) : [],
+          borderColor: `hsl(${destructive})`,
+          backgroundColor: `hsl(${destructive} / 0.5)`,
+        },
+        {
+          label: "New Plants",
+          data: data ? data.map((d) => d.newPlantCount) : [],
+          borderColor: `hsl(${success})`,
+          backgroundColor: `hsl(${success} / 0.5)`,
+        },
+      ],
+    };
+  }, [data, theme]);
 
   return (
     <>
