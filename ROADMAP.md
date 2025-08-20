@@ -52,7 +52,7 @@ For **each page**, ensure:
   - [x] Layout hierarchy matches visual system (Plants page)
   - [x] Typography uses only approved fonts and scales
   - [x] Buttons, labels, and states align with design tokens
-  - [ ] Responsive layout verified
+  - [x] Responsive layout verified
   - [ ] Regressions checked
 
 ---
