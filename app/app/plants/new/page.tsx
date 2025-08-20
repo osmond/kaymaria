@@ -7,10 +7,22 @@ export default function NewPlantPage() {
   const router = useRouter();
 
   async function handleSubmit(data: AddPlantFormData) {
-    // Placeholder submit handler - replace with API call
-    // await fetch('/api/plants', {...})
-    console.log('submit', data);
-    router.back();
+    const res = await fetch('/api/plants', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: data.name,
+        roomId: data.roomId,
+        lightLevel: data.light,
+        plan: [
+          { type: 'water', intervalDays: Number(data.waterInterval) || 7 },
+        ],
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const plant = await res.json();
+    router.push(`/app/plants/${plant.id}/created`);
+    router.refresh();
   }
 
   return (
