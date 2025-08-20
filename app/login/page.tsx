@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createSupabaseClient } from "@/lib/supabase";
+import supabase from "@/lib/supabaseClient";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -19,7 +19,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     try {
-      const supabase = createSupabaseClient();
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,

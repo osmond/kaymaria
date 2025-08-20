@@ -14,7 +14,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
 import { plantFormSchema } from "@/lib/plantFormSchema";
 
-import { createSupabaseClient } from "@/lib/supabase";
+import supabase from "@/lib/supabaseClient";
 import { subscribeToTaskChanges } from "@/lib/realtime";
 
 import { Button } from "@/components/ui/button";
@@ -759,7 +759,7 @@ export function TimelineView() {
 }
 
 export function SettingsView() {
-  const supabase = useRef(createSupabaseClient());
+  const supabaseRef = useRef(supabase);
   const singleUser = process.env.SINGLE_USER_MODE === "true";
   const router = useRouter();
 
@@ -915,7 +915,7 @@ export function SettingsView() {
   }
 
   async function handleSignOut() {
-    await supabase.current.auth.signOut();
+    await supabaseRef.current.auth.signOut();
     document.cookie = "sb-access-token=; Path=/; Max-Age=0";
     window.location.href = "/login";
   }
