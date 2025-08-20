@@ -35,4 +35,25 @@ describe('AddPlantForm', () => {
       waterInterval: '5',
     });
   });
+
+  it('prefills initial values and uses custom submit label', async () => {
+    const user = userEvent.setup();
+    render(
+      <AddPlantForm
+        onSubmit={jest.fn()}
+        initialValues={{
+          name: 'Fern',
+          roomId: 'bedroom',
+          light: 'low',
+          waterInterval: '10',
+        }}
+        submitLabel="Save"
+      />
+    );
+    expect(screen.getByLabelText(/name/i)).toHaveValue('Fern');
+    expect(screen.getByLabelText(/room/i)).toHaveValue('bedroom');
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
+  });
 });

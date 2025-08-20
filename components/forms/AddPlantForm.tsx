@@ -60,13 +60,25 @@ function CareStep({ register }: { register: UseFormRegister<AddPlantFormData> })
   );
 }
 
+type AddPlantFormProps = {
+  onSubmit: (data: AddPlantFormData) => void | Promise<void>;
+  initialValues?: AddPlantFormData;
+  submitLabel?: string;
+};
+
 export default function AddPlantForm({
   onSubmit,
-}: {
-  onSubmit: (data: AddPlantFormData) => void | Promise<void>;
-}) {
+  initialValues,
+  submitLabel,
+}: AddPlantFormProps) {
   const { register, handleSubmit } = useForm<AddPlantFormData>({
-    defaultValues: { name: '', roomId: '', light: 'medium', waterInterval: '7' },
+    defaultValues:
+      initialValues ?? {
+        name: '',
+        roomId: '',
+        light: 'medium',
+        waterInterval: '7',
+      },
   });
   const [step, setStep] = useState(0);
 
@@ -100,7 +112,7 @@ export default function AddPlantForm({
         )}
         {step === steps.length - 1 && (
           <button type="submit" className="btn btn-primary self-start">
-            Add Plant
+            {submitLabel ?? 'Add Plant'}
           </button>
         )}
       </div>

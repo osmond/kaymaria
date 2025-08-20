@@ -5,7 +5,7 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { ChipSelect } from './PlantForm';
+import { ChipSelect } from './ChipSelect';
 
 describe('ChipSelect', () => {
   it('allows arrow key navigation and selection', async () => {
