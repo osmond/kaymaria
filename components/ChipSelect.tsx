@@ -54,7 +54,7 @@ export function ChipSelect({
             } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
               e.preventDefault();
               refs.current[(i - 1 + options.length) % options.length]?.focus();
-            } else if (e.key === ' ' || e.key === 'Enter') {
+            } else if (e.key === ' ' || e.key === 'Space' || e.key === 'Enter') {
               e.preventDefault();
               onChange(opt);
             }
