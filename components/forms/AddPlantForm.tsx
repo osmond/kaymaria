@@ -29,9 +29,21 @@ type StepProps = {
   errors: FieldErrors<AddPlantFormData>;
 };
 
-type BasicsStepProps = StepProps & { rooms: Room[] };
+type BasicsStepProps = StepProps & {
+  rooms: Room[];
+  onAddRoom: (name: string) => Promise<void>;
+  roomsError?: string | null;
+};
 
-function BasicsStep({ register, errors, rooms }: BasicsStepProps) {
+function BasicsStep({ register, errors, rooms, onAddRoom, roomsError }: BasicsStepProps) {
+  const [newRoom, setNewRoom] = useState('');
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onAddRoom(newRoom);
+    setNewRoom('');
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
@@ -47,17 +59,35 @@ function BasicsStep({ register, errors, rooms }: BasicsStepProps) {
       </label>
       <label className="flex flex-col gap-1">
         <span className="font-medium">Room</span>
-        <select
-          {...register('roomId')}
-          className={`border rounded p-2 ${errors.roomId ? 'border-red-500' : ''}`}
-        >
-          <option value="">Select a room</option>
-          {rooms.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name}
-            </option>
-          ))}
-        </select>
+        {rooms.length > 0 ? (
+          <select
+            {...register('roomId')}
+            className={`border rounded p-2 ${errors.roomId ? 'border-red-500' : ''}`}
+            disabled={rooms.length === 0}
+          >
+            <option value="">Select a room</option>
+            {rooms.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <form onSubmit={handleAdd} className="flex gap-2">
+            <input
+              className="border rounded p-2 flex-1"
+              placeholder="Add room"
+              value={newRoom}
+              onChange={(e) => setNewRoom(e.target.value)}
+            />
+            <button type="submit" className="btn">
+              Save
+            </button>
+          </form>
+        )}
+        {roomsError && (
+          <p className="text-sm text-red-600">{roomsError}</p>
+        )}
         {errors.roomId && (
           <p className="text-sm text-red-600">{errors.roomId.message}</p>
         )}
@@ -202,6 +232,7 @@ export default function AddPlantForm({
     handleSubmit,
     formState: { errors },
     trigger,
+    setValue,
   } = useForm<AddPlantFormData>({
     resolver: zodResolver(formSchema),
     defaultValues:
@@ -220,17 +251,55 @@ export default function AddPlantForm({
   });
   const [step, setStep] = useState(0);
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [roomsError, setRoomsError] = useState<string | null>(null);
 
   useEffect(() => {
-    getRooms().then(setRooms).catch((e) => {
-      console.error('Failed to load rooms', e);
-    });
+    getRooms()
+      .then((data) => {
+        setRooms(data);
+        setRoomsError(null);
+      })
+      .catch((e) => {
+        console.error('Failed to load rooms', e);
+        setRoomsError('Failed to load rooms');
+      });
   }, []);
+
+  const addRoom = async (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    try {
+      const res = await fetch('/api/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmed }),
+      });
+      if (res.ok) {
+        const json: Room = await res.json();
+        setRooms((r) => [...r, json]);
+        setValue('roomId', json.id);
+        setRoomsError(null);
+      } else {
+        setRoomsError('Failed to add room');
+      }
+    } catch (e) {
+      console.error('Failed to add room', e);
+      setRoomsError('Failed to add room');
+    }
+  };
 
   const steps = [
     {
       title: 'Basics',
-      component: <BasicsStep register={register} errors={errors} rooms={rooms} />,
+      component: (
+        <BasicsStep
+          register={register}
+          errors={errors}
+          rooms={rooms}
+          onAddRoom={addRoom}
+          roomsError={roomsError}
+        />
+      ),
     },
     {
       title: 'Environment',
@@ -301,7 +370,12 @@ export default function AddPlantForm({
           </button>
         )}
         {step < steps.length - 1 && (
-          <button type="button" onClick={next} className="btn btn-primary">
+          <button
+            type="button"
+            onClick={next}
+            className="btn btn-primary"
+            disabled={step === 0 && rooms.length === 0}
+          >
             Next
           </button>
         )}

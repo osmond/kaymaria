@@ -164,4 +164,29 @@ describe('AddPlantForm', () => {
       screen.getByRole('heading', { name: /basics/i })
     ).toBeInTheDocument();
   });
+
+  it('disables next when no rooms and allows adding one', async () => {
+    const user = userEvent.setup();
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => [] })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: 'office', name: 'Office' }),
+      });
+    global.fetch = fetchMock as any;
+
+    render(<AddPlantForm onSubmit={jest.fn()} />);
+
+    await screen.findByPlaceholderText(/add room/i);
+    const nextButton = screen.getByRole('button', { name: /next/i });
+    expect(nextButton).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/name/i), 'Cactus');
+    await user.type(screen.getByPlaceholderText(/add room/i), 'Office');
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    await screen.findByRole('option', { name: 'Office' });
+    expect(screen.getByRole('button', { name: /next/i })).not.toBeDisabled();
+  });
 });
