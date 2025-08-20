@@ -45,7 +45,7 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
  - [x] `/app/plants` (All Plants / Rooms)
 - [x] `/app/today` (Daily Task View)
 - [x] `/app/timeline` (Plant History)
-- [ ] `/app/insights` (Analytics)
+- [x] `/app/insights` (Analytics)
 - [ ] `/app/settings` (App Preferences)
 
 For **each page**, ensure:

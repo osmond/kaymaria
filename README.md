@@ -18,6 +18,8 @@ The Today page lists all care tasks due today, grouped by plant with filters for
 
 The Timeline page shows recent care events with filters for plant and event type, supports infinite scroll, and displays skeleton placeholders while loading.
 
+The Insights page charts completed tasks, overdue tasks, and newly added plants over a selectable date range to highlight recent activity.
+
 The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically, shows skeleton cards while plant data loads, and displays a friendly empty state when you haven't added any plants yet.
 
 Authenticated sessions also use a Supabase-backed `/api/sync` endpoint to persist and fetch user data across devices.
@@ -72,7 +74,7 @@ After pulling new changes:
 ## Testing
 - Unit tests: `npm test`
 - Manual scenarios live in [docs/manual-test-cases.md](./docs/manual-test-cases.md)
-- End-to-end tests: `npm run test:e2e` (starts the Next.js dev server and runs Playwright smoke tests, including the Add Plant, Plant Detail, and Timeline pages)
+- End-to-end tests: `npm run test:e2e` (starts the Next.js dev server and runs Playwright smoke tests, including the Add Plant, Plant Detail, Timeline, and Insights pages)
 
 ## Project Structure
 ```
