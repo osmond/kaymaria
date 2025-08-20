@@ -49,7 +49,7 @@ describe('NewPlantPage', () => {
       name: 'Fern',
       roomId: 'living',
       light: 'medium',
-      waterInterval: '5',
+      waterInterval: 5,
     });
 
     expect(fetch).toHaveBeenCalledWith('/api/plants', {

@@ -23,9 +23,7 @@ export default function EditPlantPage({
         name: data.name,
         roomId: data.roomId,
         lightLevel: data.light,
-        plan: [
-          { type: 'water', intervalDays: Number(data.waterInterval) || 7 },
-        ],
+        plan: [{ type: 'water', intervalDays: data.waterInterval || 7 }],
       }),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -47,8 +45,8 @@ export default function EditPlantPage({
             light: (plant.lightLevel || 'medium').toLowerCase(),
             waterInterval:
               plant.waterIntervalDays !== undefined && plant.waterIntervalDays !== null
-                ? String(plant.waterIntervalDays)
-                : '7',
+                ? plant.waterIntervalDays
+                : 7,
           }}
           submitLabel="Save"
           onSubmit={handleSubmit}

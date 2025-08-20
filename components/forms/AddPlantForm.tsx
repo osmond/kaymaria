@@ -7,7 +7,7 @@ export type AddPlantFormData = {
   name: string;
   roomId: string;
   light: string;
-  waterInterval: string;
+  waterInterval: number;
 };
 
 function BasicsStep({ register }: { register: UseFormRegister<AddPlantFormData> }) {
@@ -51,7 +51,7 @@ function CareStep({ register }: { register: UseFormRegister<AddPlantFormData> })
         <span className="font-medium">Water every (days)</span>
         <input
           type="number"
-          {...register('waterInterval')}
+          {...register('waterInterval', { valueAsNumber: true })}
           className="border rounded p-2"
           min={1}
         />
@@ -77,7 +77,7 @@ export default function AddPlantForm({
         name: '',
         roomId: '',
         light: 'medium',
-        waterInterval: '7',
+        waterInterval: 7,
       },
   });
   const [step, setStep] = useState(0);
