@@ -6,11 +6,15 @@ import '@testing-library/jest-dom';
 import InsightsView from '../InsightsView';
 
 let lineProps: any;
+let mockTheme = 'light';
 jest.mock('react-chartjs-2', () => ({
   Line: (props: any) => {
     lineProps = props;
     return null;
   },
+}));
+jest.mock('next-themes', () => ({
+  useTheme: () => ({ theme: mockTheme }),
 }));
 
 describe('InsightsView', () => {
@@ -18,6 +22,10 @@ describe('InsightsView', () => {
     jest.useFakeTimers().setSystemTime(new Date('2024-05-03'));
     lineProps = null;
     global.fetch = jest.fn();
+    document.documentElement.style.setProperty('--primary', '221 83% 53%');
+    document.documentElement.style.setProperty('--destructive', '0 84% 48%');
+    document.documentElement.style.setProperty('--success', '142 72% 30%');
+    mockTheme = 'light';
   });
 
   afterEach(() => {
@@ -102,6 +110,54 @@ describe('InsightsView', () => {
 
     await waitFor(() =>
       expect(screen.queryByTestId('insights-skeleton')).not.toBeInTheDocument()
+    );
+  });
+
+  it('uses theme tokens for dataset colors', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([]),
+    });
+
+    document.documentElement.style.setProperty('--primary', '10 10% 50%');
+    document.documentElement.style.setProperty('--destructive', '20 20% 60%');
+    document.documentElement.style.setProperty('--success', '30 30% 70%');
+    mockTheme = 'light';
+    const { rerender } = render(<InsightsView />);
+
+    await waitFor(() => expect(lineProps).not.toBeNull());
+    expect(lineProps.data.datasets[0].borderColor).toBe('hsl(10 10% 50%)');
+    expect(lineProps.data.datasets[0].backgroundColor).toBe(
+      'hsl(10 10% 50% / 0.5)'
+    );
+    expect(lineProps.data.datasets[1].borderColor).toBe('hsl(20 20% 60%)');
+    expect(lineProps.data.datasets[1].backgroundColor).toBe(
+      'hsl(20 20% 60% / 0.5)'
+    );
+    expect(lineProps.data.datasets[2].borderColor).toBe('hsl(30 30% 70%)');
+    expect(lineProps.data.datasets[2].backgroundColor).toBe(
+      'hsl(30 30% 70% / 0.5)'
+    );
+
+    lineProps = null;
+    document.documentElement.style.setProperty('--primary', '40 40% 40%');
+    document.documentElement.style.setProperty('--destructive', '50 50% 50%');
+    document.documentElement.style.setProperty('--success', '60 60% 60%');
+    mockTheme = 'dark';
+    rerender(<InsightsView />);
+
+    await waitFor(() => expect(lineProps).not.toBeNull());
+    expect(lineProps.data.datasets[0].borderColor).toBe('hsl(40 40% 40%)');
+    expect(lineProps.data.datasets[0].backgroundColor).toBe(
+      'hsl(40 40% 40% / 0.5)'
+    );
+    expect(lineProps.data.datasets[1].borderColor).toBe('hsl(50 50% 50%)');
+    expect(lineProps.data.datasets[1].backgroundColor).toBe(
+      'hsl(50 50% 50% / 0.5)'
+    );
+    expect(lineProps.data.datasets[2].borderColor).toBe('hsl(60 60% 60%)');
+    expect(lineProps.data.datasets[2].backgroundColor).toBe(
+      'hsl(60 60% 60% / 0.5)'
     );
   });
 });
