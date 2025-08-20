@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import InsightsSkeleton from "./InsightsSkeleton";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -89,12 +92,12 @@ export default function InsightsView() {
   return (
     <>
       <section className="mt-4 space-y-6">
-        <h2 className="text-sm font-display font-medium text-neutral-600">Insights</h2>
+        <h2 className="text-sm font-display font-medium text-foreground">Insights</h2>
 
         {err && (
-          <div className="rounded-2xl border bg-white shadow-card p-4 text-sm text-red-600">
+          <Card className="p-4 text-sm text-destructive">
             {err}
-          </div>
+          </Card>
         )}
 
         {!data && !err && <InsightsSkeleton />}
@@ -102,40 +105,52 @@ export default function InsightsView() {
         {data && (
           <>
             <div className="flex gap-2">
-              <label className="text-sm">
+              <Label className="flex items-center gap-1">
                 Start:
-                <input
+                <Input
                   type="date"
                   value={start}
                   onChange={(e) => setStart(e.target.value)}
-                  className="ml-1 rounded border px-1"
+                  className="w-auto"
                 />
-              </label>
-              <label className="text-sm">
+              </Label>
+              <Label className="flex items-center gap-1">
                 End:
-                <input
+                <Input
                   type="date"
                   value={end}
                   onChange={(e) => setEnd(e.target.value)}
-                  className="ml-1 rounded border px-1"
+                  className="w-auto"
                 />
-              </label>
+              </Label>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-2xl border bg-white shadow-card p-4 text-center">
-                <div className="text-sm text-neutral-500">Completed Tasks</div>
-                <div className="text-2xl font-bold">{totalCompletedTasks}</div>
-              </div>
-              <div className="rounded-2xl border bg-white shadow-card p-4 text-center">
-                <div className="text-sm text-neutral-500">Overdue Tasks</div>
-                <div className="text-2xl font-bold">{totalOverdueTasks}</div>
-              </div>
-              <div className="rounded-2xl border bg-white shadow-card p-4 text-center">
-                <div className="text-sm text-neutral-500">New Plants</div>
-                <div className="text-2xl font-bold">{totalNewPlants}</div>
-              </div>
+              <Card className="text-center">
+                <CardHeader className="space-y-1">
+                  <CardDescription>Completed Tasks</CardDescription>
+                  <CardTitle className="text-2xl font-bold">
+                    {totalCompletedTasks}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card className="text-center">
+                <CardHeader className="space-y-1">
+                  <CardDescription>Overdue Tasks</CardDescription>
+                  <CardTitle className="text-2xl font-bold">
+                    {totalOverdueTasks}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              <Card className="text-center">
+                <CardHeader className="space-y-1">
+                  <CardDescription>New Plants</CardDescription>
+                  <CardTitle className="text-2xl font-bold">
+                    {totalNewPlants}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
             </div>
-            <div className="rounded-2xl border bg-white shadow-card p-4">
+            <Card className="p-4">
               <div className="h-48">
                 <Line
                   data={chartData}
@@ -145,7 +160,7 @@ export default function InsightsView() {
                   }}
                 />
               </div>
-            </div>
+            </Card>
           </>
         )}
       </section>
