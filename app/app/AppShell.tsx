@@ -147,7 +147,7 @@ export function TodayView() {
     message: string;
     action?: { label: string; onClick: () => void };
   }>({ visible: false, message: "" });
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timer = useRef<number | null>(null);
 
   // data
   const [tasks, setTasks] = useState<TaskDTO[]>([]);

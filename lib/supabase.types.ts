@@ -57,6 +57,7 @@ export interface Database {
           plant_id: string;
           type: string;
           due_at: string;
+          last_done_at: string | null;
           created_at: string | null;
         };
         Insert: {
@@ -65,11 +66,13 @@ export interface Database {
           plant_id: string;
           type: string;
           due_at: string;
+          last_done_at?: string | null;
           created_at?: string | null;
         };
         Update: {
           type?: string;
           due_at?: string;
+          last_done_at?: string | null;
           created_at?: string | null;
         };
         Relationships: [

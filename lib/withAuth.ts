@@ -8,7 +8,7 @@ import type { Database } from "./supabase.types";
 type Handler<T> = (
   supabase: SupabaseClient<Database>,
   userId: string,
-) => Promise<T>;
+) => Promise<NextResponse<T> | NextResponse<{ error: string }>>;
 
 /**
  * Helper to reduce repeated Supabase client and auth boilerplate in route handlers.
@@ -17,7 +17,7 @@ type Handler<T> = (
  * misconfigured, an appropriate JSON response is returned instead.
  */
 export async function withAuth<T>(
-  handler: Handler<NextResponse<T>>,
+  handler: Handler<T>,
 ): Promise<NextResponse<T | { error: string }>> {
   const supabase = await createRouteHandlerClient();
   const userRes = await getUserId(supabase);

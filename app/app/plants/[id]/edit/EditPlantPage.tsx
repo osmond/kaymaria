@@ -4,7 +4,22 @@ import { useRouter } from 'next/navigation';
 import PlantForm, { PlantFormSubmit } from '@/components/PlantForm';
 import type { Plant } from '@prisma/client';
 
-export default function EditPlantPage({ plant }: { plant: Plant }) {
+type PlantExtras = {
+  latitude?: number | null;
+  longitude?: number | null;
+  waterIntervalDays?: number | null;
+  waterAmountMl?: number | null;
+  fertilizeIntervalDays?: number | null;
+  fertilizeFormula?: string | null;
+  lastWateredAt?: string | Date | null;
+  lastFertilizedAt?: string | Date | null;
+};
+
+export default function EditPlantPage({
+  plant,
+}: {
+  plant: Plant & PlantExtras;
+}) {
   const router = useRouter();
 
   async function handleSubmit(data: PlantFormSubmit) {
@@ -33,10 +48,11 @@ export default function EditPlantPage({ plant }: { plant: Plant }) {
             pot: plant.potSize || '6 in',
             potHeight: plant.potSize || '6 in',
             potMaterial: plant.potMaterial || 'Plastic',
-            light: plant.lightLevel || plant.light || 'Medium',
+            light: plant.lightLevel || 'Medium',
             indoor: plant.indoor ? 'Indoor' : 'Outdoor',
-            drainage: plant.drainage || 'ok',
+            drainage: (plant.drainage as 'poor' | 'ok' | 'great' | null) ?? 'ok',
             soil: plant.soilType || '',
+            humidity: '',
             lat: plant.latitude !== undefined ? String(plant.latitude) : '',
             lon: plant.longitude !== undefined ? String(plant.longitude) : '',
             waterEvery: plant.waterIntervalDays !== undefined ? String(plant.waterIntervalDays) : '7',

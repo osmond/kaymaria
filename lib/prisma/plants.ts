@@ -117,7 +117,7 @@ export async function deletePlant(id: string): Promise<boolean> {
 export async function getComputedWaterInfo(plant: Plant) {
   const task = await prisma.task.findFirst({
     where: { plantId: plant.id, type: "water" },
-    orderBy: { dueDate: "asc" },
+    orderBy: { dueAt: "asc" },
   });
   if (!task) {
     return {
@@ -133,7 +133,7 @@ export async function getComputedWaterInfo(plant: Plant) {
       : plant.lastWateredAt
       ? plant.lastWateredAt.toISOString()
       : null,
-    nextDue: task.dueDate.toISOString(),
+    nextDue: task.dueAt.toISOString(),
   };
 }
 
