@@ -3,7 +3,7 @@
 import Link from "next/link";
  import { useEffect, useMemo, useState, useRef } from "react";
  import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Droplet, FlaskConical, Sprout, MoreVertical } from "lucide-react";
+import { ArrowLeft, Droplet, FlaskConical, Sprout, MoreVertical, Pencil } from "lucide-react";
 import BottomNav from '@/components/BottomNav';
 import CareSummary from '@/components/CareSummary';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';

@@ -159,7 +159,9 @@ export function ChipSelect({
       {options.map((opt, i) => (
         <button
           key={opt}
-          ref={(el) => (refs.current[i] = el!)}
+          ref={(el) => {
+            refs.current[i] = el!;
+          }}
           type="button"
           role="radio"
           aria-checked={value === opt}

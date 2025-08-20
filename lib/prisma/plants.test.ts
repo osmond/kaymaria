@@ -13,7 +13,7 @@ describe('getComputedWaterInfo', () => {
 
   it('returns next due and last done from task', async () => {
     mTask.findFirst.mockResolvedValue({
-      dueDate: new Date('2024-05-10T00:00:00Z'),
+      dueAt: new Date('2024-05-10T00:00:00Z'),
       lastDoneAt: new Date('2024-05-01T00:00:00Z'),
     });
     const res = await getComputedWaterInfo({ id: 'p1' } as any);
@@ -23,7 +23,7 @@ describe('getComputedWaterInfo', () => {
     });
     expect(mTask.findFirst).toHaveBeenCalledWith({
       where: { plantId: 'p1', type: 'water' },
-      orderBy: { dueDate: 'asc' },
+      orderBy: { dueAt: 'asc' },
     });
   });
 
