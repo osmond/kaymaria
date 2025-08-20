@@ -10,9 +10,11 @@ let supabase: SupabaseClient<Database>;
 if (singleUserMode) {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceKey) {
-    throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
+    console.warn(
+      "SINGLE_USER_MODE enabled without SUPABASE_SERVICE_ROLE_KEY; falling back to anon key with limited capabilities.",
+    );
   }
-  supabase = createClient<Database>(url, serviceKey, {
+  supabase = createClient<Database>(url, serviceKey ?? anonKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
