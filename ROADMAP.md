@@ -53,7 +53,7 @@ For **each page**, ensure:
   - [x] Typography uses only approved fonts and scales
   - [x] Buttons, labels, and states align with design tokens
   - [x] Responsive layout verified
-  - [ ] Regressions checked
+  - [x] Regressions checked
 
 ---
 
