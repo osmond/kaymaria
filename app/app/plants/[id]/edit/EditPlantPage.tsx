@@ -21,8 +21,14 @@ export default function EditPlantPage({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: data.name,
+        species: data.species,
         roomId: data.roomId,
+        potSize: data.potSize,
+        potMaterial: data.potMaterial,
+        soilType: data.soilType,
         lightLevel: data.light,
+        indoor: data.indoor,
+        drainage: data.drainage,
         lat: data.lat,
         lon: data.lon,
         lastWateredAt: data.lastWatered
@@ -37,7 +43,11 @@ export default function EditPlantPage({
             intervalDays: data.waterEvery || 7,
             amountMl: data.waterAmount,
           },
-          { type: 'fertilize', intervalDays: data.fertEvery || 30 },
+          {
+            type: 'fertilize',
+            intervalDays: data.fertEvery || 30,
+            formula: data.fertFormula,
+          },
         ],
       }),
     });
@@ -56,19 +66,26 @@ export default function EditPlantPage({
         <AddPlantForm
           initialValues={{
             name: plant.name,
+            species: plant.species || '',
             roomId: plant.roomId || '',
             light: (plant.lightLevel || 'medium').toLowerCase(),
+            indoor: plant.indoor ?? true,
+            lat: plant.latitude ?? undefined,
+            lon: plant.longitude ?? undefined,
+            potSize: plant.potSize || '',
+            potMaterial: plant.potMaterial || '',
+            soilType: plant.soilType || '',
+            drainage: (plant.drainage as any) || undefined,
             waterEvery: plant.waterIntervalDays ?? 7,
             waterAmount: 250,
             fertEvery: 30,
+            fertFormula: '',
             lastWatered: plant.lastWateredAt
               ? plant.lastWateredAt.toISOString().slice(0, 10)
               : '',
             lastFertilized: plant.lastFertilizedAt
               ? plant.lastFertilizedAt.toISOString().slice(0, 10)
               : '',
-            lat: plant.latitude ?? undefined,
-            lon: plant.longitude ?? undefined,
           }}
           submitLabel="Save"
           onSubmit={handleSubmit}
