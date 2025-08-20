@@ -850,21 +850,37 @@ export function SettingsView() {
         a.click();
         URL.revokeObjectURL(url);
       } else {
-        const rows = (plants || []).map((p: any) => {
-          const water = (p.carePlan || []).find((r: any) => r.type === "water") || {};
-          const fert = (p.carePlan || []).find((r: any) => r.type === "fertilize") || {};
-          return {
-            name: p.name ?? "",
-            roomId: p.roomId ?? "",
-            lat: p.latitude ?? "",
-            lon: p.longitude ?? "",
-            lastWatered: p.lastWateredAt ?? "",
-            lastFertilized: p.lastFertilizedAt ?? "",
-            waterEvery: water.intervalDays ?? "",
-            waterAmount: water.amountMl ?? "",
-            fertEvery: fert.intervalDays ?? "",
-          };
-        });
+        interface PlantCsvRow {
+          name: string;
+          roomId: string;
+          lat: string;
+          lon: string;
+          lastWatered: string;
+          lastFertilized: string;
+          waterEvery: string | number;
+          waterAmount: string | number;
+          fertEvery: string | number;
+        }
+        const rows: PlantCsvRow[] = (plants || []).map(
+          (p: any): PlantCsvRow => {
+            const water =
+              (p.carePlan || []).find((r: any) => r.type === "water") || {};
+            const fert =
+              (p.carePlan || []).find((r: any) => r.type === "fertilize") ||
+              {};
+            return {
+              name: p.name ?? "",
+              roomId: p.roomId ?? "",
+              lat: p.latitude ?? "",
+              lon: p.longitude ?? "",
+              lastWatered: p.lastWateredAt ?? "",
+              lastFertilized: p.lastFertilizedAt ?? "",
+              waterEvery: water.intervalDays ?? "",
+              waterAmount: water.amountMl ?? "",
+              fertEvery: fert.intervalDays ?? "",
+            };
+          },
+        );
         const header = [
           "name",
           "roomId",
@@ -878,9 +894,9 @@ export function SettingsView() {
         ];
         const csv = [
           header.join(","),
-          ...rows.map((r) =>
+          ...rows.map((r: PlantCsvRow) =>
             header
-              .map((key) => String((r as any)[key] ?? ""))
+              .map((key) => String(r[key as keyof PlantCsvRow] ?? ""))
               .map((v) => `"${v.replace(/"/g, '""')}"`)
               .join(","),
           ),
