@@ -26,6 +26,14 @@ describe('plantValuesToSubmit', () => {
     expect(result.createTasks).toBe(true);
   });
 
+  it('builds a default plan', () => {
+    const result = plantValuesToSubmit(base);
+    expect(result.plan).toEqual([
+      { type: 'water', intervalDays: 7, amountMl: 500 },
+      { type: 'fertilize', intervalDays: 30, formula: '10-10-10' },
+    ]);
+  });
+
   it('parses valid coordinates', () => {
     const result = plantValuesToSubmit({ ...base, lat: '45', lon: '-120' });
     expect(result.lat).toBe(45);

@@ -792,7 +792,7 @@ export function SettingsView() {
       lastFertilizedAt: v.lastFertilized
         ? new Date(v.lastFertilized).toISOString()
         : undefined,
-      rules: [
+      plan: [
         {
           type: "water" as const,
           intervalDays: Number(v.waterEvery),

@@ -26,10 +26,10 @@ export async function PATCH(req: Request, { params }: Params) {
   try {
     const { id } = await params;
     const body = await req.json().catch(() => ({}));
-    const { rules, ...rest } = body;
+    const { plan, ...rest } = body;
     const updated = await updatePlant(id, {
       ...rest,
-      ...(rules ? { carePlan: rules } : {}),
+      ...(plan ? { carePlan: plan } : {}),
     });
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(updated);
