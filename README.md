@@ -24,6 +24,8 @@ The My Plants view listens to Supabase real-time updates so changes from other s
 
 Authenticated sessions also use a Supabase-backed `/api/sync` endpoint to persist and fetch user data across devices.
 
+The Settings page lets you export or import plant data, toggle the app theme, and sign out of your session.
+
 ## Quick Start
 Kay Maria is intended to run in single-user mode by default.
 
