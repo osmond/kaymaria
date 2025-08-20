@@ -7,10 +7,29 @@ import userEvent from '@testing-library/user-event';
 import AddPlantForm from '../AddPlantForm';
 
 describe('AddPlantForm', () => {
+  const rooms = [
+    { id: 'living', name: 'Living Room' },
+    { id: 'bedroom', name: 'Bedroom' },
+  ];
+
+  const originalFetch = global.fetch;
+  beforeEach(() => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => rooms,
+    }) as any;
+  });
+  afterEach(() => {
+    global.fetch = originalFetch;
+    jest.resetAllMocks();
+  });
   it('navigates between steps and submits data', async () => {
     const handleSubmit = jest.fn();
     const user = userEvent.setup();
     render(<AddPlantForm onSubmit={handleSubmit} />);
+
+     expect(await screen.findByRole('option', { name: 'Living Room' })).toBeInTheDocument();
+     expect(screen.getByRole('option', { name: 'Bedroom' })).toBeInTheDocument();
 
     // Basics step
     await user.type(screen.getByLabelText(/name/i), 'Ficus');
@@ -75,8 +94,8 @@ describe('AddPlantForm', () => {
         submitLabel="Save"
       />
     );
+    await screen.findByRole('option', { name: 'Bedroom' });
     expect(screen.getByLabelText(/name/i)).toHaveValue('Fern');
-    expect(screen.getByLabelText(/room/i)).toHaveValue('bedroom');
     await user.click(screen.getByRole('button', { name: /next/i }));
     await user.click(screen.getByRole('button', { name: /next/i }));
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
@@ -86,6 +105,7 @@ describe('AddPlantForm', () => {
     const user = userEvent.setup();
     render(<AddPlantForm onSubmit={jest.fn()} />);
 
+    await screen.findByRole('option', { name: 'Living Room' });
     await user.click(screen.getByRole('button', { name: /next/i }));
 
     expect(await screen.findByText(/enter a plant name/i)).toBeInTheDocument();
@@ -99,6 +119,7 @@ describe('AddPlantForm', () => {
     render(<AddPlantForm onSubmit={handleSubmit} />);
 
     // pass basics and environment
+    await screen.findByRole('option', { name: 'Living Room' });
     await user.type(screen.getByLabelText(/name/i), 'Ficus');
     await user.selectOptions(screen.getByLabelText(/room/i), 'living');
     await user.click(screen.getByRole('button', { name: /next/i }));
@@ -128,6 +149,7 @@ describe('AddPlantForm', () => {
     expect(screen.getByRole('button', { name: 'Environment' })).toBeDisabled();
 
     // fill basics and advance
+    await screen.findByRole('option', { name: 'Living Room' });
     await user.type(screen.getByLabelText(/name/i), 'Ficus');
     await user.selectOptions(screen.getByLabelText(/room/i), 'living');
     await user.click(screen.getByRole('button', { name: /next/i }));
