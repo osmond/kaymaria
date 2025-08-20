@@ -235,6 +235,12 @@ export default function AddPlantForm({
   };
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
+  const handleStepClick = (i: number) => {
+    if (i <= step) {
+      setStep(i);
+    }
+  };
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -242,6 +248,34 @@ export default function AddPlantForm({
       noValidate
       className="flex flex-col gap-6"
     >
+      <nav aria-label="Progress" className="text-sm">
+        <ol className="flex items-center gap-2">
+          {steps.map((s, i) => (
+            <li key={s.title} className="flex items-center">
+              <button
+                type="button"
+                onClick={() => handleStepClick(i)}
+                disabled={i > step}
+                aria-current={i === step ? 'step' : undefined}
+                className={
+                  i === step
+                    ? 'font-semibold'
+                    : i > step
+                    ? 'text-neutral-400 cursor-not-allowed'
+                    : ''
+                }
+              >
+                {s.title}
+              </button>
+              {i < steps.length - 1 && (
+                <span aria-hidden="true" className="mx-2">
+                  →
+                </span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
       <h2 className="text-xl font-medium">{steps[step].title}</h2>
       {steps[step].component}
       <div className="flex gap-2">
