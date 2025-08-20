@@ -18,6 +18,8 @@ The Today page lists all care tasks due today, grouped by plant with filters for
 
 The Timeline page shows recent care events with filters for plant and event type, supports infinite scroll, and displays skeleton placeholders while loading.
 
+The Insights page visualizes completed and overdue tasks and new plants over a selectable date range with summary cards and a line chart.
+
 The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically, shows skeleton cards while plant data loads, and displays a friendly empty state when you haven't added any plants yet.
 
 Authenticated sessions also use a Supabase-backed `/api/sync` endpoint to persist and fetch user data across devices.
