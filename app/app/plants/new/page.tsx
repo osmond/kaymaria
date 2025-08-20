@@ -15,7 +15,7 @@ export default function NewPlantPage() {
         roomId: data.roomId,
         lightLevel: data.light,
         plan: [
-          { type: 'water', intervalDays: Number(data.waterInterval) || 7 },
+          { type: 'water', intervalDays: data.waterInterval || 7 },
         ],
       }),
     });

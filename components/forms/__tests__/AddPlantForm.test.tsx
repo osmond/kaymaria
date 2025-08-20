@@ -32,7 +32,7 @@ describe('AddPlantForm', () => {
       name: 'Ficus',
       roomId: 'living',
       light: 'medium',
-      waterInterval: '5',
+      waterInterval: 5,
     });
   });
 
@@ -45,7 +45,7 @@ describe('AddPlantForm', () => {
           name: 'Fern',
           roomId: 'bedroom',
           light: 'low',
-          waterInterval: '10',
+          waterInterval: 10,
         }}
         submitLabel="Save"
       />
