@@ -1,8 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ChipSelect } from './ChipSelect';
@@ -19,7 +18,7 @@ describe('ChipSelect', () => {
     await user.keyboard('{ArrowRight}');
     const second = getByLabelText('B');
     expect(document.activeElement).toBe(second);
-    fireEvent.keyDown(second, { key: ' ' });
+    await user.keyboard('{Space}');
     expect(onChange).toHaveBeenCalledWith('B');
   });
 
