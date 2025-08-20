@@ -16,12 +16,11 @@ export async function getUserId(
   const singleUser = process.env.SINGLE_USER_MODE === 'true';
 
   if (singleUser) {
-    const userId = process.env.SINGLE_USER_ID;
+    let userId = process.env.SINGLE_USER_ID;
     if (!userId) {
-      console.error(
-        'SINGLE_USER_MODE enabled but SINGLE_USER_ID not set'
-      );
-      return { error: 'misconfigured' };
+      userId = randomUUID();
+      process.env.SINGLE_USER_ID = userId;
+      console.warn('SINGLE_USER_ID not set, generated temporary id');
     }
 
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
