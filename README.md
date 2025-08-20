@@ -76,7 +76,7 @@ After pulling new changes:
 ## Testing
 - Unit tests: `npm test`
 - Manual scenarios live in [docs/manual-test-cases.md](./docs/manual-test-cases.md)
-- End-to-end tests: `npm run test:e2e` (starts the Next.js dev server and runs Playwright smoke tests, including the Add Plant, Plant Detail, and Timeline pages)
+- End-to-end tests: `npm run test:e2e` (starts the Next.js dev server and runs Playwright smoke tests, including the Add Plant, Plant Detail, and Timeline pages). If browsers are missing, install them with `npx playwright install` first.
 
 ## Project Structure
 ```
