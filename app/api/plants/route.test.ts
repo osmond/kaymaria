@@ -265,17 +265,23 @@ describe('GET/POST /api/plants', () => {
     ]);
   });
 
-  it('returns 500 when SINGLE_USER_ID missing in single-user mode', async () => {
+  it('auto-generates user id in single-user mode', async () => {
     process.env.SINGLE_USER_MODE = 'true';
     delete process.env.SINGLE_USER_ID;
+
+    const newPlant = { id: 'p_new', name: 'Test' };
+    (createPlant as jest.Mock).mockResolvedValue(newPlant);
+
+    const mockSupabase: any = { auth: { getUser: jest.fn() } };
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
+
     const req = new Request('http://localhost/api/plants', {
       method: 'POST',
       body: JSON.stringify({ name: 'Test' }),
     });
     const res = await POST(req as any);
-    expect(res.status).toBe(500);
-    const json = await res.json();
-    expect(json).toEqual({ error: 'misconfigured server' });
-    expect(createRouteHandlerClient).toHaveBeenCalled();
+    expect(res.status).toBe(201);
+    await res.json();
+    expect(createPlant).toHaveBeenCalledWith(process.env.SINGLE_USER_ID, { name: 'Test' });
   });
 });

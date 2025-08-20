@@ -61,13 +61,20 @@ describe('GET/POST /api/rooms', () => {
     expect(mockFrom).toHaveBeenCalledWith('rooms');
   });
 
-  it('returns 500 when SINGLE_USER_ID missing in single-user mode', async () => {
+  it('auto-generates user id in single-user mode', async () => {
     process.env.SINGLE_USER_MODE = 'true';
     delete process.env.SINGLE_USER_ID;
+    const mockFrom = jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockResolvedValue({ data: [], error: null }),
+    });
+    const mockSupabase: any = { from: mockFrom, auth: {} };
+    (createRouteHandlerClient as jest.Mock).mockResolvedValue(mockSupabase);
     const res = await GET();
-    expect(res.status).toBe(500);
-    const json = await res.json();
-    expect(json).toEqual({ error: 'misconfigured server' });
-    expect(createRouteHandlerClient).toHaveBeenCalled();
+    expect(res.status).toBe(200);
+    await res.json();
+    expect(process.env.SINGLE_USER_ID).toBeDefined();
+    expect(mockFrom).toHaveBeenCalledWith('rooms');
   });
 });

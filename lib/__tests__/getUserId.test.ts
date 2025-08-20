@@ -19,12 +19,13 @@ describe("getUserId", () => {
     jest.clearAllMocks();
   });
 
-  it("returns misconfigured when SINGLE_USER_ID is missing", async () => {
+  it("generates id when SINGLE_USER_ID is missing", async () => {
     process.env.SINGLE_USER_MODE = "true";
     const supabase = mockSupabase();
 
     const res = await getUserId(supabase);
-    expect(res).toEqual({ error: "misconfigured" });
+    expect(res).toEqual({ userId: expect.any(String) });
+    expect(process.env.SINGLE_USER_ID).toBeDefined();
     expect(supabase.auth.getUser).not.toHaveBeenCalled();
   });
 
