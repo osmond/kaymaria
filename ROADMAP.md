@@ -49,7 +49,7 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
  - [x] `/app/settings` (App Preferences)
 
 For **each page**, ensure:
-  - [ ] Layout hierarchy matches visual system
+  - [x] Layout hierarchy matches visual system (Plants page)
   - [ ] Typography uses only approved fonts and scales
   - [ ] Buttons, labels, and states align with design tokens
   - [ ] Responsive layout verified
