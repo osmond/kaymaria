@@ -12,9 +12,9 @@
     --secondary-foreground: 222 47% 11%;
     --muted: 215 16% 47%;
     --border: 214 32% 91%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 48%;
     --destructive-foreground: 210 40% 98%;
-    --success: 142 72% 36%;
+    --success: 142 72% 30%;
     --success-foreground: 210 40% 98%;
     --warning: 45 100% 51%;
     --warning-foreground: 222 47% 11%;
@@ -28,9 +28,9 @@
     --secondary-foreground: 210 40% 96%;
     --muted: 215 16% 65%;
     --border: 217 16% 26%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 48%;
     --destructive-foreground: 210 40% 98%;
-    --success: 142 72% 36%;
+    --success: 142 72% 30%;
     --success-foreground: 210 40% 98%;
     --warning: 45 100% 51%;
     --warning-foreground: 210 40% 98%;
