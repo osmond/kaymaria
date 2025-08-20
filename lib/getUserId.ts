@@ -24,6 +24,11 @@ export async function getUserId(
       return { error: 'misconfigured' };
     }
 
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.warn('SUPABASE_SERVICE_ROLE_KEY not set, skipping single user verification');
+      return { userId };
+    }
+
     try {
       const { createSupabaseAdminClient } = await import('./supabaseAdmin');
       const admin = createSupabaseAdminClient();
