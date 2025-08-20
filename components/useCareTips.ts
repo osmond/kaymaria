@@ -1,14 +1,18 @@
 'use client';
 
 import { useMemo } from 'react';
-import { PlantFormValues } from './PlantForm';
 
 export type CareTipMap = {
   potMaterial?: string;
   light?: string;
 };
 
-export function useCareTips(values: PlantFormValues | null): CareTipMap {
+export type CareTipValues = {
+  potMaterial?: string;
+  light?: string;
+};
+
+export function useCareTips(values: CareTipValues | null): CareTipMap {
   return useMemo(() => {
     if (!values) return {};
     const tips: CareTipMap = {};

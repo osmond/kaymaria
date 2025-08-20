@@ -1,6 +1,11 @@
 'use client';
 
-import { PlantFormValues } from './PlantForm';
+export type PlanSummaryValues = {
+  lastWatered: string;
+  waterEvery: string;
+  lastFertilized: string;
+  fertEvery: string;
+};
 
 function computeUpcoming(last: string, every: string, count = 3): Date[] {
   const interval = Number(every);
@@ -13,7 +18,7 @@ function computeUpcoming(last: string, every: string, count = 3): Date[] {
   return arr;
 }
 
-export default function PlanSummary({ values }: { values: PlantFormValues }) {
+export default function PlanSummary({ values }: { values: PlanSummaryValues }) {
   const fmtDate = (d: Date) =>
     new Intl.DateTimeFormat(undefined, {
       month: 'short',
