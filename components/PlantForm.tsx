@@ -167,10 +167,10 @@ export function ChipSelect({
           aria-checked={value === opt}
           aria-label={opt}
           tabIndex={value === opt ? 0 : -1}
-          className={`min-w-11 min-h-11 px-3 py-2 rounded-full border text-sm flex items-center justify-center ${
+          className={`min-w-12 min-h-12 px-4 py-3 rounded-full border text-sm flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-neutral-900 dark:focus-visible:ring-neutral-100 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-800 ${
             value === opt
-              ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
-              : 'bg-white text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
+              ? 'bg-neutral-900 text-white border-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-100'
+              : 'bg-white text-neutral-900 border-neutral-300 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-600 dark:hover:bg-neutral-700'
           }`}
           onClick={() => onChange(opt)}
           onKeyDown={(e) => {
