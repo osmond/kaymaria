@@ -51,7 +51,7 @@ This roadmap outlines the next development milestones for the **Kay Maria** plan
 For **each page**, ensure:
   - [x] Layout hierarchy matches visual system (Plants page)
   - [x] Typography uses only approved fonts and scales
-  - [ ] Buttons, labels, and states align with design tokens
+  - [x] Buttons, labels, and states align with design tokens
   - [ ] Responsive layout verified
   - [ ] Regressions checked
 

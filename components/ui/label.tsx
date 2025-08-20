@@ -1,9 +1,13 @@
 "use client";
 import * as React from "react";
 
-export function Label({
-  className = "",
-  ...props
-}: React.LabelHTMLAttributes<HTMLLabelElement>) {
-  return <label className={`text-sm font-medium ${className}`} {...props} />;
+type Variant = "default" | "muted";
+
+export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  variant?: Variant;
+}
+
+export function Label({ className = "", variant = "default", ...props }: LabelProps) {
+  const color = variant === "muted" ? "text-muted" : "text-foreground";
+  return <label className={`text-sm font-medium ${color} ${className}`} {...props} />;
 }
