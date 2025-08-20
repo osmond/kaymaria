@@ -62,7 +62,7 @@ For **each page**, ensure:
 **This pass should include final QA against the [style guide](https://github.com/osmond/kaymaria/blob/main/docs/style-guide.md).**
 
 - [ ] Revisit and polish the following views:
-  - [ ] Plants page (`/app/plants`)
+  - [x] Plants page (`/app/plants`)
   - [ ] New Plant page (`/app/plants/new`)
   - [ ] Today page (`/app/today`)
   - [ ] Timeline page (`/app/timeline`)

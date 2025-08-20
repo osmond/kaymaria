@@ -66,7 +66,10 @@ export default function PlantsView() {
             {isLoading && !items && <PlantsSkeleton />}
 
             {sortedItems && sortedItems.length > 0 && (
-              <div className="grid grid-cols-2 gap-3">
+              <div
+                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                data-testid="plants-grid"
+              >
                 {sortedItems.map((p) => (
                   <Link key={p.id} href={`/app/plants/${p.id}`} className="text-left">
                     <Card className="overflow-hidden">

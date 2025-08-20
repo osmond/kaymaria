@@ -27,6 +27,18 @@ describe('PlantsView', () => {
     expect(screen.getByText('Fern')).toBeInTheDocument();
   });
 
+  it('uses a responsive grid layout', () => {
+    mockUsePlants.mockReturnValue({
+      plants: [{ id: '1', name: 'Fern', room: 'Living' }],
+      error: null,
+      isLoading: false,
+    });
+    render(<PlantsView />);
+    const grid = screen.getByTestId('plants-grid');
+    expect(grid).toHaveClass('grid-cols-1');
+    expect(grid).toHaveClass('sm:grid-cols-2');
+  });
+
   it('shows empty state when no plants', () => {
     mockUsePlants.mockReturnValue({ plants: [], error: null, isLoading: false });
     render(<PlantsView />);
