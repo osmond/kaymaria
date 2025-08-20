@@ -1,5 +1,9 @@
 import { getUserId } from "../getUserId";
 import type { SupabaseClient } from "@supabase/supabase-js";
+jest.mock("../supabaseAdmin", () => ({
+  createSupabaseAdminClient: jest.fn(),
+}));
+const { createSupabaseAdminClient } = require("../supabaseAdmin");
 
 describe("getUserId", () => {
   const mockSupabase = () => ({
@@ -26,9 +30,45 @@ describe("getUserId", () => {
     process.env.SINGLE_USER_MODE = "true";
     process.env.SINGLE_USER_ID = "abc123";
     const supabase = mockSupabase();
+    const admin = {
+      auth: {
+        admin: {
+          getUserById: jest
+            .fn()
+            .mockResolvedValue({ data: { user: { id: "abc123" } }, error: null }),
+          createUser: jest.fn(),
+        },
+      },
+    } as any;
+    (createSupabaseAdminClient as jest.Mock).mockReturnValue(admin);
 
     const res = await getUserId(supabase);
     expect(res).toEqual({ userId: "abc123" });
     expect(supabase.auth.getUser).not.toHaveBeenCalled();
+    expect(createSupabaseAdminClient).toHaveBeenCalled();
+    expect(admin.auth.admin.getUserById).toHaveBeenCalledWith("abc123");
+    expect(admin.auth.admin.createUser).not.toHaveBeenCalled();
+  });
+
+  it("creates user if SINGLE_USER_ID not found", async () => {
+    process.env.SINGLE_USER_MODE = "true";
+    process.env.SINGLE_USER_ID = "abc123";
+    const supabase = mockSupabase();
+    const admin = {
+      auth: {
+        admin: {
+          getUserById: jest
+            .fn()
+            .mockResolvedValue({ data: { user: null }, error: { message: "User not found" } }),
+          createUser: jest.fn().mockResolvedValue({ data: {}, error: null }),
+        },
+      },
+    } as any;
+    (createSupabaseAdminClient as jest.Mock).mockReturnValue(admin);
+
+    const res = await getUserId(supabase);
+    expect(res).toEqual({ userId: "abc123" });
+    expect(admin.auth.admin.getUserById).toHaveBeenCalledWith("abc123");
+    expect(admin.auth.admin.createUser).toHaveBeenCalled();
   });
 });
