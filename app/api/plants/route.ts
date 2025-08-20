@@ -8,9 +8,9 @@ import { z } from "zod";
 export async function GET(req: NextRequest) {
   try {
     return await withAuth(async (_supabase, userId) => {
-      const { searchParams } = new URL(req.url);
-      const name = searchParams.get("name") || undefined;
-      const roomId = searchParams.get("roomId") || undefined;
+      const url = (req as any).nextUrl ?? new URL(req.url, "http://localhost");
+      const name = url.searchParams.get("name") || undefined;
+      const roomId = url.searchParams.get("roomId") || undefined;
       const filter = name || roomId ? { name, roomId } : undefined;
       const plants = await listPlants(userId, filter);
       return NextResponse.json(plants);

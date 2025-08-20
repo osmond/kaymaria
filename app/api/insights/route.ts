@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@/lib/supabase";
 import { getUserId } from "@/lib/getUserId";
 
@@ -9,8 +9,8 @@ type InsightPoint = {
   overdueTaskCount: number;
 };
 
-export async function GET(req: Request) {
-  const url = new URL(req.url);
+export async function GET(req: NextRequest) {
+  const url = (req as any).nextUrl ?? new URL(req.url, "http://localhost");
   const startParam = url.searchParams.get("start");
   const endParam = url.searchParams.get("end");
 

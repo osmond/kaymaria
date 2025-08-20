@@ -3,8 +3,8 @@ import { SPECIES, SpeciesRecord } from '@/lib/species';
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const q = (searchParams.get('q') || '').trim();
+    const url = (req as any).nextUrl ?? new URL(req.url, 'http://localhost');
+    const q = (url.searchParams.get('q') || '').trim();
     if (!q) {
       return NextResponse.json([]);
     }
