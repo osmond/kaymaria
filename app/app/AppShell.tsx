@@ -1,10 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 import TaskRow from "@/components/TaskRow";
 import ThemeToggle from "@/components/ThemeToggle";
 import { TaskDTO } from "@/lib/types";
+import { plantFormSchema } from "@/lib/plantFormSchema";
 
 import { createSupabaseClient } from "@/lib/supabase";
 import { subscribeToTaskChanges } from "@/lib/realtime";
@@ -753,6 +761,78 @@ export function TimelineView() {
 export function SettingsView() {
   const supabase = useRef(createSupabaseClient());
   const singleUser = process.env.SINGLE_USER_MODE === "true";
+  const router = useRouter();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importMessage, setImportMessage] = useState<string | null>(null);
+
+  function parseCSV(text: string) {
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length === 0) return [];
+    const headers = lines[0].split(",").map((h) => h.trim());
+    return lines.slice(1).filter(Boolean).map((line) => {
+      const values = line.split(",").map((v) => v.trim());
+      const obj: Record<string, string> = {};
+      headers.forEach((h, i) => {
+        obj[h] = values[i] ?? "";
+      });
+      return obj;
+    });
+  }
+
+  function toApiBody(v: any) {
+    return {
+      name: v.name,
+      roomId: v.roomId,
+      lat: v.lat,
+      lon: v.lon,
+      lastWateredAt: v.lastWatered
+        ? new Date(v.lastWatered).toISOString()
+        : undefined,
+      lastFertilizedAt: v.lastFertilized
+        ? new Date(v.lastFertilized).toISOString()
+        : undefined,
+      rules: [
+        {
+          type: "water" as const,
+          intervalDays: Number(v.waterEvery),
+          amountMl: Number(v.waterAmount),
+        },
+        { type: "fertilize" as const, intervalDays: Number(v.fertEvery) },
+      ],
+      createTasks: true,
+    };
+  }
+
+  async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      let items: any[];
+      if (file.name.endsWith(".json")) items = JSON.parse(text);
+      else if (file.name.endsWith(".csv")) items = parseCSV(text);
+      else throw new Error("Unsupported file type");
+      if (!Array.isArray(items)) throw new Error("Invalid file format");
+      let success = 0;
+      for (const item of items) {
+        const parsed = plantFormSchema.safeParse(item);
+        if (!parsed.success) continue;
+        const res = await fetch("/api/plants", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(toApiBody(parsed.data)),
+        });
+        if (res.ok) success++;
+      }
+      setImportMessage(`Imported ${success} of ${items.length} plants`);
+      if (success > 0) router.refresh();
+    } catch (err: any) {
+      setImportMessage(`Import failed: ${err.message}`);
+    } finally {
+      e.target.value = "";
+    }
+  }
 
   async function handleSignOut() {
     await supabase.current.auth.signOut();
@@ -787,10 +867,26 @@ export function SettingsView() {
               <Button variant="secondary" size="sm">
                 Export CSV
               </Button>
-              <Button variant="default" size="sm">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 Import
               </Button>
+              <input
+                type="file"
+                accept=".json,.csv"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </CardContent>
+            {importMessage && (
+              <div className="px-6 pb-4 text-sm text-neutral-600 dark:text-neutral-300">
+                {importMessage}
+              </div>
+            )}
           </Card>
           <div className="rounded-2xl border bg-white shadow-card p-4 flex items-center justify-between dark:bg-neutral-800 dark:border-neutral-700">
             <div className="text-base font-medium">Theme</div>
