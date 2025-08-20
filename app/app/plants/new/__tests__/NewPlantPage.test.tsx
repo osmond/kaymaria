@@ -9,11 +9,9 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
 }));
 
-jest.mock('@/components/PlantForm', () => ({
+jest.mock('@/components/forms/AddPlantForm', () => ({
   __esModule: true,
-  default: ({ submitLabel }: any) => (
-    <form aria-label="plant-form">{submitLabel}</form>
-  ),
+  default: () => <form aria-label="plant-form" />,
 }));
 
 describe('NewPlantPage', () => {
@@ -25,3 +23,4 @@ describe('NewPlantPage', () => {
     expect(screen.getByLabelText('plant-form')).toBeInTheDocument();
   });
 });
+
