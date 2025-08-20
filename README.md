@@ -36,7 +36,7 @@ Kay Maria is intended to run in single-user mode by default.
 2. Create `.env` from `.env.example` and supply the mandatory values:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` *(required for automatic user provisioning; omit to provision users manually)*
    - `NEXT_PUBLIC_BASE_URL`
    - `DATABASE_URL`
    - `SINGLE_USER_MODE=true`
