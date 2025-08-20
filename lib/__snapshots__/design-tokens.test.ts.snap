@@ -2,20 +2,20 @@
 
 exports[`design tokens matches dark token snapshot 1`] = `
 {
-  "background": "#111827",
-  "foreground": "#F9F9F9",
+  "background": "#0F172A",
+  "foreground": "#F9FAFB",
   "muted": "#9CA3AF",
-  "primary": "#508C7E",
-  "secondary": "#1E483D",
+  "primary": "#3B82F6",
+  "secondary": "#1F2937",
 }
 `;
 
 exports[`design tokens matches light token snapshot 1`] = `
 {
-  "background": "#F9F9F9",
+  "background": "#FFFFFF",
   "foreground": "#111827",
-  "muted": "#9CA3AF",
-  "primary": "#508C7E",
-  "secondary": "#D3EDE6",
+  "muted": "#6B7280",
+  "primary": "#3B82F6",
+  "secondary": "#F1F5F9",
 }
 `;

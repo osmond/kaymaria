@@ -1,16 +1,16 @@
 export const lightTokens = {
-  primary: "#508C7E",
-  secondary: "#D3EDE6",
-  background: "#F9F9F9",
+  primary: "#3B82F6",
+  secondary: "#F1F5F9",
+  background: "#FFFFFF",
   foreground: "#111827",
-  muted: "#9CA3AF",
+  muted: "#6B7280",
 };
 
 export const darkTokens = {
-  primary: "#508C7E",
-  secondary: "#1E483D",
-  background: "#111827",
-  foreground: "#F9F9F9",
+  primary: "#3B82F6",
+  secondary: "#1F2937",
+  background: "#0F172A",
+  foreground: "#F9FAFB",
   muted: "#9CA3AF",
 };
 
