@@ -19,12 +19,25 @@ describe('AddPlantForm', () => {
 
     // Environment step
     await user.selectOptions(screen.getByLabelText(/light/i), 'medium');
+    await user.type(screen.getByLabelText(/latitude/i), '40.7');
+    await user.type(screen.getByLabelText(/longitude/i), '-74');
     await user.click(screen.getByRole('button', { name: /next/i }));
 
     // Care step
     const waterInput = screen.getByLabelText(/water every/i);
     await user.clear(waterInput);
     await user.type(waterInput, '5');
+    const waterAmountInput = screen.getByLabelText(/water amount/i);
+    await user.clear(waterAmountInput);
+    await user.type(waterAmountInput, '300');
+    const fertEveryInput = screen.getByLabelText(/fertilize every/i);
+    await user.clear(fertEveryInput);
+    await user.type(fertEveryInput, '60');
+    await user.type(screen.getByLabelText(/last watered/i), '2024-01-01');
+    await user.type(
+      screen.getByLabelText(/last fertilized/i),
+      '2024-02-01'
+    );
     await user.click(screen.getByRole('button', { name: /add plant/i }));
 
     expect(handleSubmit).toHaveBeenCalled();
@@ -33,6 +46,12 @@ describe('AddPlantForm', () => {
       roomId: 'living',
       light: 'medium',
       waterEvery: 5,
+      waterAmount: 300,
+      fertEvery: 60,
+      lastWatered: '2024-01-01',
+      lastFertilized: '2024-02-01',
+      lat: 40.7,
+      lon: -74,
     });
   });
 
@@ -46,6 +65,12 @@ describe('AddPlantForm', () => {
           roomId: 'bedroom',
           light: 'low',
           waterEvery: 10,
+          waterAmount: 250,
+          fertEvery: 30,
+          lastWatered: '',
+          lastFertilized: '',
+          lat: undefined,
+          lon: undefined,
         }}
         submitLabel="Save"
       />

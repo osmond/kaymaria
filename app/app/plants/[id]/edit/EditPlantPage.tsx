@@ -23,8 +23,21 @@ export default function EditPlantPage({
         name: data.name,
         roomId: data.roomId,
         lightLevel: data.light,
+        lat: data.lat,
+        lon: data.lon,
+        lastWateredAt: data.lastWatered
+          ? new Date(data.lastWatered).toISOString()
+          : undefined,
+        lastFertilizedAt: data.lastFertilized
+          ? new Date(data.lastFertilized).toISOString()
+          : undefined,
         plan: [
-          { type: 'water', intervalDays: data.waterEvery || 7 },
+          {
+            type: 'water',
+            intervalDays: data.waterEvery || 7,
+            amountMl: data.waterAmount,
+          },
+          { type: 'fertilize', intervalDays: data.fertEvery || 30 },
         ],
       }),
     });
@@ -46,6 +59,16 @@ export default function EditPlantPage({
             roomId: plant.roomId || '',
             light: (plant.lightLevel || 'medium').toLowerCase(),
             waterEvery: plant.waterIntervalDays ?? 7,
+            waterAmount: 250,
+            fertEvery: 30,
+            lastWatered: plant.lastWateredAt
+              ? plant.lastWateredAt.toISOString().slice(0, 10)
+              : '',
+            lastFertilized: plant.lastFertilizedAt
+              ? plant.lastFertilizedAt.toISOString().slice(0, 10)
+              : '',
+            lat: plant.latitude ?? undefined,
+            lon: plant.longitude ?? undefined,
           }}
           submitLabel="Save"
           onSubmit={handleSubmit}

@@ -56,11 +56,24 @@ describe('EditPlantPage', () => {
     await user.click(screen.getByRole('button', { name: /next/i }));
 
     await user.selectOptions(screen.getByLabelText(/light/i), 'low');
+    await user.type(screen.getByLabelText(/latitude/i), '10');
+    await user.type(screen.getByLabelText(/longitude/i), '20');
     await user.click(screen.getByRole('button', { name: /next/i }));
 
     const waterInput = screen.getByLabelText(/water every/i);
     await user.clear(waterInput);
     await user.type(waterInput, '10');
+    const waterAmount = screen.getByLabelText(/water amount/i);
+    await user.clear(waterAmount);
+    await user.type(waterAmount, '400');
+    const fertInput = screen.getByLabelText(/fertilize every/i);
+    await user.clear(fertInput);
+    await user.type(fertInput, '45');
+    await user.type(screen.getByLabelText(/last watered/i), '2024-03-01');
+    await user.type(
+      screen.getByLabelText(/last fertilized/i),
+      '2024-03-10'
+    );
     await user.click(screen.getByRole('button', { name: /save/i }));
 
     expect(fetch).toHaveBeenCalledWith('/api/plants/1', {
@@ -70,7 +83,14 @@ describe('EditPlantPage', () => {
         name: 'Snake Plant',
         roomId: 'bedroom',
         lightLevel: 'low',
-        plan: [{ type: 'water', intervalDays: 10 }],
+        lat: 10,
+        lon: 20,
+        lastWateredAt: '2024-03-01T00:00:00.000Z',
+        lastFertilizedAt: '2024-03-10T00:00:00.000Z',
+        plan: [
+          { type: 'water', intervalDays: 10, amountMl: 400 },
+          { type: 'fertilize', intervalDays: 45 },
+        ],
       }),
     });
     expect(push).toHaveBeenCalledWith('/app/plants/1');
