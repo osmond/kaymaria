@@ -17,7 +17,10 @@ describe('EditPlantPage', () => {
   beforeEach(() => {
     push.mockReset();
     refresh.mockReset();
-    (global.fetch as any) = jest.fn();
+    (global.fetch as any) = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [],
+    });
   });
 
   it('renders heading and form', () => {
@@ -43,10 +46,18 @@ describe('EditPlantPage', () => {
       lightLevel: 'medium',
       waterIntervalDays: 5,
     };
-    (fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: async () => ({}),
-    });
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => [
+          { id: 'living', name: 'Living Room' },
+          { id: 'bedroom', name: 'Bedroom' },
+        ],
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({}),
+      });
     const user = userEvent.setup();
     render(<EditPlantPage plant={plant} />);
 

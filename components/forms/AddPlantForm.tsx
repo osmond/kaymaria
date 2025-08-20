@@ -1,7 +1,8 @@
 'use client';
 
 import { useForm, type UseFormRegister } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getRooms, type Room } from '@/lib/rooms';
 
 export type AddPlantFormData = {
   name: string;
@@ -10,7 +11,13 @@ export type AddPlantFormData = {
   waterInterval: number;
 };
 
-function BasicsStep({ register }: { register: UseFormRegister<AddPlantFormData> }) {
+function BasicsStep({
+  register,
+  rooms,
+}: {
+  register: UseFormRegister<AddPlantFormData>;
+  rooms: Room[];
+}) {
   return (
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1">
@@ -21,8 +28,11 @@ function BasicsStep({ register }: { register: UseFormRegister<AddPlantFormData> 
         <span className="font-medium">Room</span>
         <select {...register('roomId')} className="border rounded p-2">
           <option value="">Select a room</option>
-          <option value="living">Living Room</option>
-          <option value="bedroom">Bedroom</option>
+          {rooms.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.name}
+            </option>
+          ))}
         </select>
       </label>
     </div>
@@ -71,7 +81,7 @@ export default function AddPlantForm({
   initialValues,
   submitLabel,
 }: AddPlantFormProps) {
-  const { register, handleSubmit } = useForm<AddPlantFormData>({
+  const { register, handleSubmit, setValue } = useForm<AddPlantFormData>({
     defaultValues:
       initialValues ?? {
         name: '',
@@ -81,9 +91,22 @@ export default function AddPlantForm({
       },
   });
   const [step, setStep] = useState(0);
+  const [rooms, setRooms] = useState<Room[]>([]);
+
+  useEffect(() => {
+    getRooms()
+      .then(setRooms)
+      .catch((e) => console.error('Failed to load rooms', e));
+  }, []);
+
+  useEffect(() => {
+    if (rooms.length && initialValues?.roomId) {
+      setValue('roomId', initialValues.roomId);
+    }
+  }, [rooms, initialValues?.roomId, setValue]);
 
   const steps = [
-    { title: 'Basics', component: <BasicsStep register={register} /> },
+    { title: 'Basics', component: <BasicsStep register={register} rooms={rooms} /> },
     { title: 'Environment', component: <EnvironmentStep register={register} /> },
     { title: 'Care', component: <CareStep register={register} /> },
   ];

@@ -6,6 +6,22 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AddPlantForm from '../AddPlantForm';
 
+const mockRooms = [
+  { id: 'living', name: 'Living Room' },
+  { id: 'bedroom', name: 'Bedroom' },
+];
+
+beforeEach(() => {
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve(mockRooms),
+  } as any);
+});
+
+afterEach(() => {
+  jest.resetAllMocks();
+});
+
 describe('AddPlantForm', () => {
   it('navigates between steps and submits data', async () => {
     const handleSubmit = jest.fn();
@@ -13,6 +29,7 @@ describe('AddPlantForm', () => {
     render(<AddPlantForm onSubmit={handleSubmit} />);
 
     // Basics step
+    await screen.findByRole('option', { name: 'Living Room' });
     await user.type(screen.getByLabelText(/name/i), 'Ficus');
     await user.selectOptions(screen.getByLabelText(/room/i), 'living');
     await user.click(screen.getByRole('button', { name: /next/i }));
@@ -50,10 +67,17 @@ describe('AddPlantForm', () => {
         submitLabel="Save"
       />
     );
+    await screen.findByRole('option', { name: 'Bedroom' });
     expect(screen.getByLabelText(/name/i)).toHaveValue('Fern');
     expect(screen.getByLabelText(/room/i)).toHaveValue('bedroom');
     await user.click(screen.getByRole('button', { name: /next/i }));
     await user.click(screen.getByRole('button', { name: /next/i }));
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
+  });
+
+  it('loads rooms from API', async () => {
+    render(<AddPlantForm onSubmit={jest.fn()} />);
+    expect(await screen.findByRole('option', { name: 'Living Room' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Bedroom' })).toBeInTheDocument();
   });
 });
