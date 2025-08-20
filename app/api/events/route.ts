@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   }
   const { userId } = userRes;
 
-  const url = new URL(req.url);
+  const url = (req as any).nextUrl ?? new URL(req.url, "http://localhost");
   const offset = Number(url.searchParams.get("offset") || 0);
   const limit = Number(url.searchParams.get("limit") || 50);
 

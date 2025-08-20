@@ -3,7 +3,7 @@ import { withAuth } from "@/lib/withAuth";
 
 export async function GET(req: NextRequest) {
   return withAuth(async (supabase, userId) => {
-    const url = new URL(req.url);
+    const url = (req as any).nextUrl ?? new URL(req.url, "http://localhost");
     const win = url.searchParams.get("window") || "7d";
     const days = Number(win.replace("d", "")) || 7;
     const maxDate = new Date();

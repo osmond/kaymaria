@@ -3,8 +3,8 @@ import { getCareDefaults } from '@/lib/species-care';
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const species = searchParams.get('species') || '';
+    const url = (req as any).nextUrl ?? new URL(req.url, 'http://localhost');
+    const species = url.searchParams.get('species') || '';
     const key = species.trim().toLowerCase();
     const defaults = await getCareDefaults(species);
     if (!defaults) {
