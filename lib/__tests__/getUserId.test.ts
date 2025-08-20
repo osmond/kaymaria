@@ -15,6 +15,8 @@ describe("getUserId", () => {
   afterEach(() => {
     delete process.env.SINGLE_USER_MODE;
     delete process.env.SINGLE_USER_ID;
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    jest.clearAllMocks();
   });
 
   it("returns misconfigured when SINGLE_USER_ID is missing", async () => {
@@ -29,6 +31,7 @@ describe("getUserId", () => {
   it("returns user id when SINGLE_USER_ID is set", async () => {
     process.env.SINGLE_USER_MODE = "true";
     process.env.SINGLE_USER_ID = "abc123";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "key";
     const supabase = mockSupabase();
     const admin = {
       auth: {
@@ -53,6 +56,7 @@ describe("getUserId", () => {
   it("creates user if SINGLE_USER_ID not found", async () => {
     process.env.SINGLE_USER_MODE = "true";
     process.env.SINGLE_USER_ID = "abc123";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "key";
     const supabase = mockSupabase();
     const admin = {
       auth: {
@@ -70,5 +74,19 @@ describe("getUserId", () => {
     expect(res).toEqual({ userId: "abc123" });
     expect(admin.auth.admin.getUserById).toHaveBeenCalledWith("abc123");
     expect(admin.auth.admin.createUser).toHaveBeenCalled();
+  });
+
+  it("skips admin verification when service role key missing", async () => {
+    process.env.SINGLE_USER_MODE = "true";
+    process.env.SINGLE_USER_ID = "abc123";
+    const supabase = mockSupabase();
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+    const res = await getUserId(supabase);
+    expect(res).toEqual({ userId: "abc123" });
+    expect(createSupabaseAdminClient).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledWith(
+      "SUPABASE_SERVICE_ROLE_KEY not set, skipping single user verification"
+    );
   });
 });
