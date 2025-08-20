@@ -20,7 +20,7 @@ The Timeline page shows recent care events with filters for plant and event type
 
 The Insights page visualizes completed and overdue tasks and new plants over a selectable date range with summary cards and a line chart.
 
-The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically, shows skeleton cards while plant data loads, and displays a friendly empty state when you haven't added any plants yet.
+The My Plants view listens to Supabase real-time updates so changes from other sessions appear automatically, shows skeleton cards while plant data loads, and displays a friendly empty state when you haven't added any plants yet. It now uses the shared page header so its layout hierarchy matches the visual system used across the app.
 
 Authenticated sessions also use a Supabase-backed `/api/sync` endpoint to persist and fetch user data across devices.
 
