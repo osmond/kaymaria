@@ -38,8 +38,7 @@ type BasicsStepProps = StepProps & {
 function BasicsStep({ register, errors, rooms, onAddRoom, roomsError }: BasicsStepProps) {
   const [newRoom, setNewRoom] = useState('');
 
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAdd = async () => {
     await onAddRoom(newRoom);
     setNewRoom('');
   };
@@ -73,17 +72,23 @@ function BasicsStep({ register, errors, rooms, onAddRoom, roomsError }: BasicsSt
             ))}
           </select>
         ) : (
-          <form onSubmit={handleAdd} className="flex gap-2">
+          <div className="flex gap-2">
             <input
               className="border rounded p-2 flex-1"
               placeholder="Add room"
               value={newRoom}
               onChange={(e) => setNewRoom(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAdd();
+                }
+              }}
             />
-            <button type="submit" className="btn">
+            <button type="button" onClick={handleAdd} className="btn">
               Save
             </button>
-          </form>
+          </div>
         )}
         {roomsError && (
           <p className="text-sm text-red-600">{roomsError}</p>
